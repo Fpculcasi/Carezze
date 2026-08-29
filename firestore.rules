@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: caller is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper: caller owns the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users collection — each user can read/write their own document
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Persons — owner or authorised members can read/write
+    // Full security rules to be implemented in M3 (task 3.4)
+    match /persons/{personId} {
+      allow read, write: if isAuthenticated();  // TODO(M3): restrict to owner + members
+    }
+
+    // Therapies
+    match /therapies/{therapyId} {
+      allow read, write: if isAuthenticated();  // TODO(M4): restrict to person members
+    }
+
+    // Medication logs
+    match /medicationLogs/{logId} {
+      allow read, write: if isAuthenticated();  // TODO(M4): restrict to therapy members
+    }
+
+    // Activity logs
+    match /activityLogs/{logId} {
+      allow read, write: if isAuthenticated();  // TODO(M5): restrict to person members
+    }
+
+    // Invitations
+    match /invitations/{invitationId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();  // TODO(M6): restrict creation to person owner
+    }
+
+    // Catch-all — deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

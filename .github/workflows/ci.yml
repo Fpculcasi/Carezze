@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Setup google-services.json
+        run: cp app/google-services.json.template app/google-services.json
+        # Real google-services.json is injected via secret in release pipeline
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Run unit tests
+        run: ./gradlew test
+
+      - name: Run lint
+        run: ./gradlew lint
+
+      - name: Run Detekt
+        run: ./gradlew detekt
+
+      - name: Run Ktlint
+        run: ./gradlew ktlintCheck
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-debug.html
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: app/build/reports/tests/

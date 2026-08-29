@@ -1,0 +1,98 @@
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+config:
+  validation: true
+  warningsAsErrors: false
+  checkExhaustiveness: false
+
+processors:
+  active: true
+  exclude:
+    - 'DetektProgressListener'
+
+console-reports:
+  active: true
+
+output-reports:
+  active: true
+
+comments:
+  active: true
+  AbsentOrWrongFileLicense:
+    active: false
+  UndocumentedPublicClass:
+    active: false
+  UndocumentedPublicFunction:
+    active: false
+  UndocumentedPublicProperty:
+    active: false
+
+complexity:
+  active: true
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 15
+  LongMethod:
+    active: true
+    threshold: 60
+  LongParameterList:
+    active: true
+    functionThreshold: 6
+    constructorThreshold: 7
+  TooManyFunctions:
+    active: true
+    thresholdInFiles: 11
+    thresholdInClasses: 11
+    thresholdInInterfaces: 11
+    thresholdInObjects: 11
+    thresholdInEnums: 11
+
+coroutines:
+  active: true
+
+empty-blocks:
+  active: true
+
+exceptions:
+  active: true
+
+naming:
+  active: true
+  FunctionNaming:
+    active: true
+    functionPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ignoreAnnotated:
+      - 'Composable'
+      - 'Preview'
+    excludes:
+      - '**/test/**'
+      - '**/*Test*'
+      - '**/androidTest/**'
+
+performance:
+  active: true
+
+potential-bugs:
+  active: true
+
+style:
+  active: true
+  MagicNumber:
+    active: true
+    excludes:
+      - '**/test/**'
+      - '**/*Test*'
+      - '**/androidTest/**'
+      - '**/*.kt'
+    ignoreNumbers:
+      - '-1'
+      - '0'
+      - '1'
+      - '2'
+  WildcardImport:
+    active: true
+    excludeImports:
+      - 'java.util.*'
+      - 'kotlinx.android.synthetic.*'

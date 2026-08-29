@@ -1,0 +1,30 @@
+# Android / Gradle
+*.iml
+.gradle
+/local.properties
+/build
+/captures
+.externalNativeBuild
+.cxx
+
+# Build artefacts
+*.apk
+*.aab
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE — IntelliJ / Android Studio
+/.idea/
+
+# AI / tooling
+.bemyagent/
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Firebase — never commit real config
+app/google-services.json
