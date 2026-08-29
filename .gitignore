@@ -18,10 +18,6 @@
 # IDE — IntelliJ / Android Studio
 /.idea/
 
-# AI / tooling
-.bemyagent/
-.claude/
-
 # OS
 .DS_Store
 Thumbs.db

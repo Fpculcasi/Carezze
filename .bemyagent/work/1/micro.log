@@ -1,0 +1,10 @@
+# Micro log — Milestone 1
+
+| Data | Task | Cambiamento | Verdetto | Evidenza |
+|---|---|---|---|---|
+| 2026-08-30 | 1.2 | `app/google-services.json.template` creato con struttura Firebase per `carezze-5a3b0` | PASS | `ls app/google-services.json.template` → file presente; `.gitignore` esclude `app/google-services.json` |
+| 2026-08-30 | 1.3 | Hilt 2.56.1, Room 2.7.1, Navigation Compose 2.9.0, WorkManager 2.10.1 in `libs.versions.toml` + `app/build.gradle.kts`; `@HiltAndroidApp` su `CareNestApplication.kt` | PASS | `./gradlew assembleDebug` → BUILD SUCCESSFUL; Hilt genera `DaggerCareNestApplication_HiltComponents` |
+| 2026-08-30 | 1.4 | `git init` → branch `main` creato; `.github/workflows/ci.yml` con build+lint+test+detekt+ktlint; branch `develop` da creare dopo commit | PASS | `git status` → repository inizializzato; `ls .github/workflows/ci.yml` → file presente |
+| 2026-08-30 | 1.5 | Detekt 1.23.8 + Ktlint 12.2.0 in root `build.gradle.kts`; `config/detekt/detekt.yml` con regole Compose; `.editorconfig` con Composable naming exception | PASS | `./gradlew detekt` → BUILD SUCCESSFUL; `./gradlew ktlintCheck` → BUILD SUCCESSFUL |
+| 2026-08-30 | 1.6 | `.gitkeep` in `data/`, `domain/`, `ui/auth/`, `ui/dashboard/`, `widget/` | PASS | `ls app/src/main/kotlin/com/carezze/app/{data,domain,ui,widget}/` → directory presenti |
+| 2026-08-30 | 1.7 | `firestore.rules` skeleton con helper functions + TODO per M3-M6; `firestore.indexes.json` con indici compositi per activityLogs, medicationLogs, therapies | PASS | `ls firestore.rules firestore.indexes.json` → file presenti |
