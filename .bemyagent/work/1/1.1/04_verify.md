@@ -20,12 +20,12 @@
 | `app/build.gradle.kts` | ✓ creato |
 | `app/src/main/AndroidManifest.xml` | ✓ creato |
 | `app/src/main/kotlin/com/carezze/app/MainActivity.kt` | ✓ creato |
-| `app/src/main/kotlin/com/carezze/app/CareNestApplication.kt` | ✓ creato (@HiltAndroidApp) |
+| `app/src/main/kotlin/com/carezze/app/CarezzeApplication.kt` | ✓ creato (@HiltAndroidApp) |
 | `app/src/main/kotlin/com/carezze/app/ui/theme/` | ✓ Theme.kt, Color.kt, Type.kt |
 | `app/src/main/res/` | ✓ strings.xml, themes.xml, backup_rules.xml, data_extraction_rules.xml |
 | `app/src/main/res/mipmap-anydpi-v26/` | ✓ ic_launcher.xml, ic_launcher_round.xml |
 | `app/src/main/res/drawable/` | ✓ ic_launcher_background.xml, ic_launcher_foreground.xml |
-| `app/src/main/kotlin/.../data/service/CareNestMessagingService.kt` | ✓ stub creato |
+| `app/src/main/kotlin/.../data/service/CarezzeMessagingService.kt` | ✓ stub creato |
 | `app/proguard-rules.pro` | ✓ creato |
 | `.gitignore` | ✓ creato |
 

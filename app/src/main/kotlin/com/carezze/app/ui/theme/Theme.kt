@@ -25,7 +25,7 @@ private val LightColorScheme =
     )
 
 @Composable
-fun CareNestTheme(
+fun CarezzeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit,

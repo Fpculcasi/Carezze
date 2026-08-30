@@ -1,0 +1,28 @@
+# EXECUTE — 2.1
+
+## 2026-08-30
+
+### Step 1 — Wrote domain layer
+Files: `domain/model/User.kt`, `domain/repository/AuthRepository.kt`, `domain/usecase/auth/*.kt` (3 files)
+Result: 5 files created, no compilation run yet (requires Android SDK)
+Next intended action: write data layer
+
+### Step 2 — Wrote data layer
+Files: `data/repository/AuthRepositoryImpl.kt`
+Result: 1 file created; implements all AuthRepository methods via `FirebaseAuth` + `kotlinx.coroutines.tasks.await`; `observeAuthState()` uses `callbackFlow` with `awaitClose` to prevent listener leak
+Next intended action: write DI module
+
+### Step 3 — Wrote DI module
+Files: `di/AuthModule.kt`
+Result: `@Module @InstallIn(SingletonComponent::class)` with `@Binds` for interface + `@Provides` for `FirebaseAuth.getInstance()`
+Next intended action: write AuthViewModel
+
+### Step 4 — Wrote AuthViewModel
+Files: `ui/auth/AuthViewModel.kt`
+Result: `@HiltViewModel`; `authState: StateFlow<AuthUiState>` derived from `observeAuthState()`; `continueLocally()` launches anonymous sign-in
+Next intended action: write unit tests
+
+### Step 5 — Wrote unit tests
+Files: `src/test/…/SignInAnonymouslyUseCaseTest.kt`, `src/test/…/ObserveAuthStateUseCaseTest.kt`
+Result: 4 test cases total; MockK mocks `AuthRepository` interface; Turbine used for Flow assertions
+Next intended action: verify (run tests + build check)

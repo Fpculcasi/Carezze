@@ -7,6 +7,7 @@
 | **Kotlin** | 2.x | Linguaggio principale | Null-safety, coroutines, sealed class per domain model |
 | **Jetpack Compose** | BOM 2025.x | UI declarativa | Unico toolkit ufficiale Google per nuovi progetti Android |
 | **Firebase Auth** | latest | Autenticazione | Email/password, Google Sign-In, Anonymous (locale) — tutti in un SDK |
+| **Credential Manager** | `1.3.0` | Google Sign-In moderno | `androidx.credentials` + `credentials-play-services-auth` + `googleid:1.1.1`; sostituisce il deprecato `GoogleSignInClient` |
 | **Cloud Firestore** | latest | Database real-time | Offline-first nativo, snapshot listeners, scalabilità orizzontale |
 | **Firebase Cloud Messaging** | latest | Push notifications | Integrato con Firebase, delivery garantito, supporto multi-device |
 | **Firebase Cloud Functions** | Node.js 20 | Logica server-side | Scheduling notifiche, validazione inviti atomica, no server da gestire |

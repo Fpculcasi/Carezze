@@ -1,0 +1,24 @@
+# EXECUTE — 2.2
+
+## 2026-08-30
+
+### Step 1 — Wrote navigation + screens
+Files: `ui/navigation/AppNavigation.kt`, `ui/auth/WelcomeScreen.kt`, `ui/dashboard/DashboardScreen.kt`
+Result: type-safe routes (`@Serializable` objects), NavHost with 4 destinations, WelcomeScreen with `LaunchedEffect` navigation guard
+Next intended action: update MainActivity
+
+### Step 2 — Updated MainActivity
+Change: replaced `Greeting` placeholder with `AppNavigation()`; removed unused imports
+Result: file edited; build needed to verify Hilt graph and compose compilation
+Next intended action: run assembleDebug
+
+### Step 3 — First build attempt
+Command: `./gradlew assembleDebug --no-daemon`
+Result: FAILURE — "Could not find class file for 'com.fpculcasi.carezze.CareNestApplication'"
+Root cause: stale `Hilt_CareNestApplication.java` in build/generated from M1; config cache prevented re-run of KSP
+Next intended action: clean and rebuild
+
+### Step 4 — Clean build
+Command: `./gradlew clean assembleDebug --no-daemon`
+Result: BUILD SUCCESSFUL in 1m 48s — Hilt regenerated with `Hilt_CarezzeApplication.java`
+Next intended action: write verify

@@ -31,17 +31,45 @@ Room, Navigation Compose, GitFlow structure, and GitHub Actions pipeline.
 
 ---
 
-## Milestone 2 — Auth & Onboarding
-**Goal**: Utente può usare l'app in locale (anonimo) o registrarsi, con migrazione dati garantita | **Status**: next
+## Milestone 1.5 — Firebase App Distribution CI/CD
+**Goal**: APK di release firmato distribuito automaticamente ai beta-tester su Firebase App Distribution ad ogni tag `v*.*.*-beta` via GitHub Actions | **Status**: next
 
 | Task | Descrizione | Status |
 |---|---|---|
-| 2.1 | Firebase Anonymous Auth + AuthViewModel + flusso locale | todo |
-| 2.2 | Schermata Welcome (locale vs registrati) | todo |
-| 2.3 | Registrazione email/password + `linkWithCredential()` migrazione | todo |
-| 2.4 | Google Sign-In | todo |
-| 2.5 | Gestione `users/{userId}` documento: creazione e update | todo |
-| 2.6 | Schermata Settings: lingua, unità temperatura, quiet hours | todo |
+| 1.5.1 | Firebase Console: abilita App Distribution, crea gruppo tester `beta-testers` | todo |
+| 1.5.2 | Google Cloud: Service Account con ruolo `Firebase App Distribution Admin` → JSON key → GitHub Secret `FIREBASE_SERVICE_ACCOUNT` | todo |
+| 1.5.3 | Keystore: genera con `keytool`, codifica Base64, configura `build.gradle.kts` signing config da env var, salva secrets GitHub (`KEYSTORE_BASE64`, `KEYSTORE_ALIAS`, `KEYSTORE_STORE_PASSWORD`, `KEYSTORE_KEY_PASSWORD`) | todo |
+| 1.5.4 | GitHub Actions workflow `firebase-distribute.yml`: trigger su tag `v*.*.*-beta`, build release APK firmato, release notes da `git log` dall'ultimo tag, upload su Firebase App Distribution → gruppo `beta-testers` | todo |
+
+**Scelte architetturali:**
+- Trigger: tag git `v*.*.*-beta` su qualsiasi branch
+- Variante: release APK firmato (R8 abilitato)
+- Auth Firebase: Service Account JSON (`FIREBASE_SERVICE_ACCOUNT` secret)
+- Tester: gruppo unico `beta-testers` in Firebase Console
+- Release notes: estratte automaticamente da `git log --pretty=format:"- %s" <prev-tag>..HEAD`
+- Keystore: creato ad-hoc, mai committato — solo in GitHub Secrets come Base64
+
+**Git commit message (proposta):**
+```
+feat: [M1.5] firebase app distribution — automated beta release on tag
+
+Release APK signed and uploaded to Firebase App Distribution on v*-beta tag.
+GitHub Actions handles signing, release notes from git log, and tester notification.
+```
+
+---
+
+## Milestone 2 — Auth & Onboarding
+**Goal**: Utente può usare l'app in locale (anonimo) o registrarsi, con migrazione dati garantita | **Status**: done
+
+| Task | Descrizione | Status |
+|---|---|---|
+| 2.1 | Firebase Anonymous Auth + AuthViewModel + flusso locale | done |
+| 2.2 | Schermata Welcome (locale vs registrati) | done |
+| 2.3 | Registrazione email/password + `linkWithCredential()` migrazione | done |
+| 2.4 | Google Sign-In | done |
+| 2.5 | Gestione `users/{userId}` documento: creazione e update | done |
+| 2.6 | Schermata Settings: lingua, unità temperatura, quiet hours | done |
 
 **Git commit message (proposta):**
 ```
@@ -54,7 +82,7 @@ Settings screen covers language, temperature unit, and quiet hours.
 ---
 
 ## Milestone 3 — Gestione Persone
-**Goal**: Utente può creare, visualizzare e modificare Profili Persona | **Status**: next
+**Goal**: Utente può creare, visualizzare e modificare Profili Persona | **Status**: next ← active
 
 | Task | Descrizione | Status |
 |---|---|---|

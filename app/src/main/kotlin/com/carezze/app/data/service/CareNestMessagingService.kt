@@ -3,7 +3,7 @@ package com.fpculcasi.carezze.data.service
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
-class CareNestMessagingService : FirebaseMessagingService() {
+class CarezzeMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         // TODO(M7): route notification to correct deep-link screen

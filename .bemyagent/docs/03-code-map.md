@@ -12,6 +12,11 @@
 | Milestone | Unit Tests | Instrumented | Coverage |
 |---|---|---|---|
 | M1 (bootstrap) | 0 | 0 | N/A (nessun domain logic ancora) |
+| M2 (auth) — task 2.1 | 5 (SignInAnonymously × 2, ObserveAuthState × 3) | 0 | domain/usecase/auth |
+| M2 (auth) — task 2.3 | 6 (SignInWithEmail × 2, CreateUser × 2, LinkWithEmail × 2) | 0 | domain/usecase/auth |
+| M2 (auth) — task 2.4 | 4 (SignInWithGoogle × 2, LinkWithGoogle × 2) | 0 | domain/usecase/auth |
+| M2 (user) — task 2.5 | 6 (SyncUser × 2, GetUser × 2, ObserveUser × 2) | 0 | domain/usecase/user |
+| **M2 total** | **21** | **0** | all auth + user use cases |
 
 > Aggiornare dopo ogni milestone. Target: ≥ 80% su domain + data layer.
 
@@ -19,10 +24,10 @@
 
 | Schermata | File (futuro) | Auth richiesta | Descrizione |
 |---|---|---|---|
-| Splash / Welcome | `ui/auth/WelcomeScreen.kt` | No | Entry point: locale o registrazione |
-| Login | `ui/auth/LoginScreen.kt` | No | Email/password, Google |
-| Register | `ui/auth/RegisterScreen.kt` | No | Nuovo account + migrazione locale |
-| Dashboard | `ui/dashboard/DashboardScreen.kt` | No (locale ok) | Card view / Feed view toggle |
+| Splash / Welcome | `ui/auth/WelcomeScreen.kt` ✅ | No | Entry point: locale o registrazione |
+| Login | `ui/auth/LoginScreen.kt` ✅ | No | Email/password, Google |
+| Register | `ui/auth/RegisterScreen.kt` ✅ | No | Nuovo account + migrazione locale |
+| Dashboard | `ui/dashboard/DashboardScreen.kt` ✅ (stub) | No (locale ok) | Card view / Feed view toggle (M5) |
 | Quick Log Sheet | `ui/dashboard/QuickLogSheet.kt` | No | Bottom sheet 1-tap event |
 | Lista Persone | `ui/person/PersonListScreen.kt` | No | Tutte le Persone accessibili |
 | Dettaglio Persona | `ui/person/PersonDetailScreen.kt` | No | Tab: Terapie / Log Attività |
@@ -33,13 +38,16 @@
 | Storico Calendario | `ui/history/HistoryCalendarScreen.kt` | No | Vista mensile + dettaglio giorno |
 | Genera Invito | `ui/invitation/GenerateInvitationScreen.kt` | Sì | QR + codice testo |
 | Riscatta Invito | `ui/invitation/RedeemInvitationScreen.kt` | No | Scanner QR o input manuale |
-| Impostazioni | `ui/settings/SettingsScreen.kt` | No | Account, notifiche, lingua, unità |
+| Impostazioni | `ui/settings/SettingsScreen.kt` ✅ | No | Lingua, unità temperatura, quiet hours (Account/notifiche: M7) |
 
 ## Use Cases (Domain)
 
-| Use Case | Input | Output / Side Effect |
-|---|---|---|
-| `CreatePersonUseCase` | `name, nickname?` | `Person` creata in Firestore + Room |
+| Use Case | File | Input | Output / Side Effect |
+|---|---|---|---|
+| `SignInAnonymouslyUseCase` | `domain/usecase/auth/` | — | `Result<User>` anonimo da Firebase Auth |
+| `GetCurrentUserUseCase` | `domain/usecase/auth/` | — | `User?` sincrono dal repository |
+| `ObserveAuthStateUseCase` | `domain/usecase/auth/` | — | `Flow<User?>` real-time auth state |
+| `CreatePersonUseCase` | `domain/usecase/person/` | `name, nickname?` | `Person` creata in Firestore + Room |
 | `CreateTherapyUseCase` | `personId, TherapyRequest` | `Therapy` con Farmaci schedulati |
 | `LogActivityUseCase` | `personId, ActivityLog` | Log scritto locale + Firestore |
 | `LogMedicationUseCase` | `therapyId, medicationId, status` | `MedicationLog` aggiornato |
@@ -161,7 +169,8 @@
 
 ## Domain Models (Kotlin)
 
-> Path futuro: `app/src/main/java/com/carezze/domain/model/`
+> Path: `app/src/main/kotlin/com/carezze/app/domain/model/` | Package: `com.fpculcasi.carezze.domain.model`
+> **Note:** Physical dir is `com/carezze/app/` but package is `com.fpculcasi.carezze` (namespace from build.gradle).
 
 ```kotlin
 // --- User ---
