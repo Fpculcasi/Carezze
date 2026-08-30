@@ -13,6 +13,7 @@
 *.aab
 *.class
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 *.war
 *.ear
 
@@ -25,3 +26,11 @@ Thumbs.db
 
 # Firebase — never commit real config
 app/google-services.json
+
+# Signing — NEVER commit keystore files
+*.keystore
+*.jks
+*.b64
+
+# hidden files
+.secrets

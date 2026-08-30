@@ -32,14 +32,14 @@ Room, Navigation Compose, GitFlow structure, and GitHub Actions pipeline.
 ---
 
 ## Milestone 1.5 — Firebase App Distribution CI/CD
-**Goal**: APK di release firmato distribuito automaticamente ai beta-tester su Firebase App Distribution ad ogni tag `v*.*.*-beta` via GitHub Actions | **Status**: next
+**Goal**: APK di release firmato distribuito automaticamente ai beta-tester su Firebase App Distribution ad ogni tag `v*.*.*-beta` via GitHub Actions | **Status**: in-progress (1.5.1–1.5.2 richiedono azione manuale umana)
 
 | Task | Descrizione | Status |
 |---|---|---|
-| 1.5.1 | Firebase Console: abilita App Distribution, crea gruppo tester `beta-testers` | todo |
-| 1.5.2 | Google Cloud: Service Account con ruolo `Firebase App Distribution Admin` → JSON key → GitHub Secret `FIREBASE_SERVICE_ACCOUNT` | todo |
-| 1.5.3 | Keystore: genera con `keytool`, codifica Base64, configura `build.gradle.kts` signing config da env var, salva secrets GitHub (`KEYSTORE_BASE64`, `KEYSTORE_ALIAS`, `KEYSTORE_STORE_PASSWORD`, `KEYSTORE_KEY_PASSWORD`) | todo |
-| 1.5.4 | GitHub Actions workflow `firebase-distribute.yml`: trigger su tag `v*.*.*-beta`, build release APK firmato, release notes da `git log` dall'ultimo tag, upload su Firebase App Distribution → gruppo `beta-testers` | todo |
+| 1.5.1 | Firebase Console: abilita App Distribution, crea gruppo tester `beta-testers` | requires-human-action |
+| 1.5.2 | Google Cloud: Service Account con ruolo `Firebase App Distribution Admin` → JSON key → GitHub Secrets (`FIREBASE_SERVICE_ACCOUNT`, `FIREBASE_APP_ID`, `GOOGLE_SERVICES_JSON`) | requires-human-action |
+| 1.5.3 | Keystore: genera con `keytool`, codifica Base64, configura `build.gradle.kts` signing config da env var, salva secrets GitHub (`KEYSTORE_BASE64`, `KEYSTORE_ALIAS`, `KEYSTORE_STORE_PASSWORD`, `KEYSTORE_KEY_PASSWORD`) — signing config in Gradle: **done** (keytool + secrets: requires-human-action) | partial |
+| 1.5.4 | GitHub Actions workflow `firebase-distribute.yml`: trigger su tag `v*.*.*-beta`, build release APK firmato, release notes da `git log` dall'ultimo tag, upload su Firebase App Distribution → gruppo `beta-testers` | done |
 
 **Scelte architetturali:**
 - Trigger: tag git `v*.*.*-beta` su qualsiasi branch
