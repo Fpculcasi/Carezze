@@ -1,5 +1,8 @@
 package com.fpculcasi.carezze.ui.auth
 
+import android.graphics.drawable.AdaptiveIconDrawable
+import android.graphics.drawable.Drawable
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,9 +19,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fpculcasi.carezze.R
 
 @Composable
 fun WelcomeScreen(
@@ -42,6 +48,7 @@ fun WelcomeScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Image(painterResource(R.drawable.ic_app_logo), "logo")
         Text(
             text = "Carezze",
             style = MaterialTheme.typography.displayMedium,
@@ -50,7 +57,7 @@ fun WelcomeScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Traccia terapie e parametri con cura",
+            text = "Monitora i bisogni delle persone a te più care",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

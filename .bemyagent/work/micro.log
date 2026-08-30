@@ -1,0 +1,1 @@
+2026-08-30T13:10Z | logo-integration | Replace app launcher icon with carezze-logo.png | PASS | ic_launcher_foreground.xml updated (bitmap → ic_app_logo), logo PNG copied to app/src/main/res/drawable/ic_app_logo.png

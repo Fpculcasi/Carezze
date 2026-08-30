@@ -57,12 +57,12 @@ jobs:
 
       - name: Upload to Firebase App Distribution
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
         run: |
           echo "$FIREBASE_SERVICE_ACCOUNT" > /tmp/sa.json
           npm install -g firebase-tools
+          firebase login:ci --token "$(cat /tmp/sa.json | jq -r '.private_key' | base64 -d)"
           firebase appdistribution:distribute \
             app/build/outputs/apk/release/app-release.apk \
             --app "$FIREBASE_APP_ID" \
