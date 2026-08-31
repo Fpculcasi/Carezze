@@ -88,6 +88,7 @@
 | `nickname` | `String?` | `"Sofi"` | User |
 | `createdBy` | `String` (userId) | `"uid123"` | System |
 | `members` | `Map<String, String>` | `{"uid1":"owner","uid2":"editor"}` | System |
+| `memberIds` | `List<String>` | `["uid1","uid2"]` | System (denorm. per `arrayContains` query) |
 | `createdAt` | `Timestamp` | — | System |
 | `updatedAt` | `Timestamp` | — | System |
 

@@ -1,0 +1,8 @@
+{
+  "firestore": {
+    "database": "carezze-prod",
+    "location": "europe-west12",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}

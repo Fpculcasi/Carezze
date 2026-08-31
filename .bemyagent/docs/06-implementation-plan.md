@@ -89,7 +89,7 @@ Settings screen covers language, temperature unit, and quiet hours.
 | 3.1 | Domain: `Person` model + `PersonRepository` interface + Use Cases | done |
 | 3.2 | Data: `PersonRepositoryImpl` (Firestore + Room) con snapshot listener | done |
 | 3.3 | UI: Lista Persone + schermata Aggiungi/Modifica Persona | done |
-| 3.4 | Firestore Security Rules per `persons/{personId}` | done |
+| 3.4 | Firestore Security Rules per `persons/{personId}` — regole scritte + deploy completato | done |
 | 3.5 | Test unitari: Use Cases Persona (TDD) | done |
 
 **Git commit message (proposta):**

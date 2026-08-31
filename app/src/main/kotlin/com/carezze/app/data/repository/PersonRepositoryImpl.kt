@@ -3,7 +3,6 @@ package com.fpculcasi.carezze.data.repository
 import com.fpculcasi.carezze.domain.model.MemberRole
 import com.fpculcasi.carezze.domain.model.Person
 import com.fpculcasi.carezze.domain.repository.PersonRepository
-import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -23,9 +22,8 @@ class PersonRepositoryImpl @Inject constructor(
     private fun personsCollection() = firestore.collection("persons")
 
     override fun observePersons(userId: String): Flow<List<Person>> = callbackFlow {
-        val memberField = FieldPath.of("members", userId)
         val listener = personsCollection()
-            .whereNotEqualTo(memberField, null)
+            .whereArrayContains("memberIds", userId)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     close(error)
@@ -49,6 +47,7 @@ class PersonRepositoryImpl @Inject constructor(
             "nickname" to nickname,
             "createdBy" to userId,
             "members" to mapOf(userId to "OWNER"),
+            "memberIds" to listOf(userId),
             "createdAt" to FieldValue.serverTimestamp(),
             "updatedAt" to FieldValue.serverTimestamp(),
         )
