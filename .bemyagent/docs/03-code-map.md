@@ -19,6 +19,8 @@
 | **M2 total** | **21** | **0** | all auth + user use cases |
 | M3 (person) — task 3.5 | 5 (CreatePerson × 1+, GetPerson × 1+, UpdatePerson × 1+, DeletePerson × 1+, ObservePersons × 1+) | 0 | domain/usecase/person |
 | **M3 total** | **5** | **0** | all person use cases |
+| M4 (therapy) — task 4.7 | 17 (ScheduleCalculator × 6, CreateTherapy × 2, GetTherapy × 2, UpdateTherapy × 2, DeleteTherapy × 2, ObserveTherapies × 1, LogMedication × 2) | 0 | domain/usecase/therapy |
+| **M4 total** | **17** | **0** | all therapy use cases + schedule logic |
 
 > Aggiornare dopo ogni milestone. Target: ≥ 80% su domain + data layer.
 
@@ -34,8 +36,8 @@
 | Lista Persone | `ui/person/PersonListScreen.kt` ✅ | No | Tutte le Persone accessibili |
 | Dettaglio Persona | `ui/person/PersonDetailScreen.kt` ✅ (stub) | No | Tab: Terapie / Log Attività (M4/M5) |
 | Aggiungi/Modifica Persona | `ui/person/EditPersonScreen.kt` ✅ | No | Form Persona |
-| Dettaglio Terapia | `ui/therapy/TherapyDetailScreen.kt` | No | Farmaci, progresso, log, share |
-| Aggiungi/Modifica Terapia | `ui/therapy/EditTherapyScreen.kt` | No | Wizard multi-step |
+| Dettaglio Terapia | `ui/therapy/TherapyDetailScreen.kt` ✅ | No | Farmaci, barra progresso, contatore dosi rimanenti |
+| Aggiungi Terapia | `ui/therapy/AddTherapyScreen.kt` ✅ | No | Wizard 2-step (info + farmaci) |
 | Storico Lista | `ui/history/HistoryListScreen.kt` | No | Feed cronologico filtrato |
 | Storico Calendario | `ui/history/HistoryCalendarScreen.kt` | No | Vista mensile + dettaglio giorno |
 | Genera Invito | `ui/invitation/GenerateInvitationScreen.kt` | Sì | QR + codice testo |
@@ -50,9 +52,14 @@
 | `GetCurrentUserUseCase` | `domain/usecase/auth/` | — | `User?` sincrono dal repository |
 | `ObserveAuthStateUseCase` | `domain/usecase/auth/` | — | `Flow<User?>` real-time auth state |
 | `CreatePersonUseCase` | `domain/usecase/person/` | `name, nickname?` | `Person` creata in Firestore + Room |
-| `CreateTherapyUseCase` | `personId, TherapyRequest` | `Therapy` con Farmaci schedulati |
+| `CreateTherapyUseCase` | `domain/usecase/therapy/` | `personId, name, startDate, duration, medications, userId` | `Result<Therapy>` |
+| `GetTherapyUseCase` | `domain/usecase/therapy/` | `personId, therapyId` | `Result<Therapy>` |
+| `UpdateTherapyUseCase` | `domain/usecase/therapy/` | `Therapy` | `Result<Unit>` |
+| `DeleteTherapyUseCase` | `domain/usecase/therapy/` | `personId, therapyId` | `Result<Unit>` |
+| `ObserveTherapiesUseCase` | `domain/usecase/therapy/` | `personId` | `Flow<List<Therapy>>` |
+| `ObserveLogsUseCase` | `domain/usecase/therapy/` | `personId, therapyId` | `Flow<List<MedicationLog>>` |
+| `LogMedicationUseCase` | `domain/usecase/therapy/` | `personId, therapyId, medicationId, scheduledTime, status, userId` | `Result<MedicationLog>` |
 | `LogActivityUseCase` | `personId, ActivityLog` | Log scritto locale + Firestore |
-| `LogMedicationUseCase` | `therapyId, medicationId, status` | `MedicationLog` aggiornato |
 | `GenerateInvitationUseCase` | `type, targetId` | `Invitation` con codice 8 char |
 | `RedeemInvitationUseCase` | `code` | Aggiunge utente come Membro |
 | `RevokeAccessUseCase` | `targetId, userId` | Rimuove Membro + cancella suoi dati |

@@ -2,25 +2,16 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper: caller is authenticated
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    // Helper: caller owns the document
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // Users collection — each user can read/write their own document
     match /users/{userId} {
       allow read, write: if isOwner(userId);
-    }
-
-    // Persons — only owner or members can read/write
-    function isPersonMember(personData) {
-      return isAuthenticated() &&
-             request.auth.uid in personData.members;
     }
 
     match /persons/{personId} {
@@ -33,30 +24,39 @@ service cloud.firestore {
                        request.auth.uid in resource.data.members;
       allow delete: if isAuthenticated() &&
                        resource.data.members[request.auth.uid] == 'OWNER';
+
+      match /therapies/{therapyId} {
+        // Person members can create therapies; therapy members can read/update; therapy owners can delete
+        allow create: if isAuthenticated() &&
+                         request.auth.uid in
+                           get(/databases/$(database)/documents/persons/$(personId)).data.members &&
+                         request.resource.data.members[request.auth.uid] == 'OWNER';
+        allow read: if isAuthenticated() &&
+                       request.auth.uid in resource.data.memberIds;
+        allow update: if isAuthenticated() &&
+                         request.auth.uid in resource.data.members;
+        allow delete: if isAuthenticated() &&
+                         resource.data.members[request.auth.uid] == 'OWNER';
+
+        match /medicationLogs/{logId} {
+          allow read, write: if isAuthenticated() &&
+                                request.auth.uid in
+                                  get(/databases/$(database)/documents/persons/$(personId)/therapies/$(therapyId)).data.memberIds;
+        }
+      }
     }
 
-    // Therapies
-    match /therapies/{therapyId} {
-      allow read, write: if isAuthenticated();  // TODO(M4): restrict to person members
-    }
-
-    // Medication logs
-    match /medicationLogs/{logId} {
-      allow read, write: if isAuthenticated();  // TODO(M4): restrict to therapy members
-    }
-
-    // Activity logs
+    // Activity logs — TODO(M5): restrict to person members
     match /activityLogs/{logId} {
-      allow read, write: if isAuthenticated();  // TODO(M5): restrict to person members
+      allow read, write: if isAuthenticated();
     }
 
-    // Invitations
+    // Invitations — TODO(M6): restrict creation to person owner
     match /invitations/{invitationId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();  // TODO(M6): restrict creation to person owner
+      allow write: if isAuthenticated();
     }
 
-    // Catch-all — deny everything else
     match /{document=**} {
       allow read, write: if false;
     }

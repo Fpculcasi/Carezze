@@ -13,6 +13,8 @@ import com.fpculcasi.carezze.ui.person.EditPersonScreen
 import com.fpculcasi.carezze.ui.person.PersonDetailScreen
 import com.fpculcasi.carezze.ui.person.PersonListScreen
 import com.fpculcasi.carezze.ui.settings.SettingsScreen
+import com.fpculcasi.carezze.ui.therapy.AddTherapyScreen
+import com.fpculcasi.carezze.ui.therapy.TherapyDetailScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -38,6 +40,12 @@ data class PersonDetail(val personId: String)
 
 @Serializable
 data class EditPerson(val personId: String? = null)
+
+@Serializable
+data class AddTherapy(val personId: String)
+
+@Serializable
+data class TherapyDetail(val personId: String, val therapyId: String)
 
 @Composable
 fun AppNavigation() {
@@ -111,6 +119,8 @@ fun AppNavigation() {
                 personId = route.personId,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToEdit = { id -> navController.navigate(EditPerson(id)) },
+                onNavigateToAddTherapy = { pid -> navController.navigate(AddTherapy(pid)) },
+                onNavigateToTherapy = { pid, tid -> navController.navigate(TherapyDetail(pid, tid)) },
             )
         }
 
@@ -118,6 +128,23 @@ fun AppNavigation() {
             val route = backStackEntry.toRoute<EditPerson>()
             EditPersonScreen(
                 personId = route.personId,
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+
+        composable<AddTherapy> { backStackEntry ->
+            val route = backStackEntry.toRoute<AddTherapy>()
+            AddTherapyScreen(
+                personId = route.personId,
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+
+        composable<TherapyDetail> { backStackEntry ->
+            val route = backStackEntry.toRoute<TherapyDetail>()
+            TherapyDetailScreen(
+                personId = route.personId,
+                therapyId = route.therapyId,
                 onNavigateBack = { navController.popBackStack() },
             )
         }
