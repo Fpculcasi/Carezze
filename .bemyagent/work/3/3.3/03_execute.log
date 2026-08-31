@@ -1,0 +1,5 @@
+2026-08-31 | CREATE PersonViewModel, PersonListScreen, EditPersonScreen, PersonDetailScreen (tutti con pattern Content + @Preview) | next: compile verify
+2026-08-31 | EDIT AppNavigation — PersonList, PersonDetail, EditPerson routes (linter ha applicato le modifiche) | next: compile verify
+2026-08-31 | EDIT DashboardScreen — aggiunto DashboardContent + @Preview + pulsante Persone | next: compile verify
+2026-08-31 | EDIT WelcomeScreen, LoginScreen, RegisterScreen, SettingsScreen — refactor state-hoisting + @Preview | next: compile verify
+2026-08-31 | Compilazione: pending (background job) | next: write 04_verify.md on result

@@ -17,10 +17,22 @@ service cloud.firestore {
       allow read, write: if isOwner(userId);
     }
 
-    // Persons — owner or authorised members can read/write
-    // Full security rules to be implemented in M3 (task 3.4)
+    // Persons — only owner or members can read/write
+    function isPersonMember(personData) {
+      return isAuthenticated() &&
+             request.auth.uid in personData.members;
+    }
+
     match /persons/{personId} {
-      allow read, write: if isAuthenticated();  // TODO(M3): restrict to owner + members
+      allow read: if isAuthenticated() &&
+                     request.auth.uid in resource.data.members;
+      allow create: if isAuthenticated() &&
+                       request.auth.uid == request.resource.data.createdBy &&
+                       request.resource.data.members[request.auth.uid] == 'OWNER';
+      allow update: if isAuthenticated() &&
+                       request.auth.uid in resource.data.members;
+      allow delete: if isAuthenticated() &&
+                       resource.data.members[request.auth.uid] == 'OWNER';
     }
 
     // Therapies

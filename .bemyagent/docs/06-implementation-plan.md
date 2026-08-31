@@ -82,15 +82,15 @@ Settings screen covers language, temperature unit, and quiet hours.
 ---
 
 ## Milestone 3 — Gestione Persone
-**Goal**: Utente può creare, visualizzare e modificare Profili Persona | **Status**: next ← active
+**Goal**: Utente può creare, visualizzare e modificare Profili Persona | **Status**: done
 
 | Task | Descrizione | Status |
 |---|---|---|
-| 3.1 | Domain: `Person` model + `PersonRepository` interface + Use Cases | todo |
-| 3.2 | Data: `PersonRepositoryImpl` (Firestore + Room) con snapshot listener | todo |
-| 3.3 | UI: Lista Persone + schermata Aggiungi/Modifica Persona | todo |
-| 3.4 | Firestore Security Rules per `persons/{personId}` | todo |
-| 3.5 | Test unitari: Use Cases Persona (TDD) | todo |
+| 3.1 | Domain: `Person` model + `PersonRepository` interface + Use Cases | done |
+| 3.2 | Data: `PersonRepositoryImpl` (Firestore + Room) con snapshot listener | done |
+| 3.3 | UI: Lista Persone + schermata Aggiungi/Modifica Persona | done |
+| 3.4 | Firestore Security Rules per `persons/{personId}` | done |
+| 3.5 | Test unitari: Use Cases Persona (TDD) | done |
 
 **Git commit message (proposta):**
 ```

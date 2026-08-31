@@ -29,11 +29,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     onNavigateToDashboard: () -> Unit,
@@ -44,17 +45,35 @@ fun RegisterScreen(
     val authState by viewModel.authState.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var confirmPassword by rememberSaveable { mutableStateOf("") }
-    val passwordMismatch = password.isNotEmpty() && confirmPassword.isNotEmpty() && password != confirmPassword
-
     LaunchedEffect(authState) {
         when (authState) {
             is AuthUiState.Anonymous, is AuthUiState.Authenticated -> onNavigateToDashboard()
             else -> Unit
         }
     }
+
+    RegisterContent(
+        errorMessage = errorMessage,
+        onRegister = viewModel::registerOrLink,
+        onClearError = viewModel::clearError,
+        onNavigateToLogin = onNavigateToLogin,
+        onNavigateBack = onNavigateBack,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun RegisterContent(
+    errorMessage: String?,
+    onRegister: (email: String, password: String) -> Unit,
+    onClearError: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onNavigateBack: () -> Unit,
+) {
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var confirmPassword by rememberSaveable { mutableStateOf("") }
+    val passwordMismatch = password.isNotEmpty() && confirmPassword.isNotEmpty() && password != confirmPassword
 
     Scaffold(
         topBar = {
@@ -79,7 +98,7 @@ fun RegisterScreen(
 
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it; viewModel.clearError() },
+                onValueChange = { email = it; onClearError() },
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -88,7 +107,7 @@ fun RegisterScreen(
 
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it; viewModel.clearError() },
+                onValueChange = { password = it; onClearError() },
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = PasswordVisualTransformation(),
@@ -112,7 +131,7 @@ fun RegisterScreen(
 
             if (errorMessage != null) {
                 Text(
-                    text = errorMessage!!,
+                    text = errorMessage,
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
                 )
@@ -121,7 +140,7 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = { viewModel.registerOrLink(email.trim(), password) },
+                onClick = { onRegister(email.trim(), password) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = email.isNotBlank() && password.isNotBlank() && !passwordMismatch,
             ) {
@@ -132,5 +151,33 @@ fun RegisterScreen(
                 Text("Hai già un account? Accedi")
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun RegisterContentPreview() {
+    CarezzeTheme {
+        RegisterContent(
+            errorMessage = null,
+            onRegister = { _, _ -> },
+            onClearError = {},
+            onNavigateToLogin = {},
+            onNavigateBack = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "With error")
+@Composable
+private fun RegisterContentErrorPreview() {
+    CarezzeTheme {
+        RegisterContent(
+            errorMessage = "Indirizzo email già in uso",
+            onRegister = { _, _ -> },
+            onClearError = {},
+            onNavigateToLogin = {},
+            onNavigateBack = {},
+        )
     }
 }

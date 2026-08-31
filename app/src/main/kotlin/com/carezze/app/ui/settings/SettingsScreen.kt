@@ -27,13 +27,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fpculcasi.carezze.domain.model.Language
 import com.fpculcasi.carezze.domain.model.TemperatureUnit
+import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
@@ -41,6 +42,32 @@ fun SettingsScreen(
 ) {
     val user by viewModel.settingsState.collectAsStateWithLifecycle()
 
+    SettingsContent(
+        language = user?.language ?: Language.IT,
+        temperatureUnit = user?.temperatureUnit ?: TemperatureUnit.C,
+        quietHoursStart = user?.quietHoursStart ?: "22:00",
+        quietHoursEnd = user?.quietHoursEnd ?: "07:00",
+        onLanguageChange = viewModel::setLanguage,
+        onTemperatureUnitChange = viewModel::setTemperatureUnit,
+        onQuietHoursStartChange = viewModel::setQuietHoursStart,
+        onQuietHoursEndChange = viewModel::setQuietHoursEnd,
+        onNavigateBack = onNavigateBack,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun SettingsContent(
+    language: Language,
+    temperatureUnit: TemperatureUnit,
+    quietHoursStart: String,
+    quietHoursEnd: String,
+    onLanguageChange: (Language) -> Unit,
+    onTemperatureUnitChange: (TemperatureUnit) -> Unit,
+    onQuietHoursStartChange: (String) -> Unit,
+    onQuietHoursEndChange: (String) -> Unit,
+    onNavigateBack: () -> Unit,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -64,8 +91,8 @@ fun SettingsScreen(
             SettingDropdown(
                 label = "Lingua",
                 options = Language.entries.map { it.name },
-                selected = user?.language?.name ?: Language.IT.name,
-                onSelected = { viewModel.setLanguage(Language.valueOf(it)) },
+                selected = language.name,
+                onSelected = { onLanguageChange(Language.valueOf(it)) },
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -73,8 +100,8 @@ fun SettingsScreen(
             SettingDropdown(
                 label = "Unità temperatura",
                 options = TemperatureUnit.entries.map { it.name },
-                selected = user?.temperatureUnit?.name ?: TemperatureUnit.C.name,
-                onSelected = { viewModel.setTemperatureUnit(TemperatureUnit.valueOf(it)) },
+                selected = temperatureUnit.name,
+                onSelected = { onTemperatureUnitChange(TemperatureUnit.valueOf(it)) },
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -86,16 +113,16 @@ fun SettingsScreen(
                 SettingDropdown(
                     label = "Silenzio da",
                     options = quietHourOptions(),
-                    selected = user?.quietHoursStart ?: "22:00",
-                    onSelected = { viewModel.setQuietHoursStart(it) },
+                    selected = quietHoursStart,
+                    onSelected = onQuietHoursStartChange,
                     modifier = Modifier.weight(1f),
                 )
                 Text(modifier = Modifier.padding(horizontal = 8.dp), text = "—")
                 SettingDropdown(
                     label = "a",
                     options = quietHourOptions(),
-                    selected = user?.quietHoursEnd ?: "07:00",
-                    onSelected = { viewModel.setQuietHoursEnd(it) },
+                    selected = quietHoursEnd,
+                    onSelected = onQuietHoursEndChange,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -148,4 +175,22 @@ private fun SettingDropdown(
 
 private fun quietHourOptions(): List<String> = (0..23).flatMap { h ->
     listOf("${"$h".padStart(2, '0')}:00", "${"$h".padStart(2, '0')}:30")
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SettingsContentPreview() {
+    CarezzeTheme {
+        SettingsContent(
+            language = Language.IT,
+            temperatureUnit = TemperatureUnit.C,
+            quietHoursStart = "22:00",
+            quietHoursEnd = "07:00",
+            onLanguageChange = {},
+            onTemperatureUnitChange = {},
+            onQuietHoursStartChange = {},
+            onQuietHoursEndChange = {},
+            onNavigateBack = {},
+        )
+    }
 }

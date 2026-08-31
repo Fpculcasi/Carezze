@@ -1,6 +1,8 @@
 package com.fpculcasi.carezze.di
 
+import com.fpculcasi.carezze.data.repository.PersonRepositoryImpl
 import com.fpculcasi.carezze.data.repository.UserRepositoryImpl
+import com.fpculcasi.carezze.domain.repository.PersonRepository
 import com.fpculcasi.carezze.domain.repository.UserRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Binds
@@ -17,6 +19,10 @@ abstract class FirestoreModule {
     @Binds
     @Singleton
     abstract fun bindUserRepository(impl: UserRepositoryImpl): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPersonRepository(impl: PersonRepositoryImpl): PersonRepository
 
     companion object {
         @Provides

@@ -1,7 +1,5 @@
 package com.fpculcasi.carezze.ui.auth
 
-import android.graphics.drawable.AdaptiveIconDrawable
-import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fpculcasi.carezze.R
+import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 
 @Composable
 fun WelcomeScreen(
@@ -41,6 +40,21 @@ fun WelcomeScreen(
         }
     }
 
+    WelcomeContent(
+        isLoading = authState is AuthUiState.Loading,
+        onContinueLocally = viewModel::continueLocally,
+        onNavigateToLogin = onNavigateToLogin,
+        onGoogleSignIn = viewModel::signInOrLinkWithGoogle,
+    )
+}
+
+@Composable
+internal fun WelcomeContent(
+    isLoading: Boolean,
+    onContinueLocally: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onGoogleSignIn: (String) -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -48,7 +62,7 @@ fun WelcomeScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Image(painterResource(R.drawable.ic_app_logo), "logo")
+        Image(painterResource(R.drawable.ic_app_logo), contentDescription = "logo")
         Text(
             text = "Carezze",
             style = MaterialTheme.typography.displayMedium,
@@ -65,9 +79,9 @@ fun WelcomeScreen(
         Spacer(modifier = Modifier.height(48.dp))
 
         Button(
-            onClick = { viewModel.continueLocally() },
+            onClick = onContinueLocally,
             modifier = Modifier.fillMaxWidth(),
-            enabled = authState !is AuthUiState.Loading,
+            enabled = !isLoading,
         ) {
             Text("Continua in locale")
         }
@@ -84,8 +98,34 @@ fun WelcomeScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         GoogleSignInButton(
-            onIdTokenReceived = { viewModel.signInOrLinkWithGoogle(it) },
-            onError = { /* error surfaced via authState error — future polish M9 */ },
+            onIdTokenReceived = onGoogleSignIn,
+            onError = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun WelcomeContentPreview() {
+    CarezzeTheme {
+        WelcomeContent(
+            isLoading = false,
+            onContinueLocally = {},
+            onNavigateToLogin = {},
+            onGoogleSignIn = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Loading")
+@Composable
+private fun WelcomeContentLoadingPreview() {
+    CarezzeTheme {
+        WelcomeContent(
+            isLoading = true,
+            onContinueLocally = {},
+            onNavigateToLogin = {},
+            onGoogleSignIn = {},
         )
     }
 }

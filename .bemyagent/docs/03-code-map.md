@@ -17,6 +17,8 @@
 | M2 (auth) — task 2.4 | 4 (SignInWithGoogle × 2, LinkWithGoogle × 2) | 0 | domain/usecase/auth |
 | M2 (user) — task 2.5 | 6 (SyncUser × 2, GetUser × 2, ObserveUser × 2) | 0 | domain/usecase/user |
 | **M2 total** | **21** | **0** | all auth + user use cases |
+| M3 (person) — task 3.5 | 5 (CreatePerson × 1+, GetPerson × 1+, UpdatePerson × 1+, DeletePerson × 1+, ObservePersons × 1+) | 0 | domain/usecase/person |
+| **M3 total** | **5** | **0** | all person use cases |
 
 > Aggiornare dopo ogni milestone. Target: ≥ 80% su domain + data layer.
 
@@ -29,9 +31,9 @@
 | Register | `ui/auth/RegisterScreen.kt` ✅ | No | Nuovo account + migrazione locale |
 | Dashboard | `ui/dashboard/DashboardScreen.kt` ✅ (stub) | No (locale ok) | Card view / Feed view toggle (M5) |
 | Quick Log Sheet | `ui/dashboard/QuickLogSheet.kt` | No | Bottom sheet 1-tap event |
-| Lista Persone | `ui/person/PersonListScreen.kt` | No | Tutte le Persone accessibili |
-| Dettaglio Persona | `ui/person/PersonDetailScreen.kt` | No | Tab: Terapie / Log Attività |
-| Aggiungi/Modifica Persona | `ui/person/EditPersonScreen.kt` | No | Form Persona |
+| Lista Persone | `ui/person/PersonListScreen.kt` ✅ | No | Tutte le Persone accessibili |
+| Dettaglio Persona | `ui/person/PersonDetailScreen.kt` ✅ (stub) | No | Tab: Terapie / Log Attività (M4/M5) |
+| Aggiungi/Modifica Persona | `ui/person/EditPersonScreen.kt` ✅ | No | Form Persona |
 | Dettaglio Terapia | `ui/therapy/TherapyDetailScreen.kt` | No | Farmaci, progresso, log, share |
 | Aggiungi/Modifica Terapia | `ui/therapy/EditTherapyScreen.kt` | No | Wizard multi-step |
 | Storico Lista | `ui/history/HistoryListScreen.kt` | No | Feed cronologico filtrato |

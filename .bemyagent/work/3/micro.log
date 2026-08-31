@@ -1,0 +1,1 @@
+2026-08-31 | 3.4 | firestore.rules — aggiunto match /persons/{personId} con rules read/create/update/delete basate su members map e OWNER role | PASS | grep "match /persons" firestore.rules → riga 26-36, regole presenti
