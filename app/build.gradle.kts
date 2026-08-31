@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace = "com.fpculcasi.carezze"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.fpculcasi.carezze"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -40,6 +40,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
