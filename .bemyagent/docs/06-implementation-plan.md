@@ -103,17 +103,17 @@ Firestore snapshot listeners with full offline support.
 ---
 
 ## Milestone 4 — Gestione Terapie
-**Goal**: Utente può creare terapie con farmaci multipli, schedule automatiche e progresso | **Status**: next
+**Goal**: Utente può creare terapie con farmaci multipli, schedule automatiche e progresso | **Status**: done
 
 | Task | Descrizione | Status |
 |---|---|---|
-| 4.1 | Domain: `Therapy`, `Medication`, `TherapyDuration` + Use Cases | todo |
-| 4.2 | Logica calcolo `scheduledTimes[]` da `frequencyHours` + orario inizio | todo |
-| 4.3 | Data: `TherapyRepositoryImpl` + `MedicationLogRepositoryImpl` | todo |
-| 4.4 | UI: Wizard Aggiungi Terapia (multi-step) + Dettaglio Terapia | todo |
-| 4.5 | Progresso terapia: barra avanzamento + calendario dosi + contatore rimanenti | todo |
-| 4.6 | Firestore Security Rules per `therapies/` e `medicationLogs/` | todo |
-| 4.7 | Test unitari: Use Cases Terapia + logica schedule (TDD) | todo |
+| 4.1 | Domain: `Therapy`, `Medication`, `TherapyDuration` + Use Cases | done |
+| 4.2 | Logica calcolo `scheduledTimes[]` da `frequencyHours` + orario inizio | done |
+| 4.3 | Data: `TherapyRepositoryImpl` + `MedicationLogRepositoryImpl` | done |
+| 4.4 | UI: Wizard Aggiungi Terapia (multi-step) + Dettaglio Terapia | done |
+| 4.5 | Progresso terapia: barra avanzamento + calendario dosi + contatore rimanenti | done |
+| 4.6 | Firestore Security Rules per `therapies/` e `medicationLogs/` | done |
+| 4.7 | Test unitari: Use Cases Terapia + logica schedule (TDD) | done |
 
 **Git commit message (proposta):**
 ```

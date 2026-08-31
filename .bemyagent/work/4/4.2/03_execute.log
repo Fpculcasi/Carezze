@@ -1,0 +1,2 @@
+2026-08-31T00:00Z | created domain/usecase/therapy/ScheduleCalculator.kt — object with computeScheduledTimes(frequencyHours, startHour=8) | next: compile check
+2026-08-31T00:00Z | ./gradlew :app:compileDebugKotlin → BUILD SUCCESSFUL in 5s | DONE
