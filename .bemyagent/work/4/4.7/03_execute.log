@@ -1,0 +1,2 @@
+2026-08-31T00:00Z | created 7 test files in test/kotlin/com/carezze/app/domain/usecase/therapy/ | next: run test suite
+2026-08-31T00:00Z | ./gradlew :app:test → BUILD SUCCESSFUL in 1m 16s; all 7 therapy test files pass (failures=0, errors=0 confirmed in XML reports) | DONE
