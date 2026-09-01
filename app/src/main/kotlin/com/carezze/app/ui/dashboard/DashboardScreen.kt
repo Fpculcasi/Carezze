@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -118,6 +119,9 @@ internal fun DashboardContent(
                             contentDescription = if (viewMode == DashboardViewMode.CARD) "Vista feed" else "Vista card",
                         )
                     }
+                    IconButton(onClick = onNavigateToPersons) {
+                        Icon(Icons.Default.Person, contentDescription = "Gestisci persone")
+                    }
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(Icons.Default.Settings, contentDescription = "Impostazioni")
                     }
@@ -206,6 +210,12 @@ private fun CardView(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                Spacer(Modifier.height(16.dp))
+                Button(onClick = onNavigateToPersons) {
+                    Icon(Icons.Default.Person, contentDescription = null)
+                    Spacer(Modifier.size(8.dp))
+                    Text("Gestisci persone")
+                }
             }
         }
     } else {
