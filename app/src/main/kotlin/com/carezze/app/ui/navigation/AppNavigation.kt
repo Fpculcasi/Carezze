@@ -9,6 +9,8 @@ import com.fpculcasi.carezze.ui.auth.LoginScreen
 import com.fpculcasi.carezze.ui.auth.RegisterScreen
 import com.fpculcasi.carezze.ui.auth.WelcomeScreen
 import com.fpculcasi.carezze.ui.dashboard.DashboardScreen
+import com.fpculcasi.carezze.ui.history.HistoryCalendarScreen
+import com.fpculcasi.carezze.ui.history.HistoryListScreen
 import com.fpculcasi.carezze.ui.person.EditPersonScreen
 import com.fpculcasi.carezze.ui.person.PersonDetailScreen
 import com.fpculcasi.carezze.ui.person.PersonListScreen
@@ -47,6 +49,12 @@ data class AddTherapy(val personId: String)
 @Serializable
 data class TherapyDetail(val personId: String, val therapyId: String)
 
+@Serializable
+data class HistoryList(val personId: String)
+
+@Serializable
+data class HistoryCalendar(val personId: String)
+
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
@@ -70,6 +78,7 @@ fun AppNavigation() {
             DashboardScreen(
                 onNavigateToSettings = { navController.navigate(Settings) },
                 onNavigateToPersons = { navController.navigate(PersonList) },
+                onNavigateToHistory = { personId -> navController.navigate(HistoryList(personId)) },
             )
         }
 
@@ -145,6 +154,20 @@ fun AppNavigation() {
             TherapyDetailScreen(
                 personId = route.personId,
                 therapyId = route.therapyId,
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+
+        composable<HistoryList> { backStackEntry ->
+            val route = backStackEntry.toRoute<HistoryList>()
+            HistoryListScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToCalendar = { navController.navigate(HistoryCalendar(route.personId)) },
+            )
+        }
+
+        composable<HistoryCalendar> {
+            HistoryCalendarScreen(
                 onNavigateBack = { navController.popBackStack() },
             )
         }

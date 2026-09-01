@@ -126,18 +126,18 @@ Progress shown as bar, calendar, and remaining dose counter.
 ---
 
 ## Milestone 5 — Activity Logging & Dashboard
-**Goal**: Dashboard operativa, Quick Log 1-tap, storico 30 giorni in lista e calendario | **Status**: next
+**Goal**: Dashboard operativa, Quick Log 1-tap, storico 30 giorni in lista e calendario | **Status**: done
 
 | Task | Descrizione | Status |
 |---|---|---|
-| 5.1 | Domain: `ActivityLog` sealed class + `ActivityLogRepository` + Use Cases | todo |
-| 5.2 | Data: `ActivityLogRepositoryImpl` (tutti i tipi: pasto, pannolino, sonno, temperatura, peso, igiene) | todo |
-| 5.3 | UI: Dashboard — card view per Persona + feed cronologico con toggle | todo |
-| 5.4 | UI: Quick Log Bottom Sheet (1 tap + dettagli opzionali espandibili) | todo |
-| 5.5 | UI: Storico Lista (feed 30gg, lazy load per date precedenti) | todo |
-| 5.6 | UI: Storico Calendario (vista mensile + dettaglio giorno) | todo |
-| 5.7 | Filtro Dashboard per singola Persona | todo |
-| 5.8 | Test unitari: Use Cases log attività (TDD) | todo |
+| 5.1 | Domain: `ActivityLog` sealed class + `ActivityLogRepository` + Use Cases | done |
+| 5.2 | Data: `ActivityLogRepositoryImpl` (tutti i tipi: pasto, pannolino, sonno, temperatura, peso, igiene) | done |
+| 5.3 | UI: Dashboard — card view per Persona + feed cronologico con toggle | done |
+| 5.4 | UI: Quick Log Bottom Sheet (1 tap + dettagli opzionali espandibili) | done |
+| 5.5 | UI: Storico Lista (feed 30gg, lazy load per date precedenti) | done |
+| 5.6 | UI: Storico Calendario (vista mensile + dettaglio giorno) | done |
+| 5.7 | Filtro Dashboard per singola Persona | done |
+| 5.8 | Test unitari: Use Cases log attività (TDD) | done |
 
 **Git commit message (proposta):**
 ```

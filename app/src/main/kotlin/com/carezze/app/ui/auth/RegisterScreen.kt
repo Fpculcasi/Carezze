@@ -73,7 +73,8 @@ internal fun RegisterContent(
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
-    val passwordMismatch = password.isNotEmpty() && confirmPassword.isNotEmpty() && password != confirmPassword
+    val passwordMismatch =
+        password.isNotEmpty() && confirmPassword.isNotEmpty() && password != confirmPassword
 
     Scaffold(
         topBar = {

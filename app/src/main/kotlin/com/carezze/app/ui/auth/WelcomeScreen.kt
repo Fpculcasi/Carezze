@@ -63,6 +63,9 @@ internal fun WelcomeContent(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(painterResource(R.drawable.ic_app_logo), contentDescription = "logo")
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         Text(
             text = "Carezze",
             style = MaterialTheme.typography.displayMedium,

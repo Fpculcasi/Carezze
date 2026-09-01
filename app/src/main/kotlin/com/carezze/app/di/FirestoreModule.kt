@@ -1,10 +1,14 @@
 package com.fpculcasi.carezze.di
 
+import com.fpculcasi.carezze.data.repository.ActivityLogRepositoryImpl
 import com.fpculcasi.carezze.data.repository.MedicationLogRepositoryImpl
+
 import com.fpculcasi.carezze.data.repository.PersonRepositoryImpl
 import com.fpculcasi.carezze.data.repository.TherapyRepositoryImpl
 import com.fpculcasi.carezze.data.repository.UserRepositoryImpl
+import com.fpculcasi.carezze.domain.repository.ActivityLogRepository
 import com.fpculcasi.carezze.domain.repository.MedicationLogRepository
+
 import com.fpculcasi.carezze.domain.repository.PersonRepository
 import com.fpculcasi.carezze.domain.repository.TherapyRepository
 import com.fpculcasi.carezze.domain.repository.UserRepository
@@ -35,6 +39,10 @@ abstract class FirestoreModule {
     @Binds
     @Singleton
     abstract fun bindMedicationLogRepository(impl: MedicationLogRepositoryImpl): MedicationLogRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindActivityLogRepository(impl: ActivityLogRepositoryImpl): ActivityLogRepository
 
     companion object {
         @Provides
