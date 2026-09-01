@@ -22,6 +22,9 @@
 | M4 (therapy) — task 4.7 | 17 (ScheduleCalculator × 6, CreateTherapy × 2, GetTherapy × 2, UpdateTherapy × 2, DeleteTherapy × 2, ObserveTherapies × 1, LogMedication × 2) | 0 | domain/usecase/therapy |
 | **M4 total** | **17** | **0** | all therapy use cases + schedule logic |
 
+| M6 (sharing) — task 6.1 | 8 (Generate × 2, Redeem × 2, RevokeAccess × 2, ObserveInvitations × 2) | 0 | domain/usecase/invitation |
+| **M6 total (parziale)** | **8** | **0** | invitation use cases |
+
 > Aggiornare dopo ogni milestone. Target: ≥ 80% su domain + data layer.
 
 ## Navigazione / Schermate

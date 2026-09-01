@@ -108,6 +108,8 @@
 - **Detekt FunctionNaming + Compose**: le funzioni `@Composable` iniziano con maiuscola per convenzione. Aggiungere `ignoreAnnotated: ['Composable', 'Preview']` nella regola `FunctionNaming` di `config/detekt/detekt.yml`.
 - **Ktlint Composable naming**: aggiungere `ktlint_function_naming_ignore_when_annotated_with = Composable,Preview` in `.editorconfig`.
 
+- **ViewModel UseCase shadowing → ANR**: se un `@HiltViewModel` ha una `private val` iniettata con lo stesso nome di una `fun` membro pubblica (es. `val updatePerson: UpdatePersonUseCase` + `fun updatePerson(...)`), Kotlin risolve la chiamata alla funzione membro — non all'invoke del use case — causando ricorsione infinita sul `viewModelScope`, CPU al 100% e ANR dopo 10 s. **Regola:** rinominare sempre le proprietà iniettate con suffisso `UseCase` (es. `updatePersonUseCase`) quando il nome collide con un metodo pubblico del ViewModel.
+
 ## Known Issues
 
 > Nessun problema noto al momento del bootstrap.

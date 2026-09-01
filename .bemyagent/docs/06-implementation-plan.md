@@ -150,11 +150,11 @@ card and feed view. History shows 30 days in list or calendar mode.
 ---
 
 ## Milestone 6 — Condivisione & Inviti
-**Goal**: Utente può condividere Persona o Terapia tramite QR/codice, revocare accesso | **Status**: next
+**Goal**: Utente può condividere Persona o Terapia tramite QR/codice, revocare accesso | **Status**: in-progress
 
 | Task | Descrizione | Status |
 |---|---|---|
-| 6.1 | Domain: `Invitation` model + `InvitationRepository` + Use Cases | todo |
+| 6.1 | Domain: `Invitation` model + `InvitationRepository` + Use Cases | done |
 | 6.2 | Firestore transaction: `redeemInvitation` (atomica lato client, single-use + scadenza) | todo |
 | 6.3 | Client-side cascade: `onMemberRevoked` (transazione revoca + cancellazione dati membro) | todo |
 | 6.4 | Data: `InvitationRepositoryImpl` (generazione codice + QR bitmap) | todo |

@@ -47,7 +47,7 @@ class TherapyViewModel @Inject constructor(
     private val observeTherapies: ObserveTherapiesUseCase,
     private val observeLogs: ObserveLogsUseCase,
     private val createTherapy: CreateTherapyUseCase,
-    private val deleteTherapy: DeleteTherapyUseCase,
+    private val deleteTherapyUseCase: DeleteTherapyUseCase,
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
@@ -144,6 +144,6 @@ class TherapyViewModel @Inject constructor(
     }
 
     fun deleteTherapy(personId: String, therapyId: String) {
-        viewModelScope.launch { deleteTherapy(personId, therapyId) }
+        viewModelScope.launch { deleteTherapyUseCase(personId, therapyId) }
     }
 }

@@ -20,8 +20,8 @@ import javax.inject.Inject
 class PersonViewModel @Inject constructor(
     private val observePersons: ObservePersonsUseCase,
     private val createPerson: CreatePersonUseCase,
-    private val updatePerson: UpdatePersonUseCase,
-    private val deletePerson: DeletePersonUseCase,
+    private val updatePersonUseCase: UpdatePersonUseCase,
+    private val deletePersonUseCase: DeletePersonUseCase,
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
@@ -40,10 +40,10 @@ class PersonViewModel @Inject constructor(
     }
 
     fun updatePerson(person: Person) {
-        viewModelScope.launch { updatePerson(person) }
+        viewModelScope.launch { updatePersonUseCase(person) }
     }
 
     fun deletePerson(personId: String) {
-        viewModelScope.launch { deletePerson(personId) }
+        viewModelScope.launch { deletePersonUseCase(personId) }
     }
 }

@@ -1,0 +1,8 @@
+# EXECUTE — 6.1
+
+2026-09-01T15:40Z | CREATE domain/model/Invitation.kt + InvitationType enum | next: InvitationRepository interface
+2026-09-01T15:40Z | CREATE domain/repository/InvitationRepository.kt | next: 4 use cases
+2026-09-01T15:41Z | CREATE domain/usecase/invitation/{Generate,Redeem,RevokeAccess,ObserveInvitations}UseCase.kt | next: 4 test files
+2026-09-01T15:41Z | CREATE test/…/invitation/{Generate,Redeem,RevokeAccess,ObserveInvitations}UseCaseTest.kt | next: compile
+2026-09-01T15:42Z | ./gradlew compileDebugKotlin → BUILD SUCCESSFUL in 25s | next: run tests
+2026-09-01T15:43Z | ./gradlew :app:testDebugUnitTest --tests "*.invitation.*" → BUILD SUCCESSFUL in 32s | 8 tests, 0 failures, 0 errors (XML reports verificati)
