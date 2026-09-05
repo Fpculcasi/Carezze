@@ -125,6 +125,26 @@ Progress shown as bar, calendar, and remaining dose counter.
 
 ---
 
+## Milestone 4.5 — Gestione Terapie: Edit / Termina / Elimina + Log Somministrazioni
+**Goal**: Utente può modificare tutti i campi di una terapia, terminarla (soft-stop con storico conservato), eliminarla (hard delete con cascade), e visualizzare/aggiungere manualmente dosi al di fuori del Quick Log | **Status**: todo
+
+| Task | Descrizione | Status |
+|---|---|---|
+| 4.5.1 | Domain: `TherapyStatus` enum (ACTIVE, COMPLETED) + Use Cases `updateTherapy`, `terminateTherapy`, `deleteTherapy`, `addManualMedicationLog` | todo |
+| 4.5.2 | Data: `TherapyRepositoryImpl` — update (tutti i campi) + terminate (endDate=today, status=COMPLETED) + delete (hard, cascade `MedicationLog`) | todo |
+| 4.5.3 | UI: `EditTherapyScreen` — wizard pre-popolato, tutti i campi modificabili | todo |
+| 4.5.4 | UI: `TherapyDetailScreen` — FAB "Modifica" + menu overflow con "Termina" (dialog soft) e "Elimina" (dialog hard con warning perdita dati) | todo |
+| 4.5.5 | UI: `TherapyLogScreen` — lista cronologica dosi prese (da `MedicationLog`) + FAB aggiunta manuale con DateTimePicker e selezione farmaco | todo |
+| 4.5.6 | Firestore Security Rules: permesso `delete` su `therapies/{id}` + `medicationLogs` cascade | todo |
+| 4.5.7 | Test unitari: Use Cases `updateTherapy`, `terminateTherapy`, `deleteTherapy`, `addManualMedicationLog` | todo |
+
+**Scelte architetturali:**
+- Termina = soft-stop: `endDate = today`, `status = COMPLETED`; terapia rimane visibile in lista con badge "Conclusa"; log esistenti conservati
+- Elimina = hard delete: dialog con warning esplicito "I log saranno cancellati"; cancella `therapy` doc + tutti i `medicationLogs` correlati (batch Firestore)
+- Log manuale: riutilizza il model `MedicationLog` esistente con flag `isManual = true`
+
+---
+
 ## Milestone 5 — Activity Logging & Dashboard
 **Goal**: Dashboard operativa, Quick Log 1-tap, storico 30 giorni in lista e calendario | **Status**: done
 
@@ -155,13 +175,49 @@ card and feed view. History shows 30 days in list or calendar mode.
 | Task | Descrizione | Status |
 |---|---|---|
 | 5.5.1 | Bottom navigation shell 4 tab (Home, Persone, Profilo, Impostazioni) + inner NavHost | done |
-| 5.5.2 | Quick Log per-persona: azione "+" nella card, sheet vincolato alla persona, header con nome (R2) | todo |
+| 5.5.2 | Quick Log per-persona: azione "+" nella card, sheet vincolato alla persona, header con nome (R2) | done |
 | 5.5.3 | Evento "Farmaco" nel Quick Log: dosi schedulate terapie attive → conferma TAKEN (R3) | todo |
 | 5.5.4 | Tab Profilo/Account: vedi/modifica profilo se loggato, CTA login se anonimo (R4) | todo |
 | 5.5.5 | Navigazione: no back su tab radice; PersonDetail unica pagina persona, EditPersonScreen assorbita (R5) | todo |
 | 5.5.6 | Distinzione persone: colore locale per-utente e/o icona fascia d'età (R6) | todo |
 | 5.5.7 | Filtro Home: card singola su selezione + search bar nome/nickname (R7) | todo |
 | 5.5.8 | Pulizia: preview duplicate Dashboard, titolo QuickLogSheet con nome, test unit nuovi ViewModel | todo |
+
+---
+
+## Milestone 5.6 — Salvataggio Non Bloccante + Pending Indicator
+**Goal**: Tutte le operazioni di salvataggio (activity log, creazione terapia, log terapia) sono fire-and-forget: l'UI si chiude immediatamente con un toast, lo stato di sincronizzazione è visibile nell'app, gli errori sono gestiti con retry silenzioso | **Status**: todo
+
+| Task | Descrizione | Status |
+|---|---|---|
+| 5.6.1 | Infrastruttura: `SyncStatus` enum (SYNCED, PENDING, ERROR) + colonna `syncStatus` nelle Room entities `ActivityLog`, `Therapy`, `MedicationLog` | todo |
+| 5.6.2 | Repository pattern: scrittura Room-first → Firestore in coroutine background; in caso di errore: 3 retry esponenziali silenziosi → imposta `syncStatus = ERROR` | todo |
+| 5.6.3 | UI: indicatore pending — icona/badge discreta sull'elemento in lista quando `syncStatus != SYNCED` (es. orologio o dot colorato) | todo |
+| 5.6.4 | Activity Log non bloccante: Quick Log Bottom Sheet si chiude al tap "Salva" + toast "Registrato"; log appare in lista immediatamente con stato PENDING | todo |
+| 5.6.5 | Creazione terapia non bloccante: ultimo step wizard chiude la schermata immediatamente + toast "Terapia salvata"; terapia appare in lista con stato PENDING | todo |
+| 5.6.6 | Log terapia non bloccante: `TherapyLogScreen` aggiunta manuale chiude dialog immediatamente + toast + entry in lista con PENDING | todo |
+
+**Scelte architetturali:**
+- Room è la source of truth locale; Firestore è il target di sync
+- Nessun WorkManager per ora: retry gestito in-process con `retry` su coroutine (3 tentativi, backoff 1s/2s/4s)
+- Se tutti i retry falliscono → `syncStatus = ERROR` → l'utente vede l'indicatore ma non viene disturbato
+- Toast: `Snackbar` breve (2s), nessun tasto Retry esposto in UI
+
+---
+
+## Milestone 5.7 — Branding: Tema Allineato al Logo
+**Goal**: Il tema Compose riflette l'identità visiva del logo (navy, gradiente blu-viola); `dynamicColor` disabilitato per coerenza su tutti i dispositivi | **Status**: todo
+
+| Task | Descrizione | Status |
+|---|---|---|
+| 5.7.1 | Estrai palette M3 dal logo: primary navy `~#1B2763`, secondary blue-cyan `~#40C8F5`, tertiary violet `~#B868E8` → genera token M3 completi (container, on*, surface) | todo |
+| 5.7.2 | `Color.kt`: sostituisci token default Material3 purple con palette logo; `Theme.kt`: imposta `dynamicColor = false` | todo |
+| 5.7.3 | Verifica visiva: bottom nav, card, FAB, dialog, QuickLog sheet — nessun colore fuori palette | todo |
+
+**Note:**
+- Colori logo (da `ic_launcher.webp` xxxhdpi): sfondo **navy** `~#1B2763`, cuore **gradiente** `~#40C8F5 → #B868E8`, testo bianco
+- Dark scheme: primary → versione chiara del navy (`~#8BB4FF`), secondary/tertiary chiariti proporzionalmente
+- M9.5 ("colori pastello nel tema") rimpiazzato da questa milestone — aggiornare M9.5 a "verifica accessibilità contrasto + touch target" quando M5.7 è done
 
 ---
 

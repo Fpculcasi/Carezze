@@ -90,8 +90,13 @@ Carezze/
 ./gradlew assembleRelease
 ```
 
-> JAVA_HOME deve puntare al JDK 21 di Android Studio se il JDK di sistema non è 21:
+> JDK di sistema non configurato — usare il JBR bundled di Android Studio:
 > `export JAVA_HOME="/c/Program Files/Android/Android Studio/jbr"`
+>
+> Comando completo verificato (build + ktlint + detekt + unit test):
+> `JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew :app:compileDebugKotlin :app:ktlintCheck detekt :app:testDebugUnitTest`
+>
+> Nota: `detekt` è task root (non `:app:detekt`)
 
 ## Variabili d'Ambiente / Firebase Config
 

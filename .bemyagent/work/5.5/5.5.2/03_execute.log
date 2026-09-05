@@ -1,0 +1,8 @@
+# EXECUTE — 5.5.2
+
+## 2026-09-05T00:00Z
+cmd: Edit DashboardScreen.kt — rimozione FAB, "+" su PersonCard, firma onOpenQuickLog, stato quickLogPersonId, rimozione preview duplicate | PASS
+cmd: Edit QuickLogSheet.kt — aggiunta personName, fix header | PASS
+cmd: JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew :app:compileDebugKotlin :app:ktlintCheck detekt :app:testDebugUnitTest
+result: BUILD SUCCESSFUL in 2m 22s — 42 tasks (12 executed, 30 up-to-date)
+next: write 04_verify.md, update 02_tasks.md, update implementation plan

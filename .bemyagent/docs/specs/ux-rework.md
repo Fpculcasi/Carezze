@@ -1,6 +1,6 @@
 # Spec — UX Rework: Dashboard, Navigazione, Persone
 
-> Origine: feedback utente 2026-09-04. Stato: **draft — open questions da chiudere prima dell'EXECUTE.**
+> Origine: feedback utente 2026-09-04. Stato: **pronta per EXECUTE** — OQ1–OQ5 chiuse 2026-09-05.
 
 ## Problemi rilevati
 
@@ -20,16 +20,16 @@
 | R3 | Evento "💊 Farmaco" nel Quick Log: elenca dosi schedulate delle terapie attive della persona → tap conferma (`LogMedicationUseCase`, status TAKEN) | riusa `ObserveTherapiesUseCase` + `ScheduleCalculator` |
 | R4 | Tab Profilo: se loggato → vedi/modifica profilo (displayName, email, provider); se anonimo → CTA "Accedi / Registrati" (riuso Login/Register, `linkWithCredential` preserva i dati) | |
 | R5 | Tab radice senza freccia back; PersonDetail diventa l'unica pagina persona (edit inline + delete + terapie); EditPersonScreen assorbita; creazione da PersonList | |
-| R6 | Distinzione visiva persone: colore scelto dall'utente e/o icona fascia d'età (bimbo/adulto/anziano) | colore = preferenza **locale per-utente** (DataStore/Room), NON sul documento `persons/` condiviso |
+| R6 | Distinzione visiva persone: colore scelto dall'utente | colore = preferenza **locale per-utente** (DataStore/Room), NON sul documento `persons/` condiviso; icona fascia d'età **droppata** (OQ3) |
 | R7 | Filtro Home: selezionata una persona si vede **solo** la sua card; ricerca per nome/nickname tramite search bar | |
 
-## Open Questions (bloccanti per EXECUTE)
+## Open Questions — **Risolte 2026-09-05**
 
-- **OQ1** — FAB globale: eliminarlo del tutto o tenerlo come scorciatoia con selezione persona esplicita nel sheet?
-- **OQ2** — "Farmaco" nel Quick Log: solo conferma di dosi schedulate, o anche dose una tantum fuori schedule?
-- **OQ3** — Icona fascia d'età: attributo condiviso del documento Person o preferenza locale come il colore?
-- **OQ4** — Search bar: sostituisce i FilterChip o li affianca?
-- **OQ5** — Profilo e Impostazioni: due tab separate o una sola tab "Profilo" con dentro le impostazioni (bottom bar a 3 tab)?
+- **OQ1** ✅ FAB globale **eliminato**; ogni card persona espone il proprio "+" per il Quick Log.
+- **OQ2** ✅ Farmaco nel Quick Log: dosi schedulate + possibilità di aggiungere una dose **una tantum** fuori schedule.
+- **OQ3** ✅ Icona fascia d'età **droppata** (il dato non ha utilità per l'utente); R6 ridotto al solo colore locale.
+- **OQ4** ✅ Search bar **affianca** i FilterChip (non li sostituisce).
+- **OQ5** ✅ Risolto implicitamente da 5.5.1: 4 tab separate (Home, Persone, Profilo, Impostazioni).
 
 ## Acceptance Criteria
 

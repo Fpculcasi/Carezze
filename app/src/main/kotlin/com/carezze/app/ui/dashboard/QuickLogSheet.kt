@@ -45,6 +45,7 @@ import com.fpculcasi.carezze.domain.model.TemperatureUnit
 @Composable
 fun QuickLogSheet(
     personId: String,
+    personName: String,
     onDismiss: () -> Unit,
     viewModel: QuickLogViewModel = hiltViewModel(),
 ) {
@@ -67,7 +68,7 @@ fun QuickLogSheet(
                     .navigationBarsPadding(),
         ) {
             Text(
-                "Registra evento per $personId",
+                "Registra evento per $personName",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
             )

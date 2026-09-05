@@ -26,7 +26,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -68,7 +67,7 @@ fun DashboardScreen(
     val recentLogs by viewModel.recentLogs.collectAsState()
     val selectedPersonId by viewModel.selectedPersonId.collectAsState()
     val viewMode by viewModel.viewMode.collectAsState()
-    var showQuickLog by remember { mutableStateOf(false) }
+    var quickLogPersonId by remember { mutableStateOf<String?>(null) }
 
     DashboardContent(
         persons = persons,
@@ -80,13 +79,15 @@ fun DashboardScreen(
         onNavigateToSettings = onNavigateToSettings,
         onNavigateToPersons = onNavigateToPersons,
         onNavigateToHistory = onNavigateToHistory,
-        onOpenQuickLog = { showQuickLog = true },
+        onOpenQuickLog = { personId -> quickLogPersonId = personId },
     )
 
-    if (showQuickLog) {
+    quickLogPersonId?.let { pid ->
+        val personName = persons.find { it.id == pid }?.let { it.nickname ?: it.name } ?: ""
         QuickLogSheet(
-            personId = selectedPersonId ?: persons.firstOrNull()?.id ?: "",
-            onDismiss = { showQuickLog = false },
+            personId = pid,
+            personName = personName,
+            onDismiss = { quickLogPersonId = null },
         )
     }
 }
@@ -103,7 +104,7 @@ internal fun DashboardContent(
     onNavigateToSettings: () -> Unit,
     onNavigateToPersons: () -> Unit,
     onNavigateToHistory: (personId: String) -> Unit,
-    onOpenQuickLog: () -> Unit,
+    onOpenQuickLog: (personId: String) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -125,11 +126,6 @@ internal fun DashboardContent(
                 },
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onOpenQuickLog) {
-                Icon(Icons.Default.Add, contentDescription = "Registra evento")
-            }
-        },
     ) { padding ->
         Column(
             modifier =
@@ -150,6 +146,7 @@ internal fun DashboardContent(
                     recentLogs = recentLogs,
                     onNavigateToHistory = onNavigateToHistory,
                     onNavigateToPersons = onNavigateToPersons,
+                    onOpenQuickLog = onOpenQuickLog,
                 )
             } else {
                 FeedView(
@@ -197,6 +194,7 @@ private fun CardView(
     recentLogs: List<ActivityLog>,
     onNavigateToHistory: (personId: String) -> Unit,
     onNavigateToPersons: () -> Unit,
+    onOpenQuickLog: (personId: String) -> Unit,
 ) {
     if (persons.isEmpty()) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -227,6 +225,7 @@ private fun CardView(
                     person = person,
                     recentLogCount = logCount,
                     onNavigateToHistory = { onNavigateToHistory(person.id) },
+                    onOpenQuickLog = { onOpenQuickLog(person.id) },
                 )
             }
         }
@@ -238,6 +237,7 @@ private fun PersonCard(
     person: Person,
     recentLogCount: Int,
     onNavigateToHistory: () -> Unit,
+    onOpenQuickLog: () -> Unit,
 ) {
     ElevatedCard(
         onClick = onNavigateToHistory,
@@ -266,7 +266,7 @@ private fun PersonCard(
                 )
             }
             Spacer(Modifier.size(16.dp))
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(person.name, style = MaterialTheme.typography.titleMedium)
                 if (person.nickname != null) {
                     Text(
@@ -284,6 +284,9 @@ private fun PersonCard(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+            }
+            IconButton(onClick = onOpenQuickLog) {
+                Icon(Icons.Default.Add, contentDescription = "Registra evento")
             }
         }
     }
@@ -390,49 +393,7 @@ private fun DashboardContentPreview() {
             onNavigateToSettings = {},
             onNavigateToPersons = {},
             onNavigateToHistory = {},
-            onOpenQuickLog = {},
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun DashboardContentPreview2() {
-    val person = Person("p1", "Vittoria", "Vicky", "uid1", emptyMap())
-    val log = ActivityLog.Diaper("l1", "p1", Instant.now(), "uid1", DiaperType.WET, null)
-    CarezzeTheme {
-        DashboardContent(
-            persons = listOf(person),
-            recentLogs = listOf(log),
-            selectedPersonId = "p1",
-            viewMode = DashboardViewMode.CARD,
-            onSelectPerson = {},
-            onToggleViewMode = {},
-            onNavigateToSettings = {},
-            onNavigateToPersons = {},
-            onNavigateToHistory = {},
-            onOpenQuickLog = {},
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun DashboardContentPreviewQuickLog() {
-    val person = Person("p1", "Vittoria", "Vicky", "uid1", emptyMap())
-    val log = ActivityLog.Diaper("l1", "p1", Instant.now(), "uid1", DiaperType.WET, null)
-    CarezzeTheme {
-        DashboardContent(
-            persons = listOf(person),
-            recentLogs = listOf(log),
-            selectedPersonId = "p1",
-            viewMode = DashboardViewMode.CARD,
-            onSelectPerson = {},
-            onToggleViewMode = {},
-            onNavigateToSettings = {},
-            onNavigateToPersons = {},
-            onNavigateToHistory = {},
-            onOpenQuickLog = {},
+            onOpenQuickLog = { _ -> },
         )
     }
 }
