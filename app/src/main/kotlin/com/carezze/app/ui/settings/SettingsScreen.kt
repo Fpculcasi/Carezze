@@ -81,10 +81,11 @@ internal fun SettingsContent(
         },
     ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 24.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 24.dp),
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -152,9 +153,10 @@ private fun SettingDropdown(
             readOnly = true,
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                    .fillMaxWidth(),
         )
         ExposedDropdownMenu(
             expanded = expanded,
@@ -173,9 +175,10 @@ private fun SettingDropdown(
     }
 }
 
-private fun quietHourOptions(): List<String> = (0..23).flatMap { h ->
-    listOf("${"$h".padStart(2, '0')}:00", "${"$h".padStart(2, '0')}:30")
-}
+private fun quietHourOptions(): List<String> =
+    (0..23).flatMap { h ->
+        listOf("${"$h".padStart(2, '0')}:00", "${"$h".padStart(2, '0')}:30")
+    }
 
 @Preview(showBackground = true)
 @Composable

@@ -9,29 +9,30 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class RevokeAccessUseCaseTest {
-
     private val invitationRepository = mockk<InvitationRepository>()
     private val useCase = RevokeAccessUseCase(invitationRepository)
 
     @Test
-    fun `returns success when access revoked`() = runTest {
-        coEvery {
-            invitationRepository.revokeAccess("pid-1", InvitationType.PERSON, "uid-2")
-        } returns Result.success(Unit)
+    fun `returns success when access revoked`() =
+        runTest {
+            coEvery {
+                invitationRepository.revokeAccess("pid-1", InvitationType.PERSON, "uid-2")
+            } returns Result.success(Unit)
 
-        val result = useCase("pid-1", InvitationType.PERSON, "uid-2")
+            val result = useCase("pid-1", InvitationType.PERSON, "uid-2")
 
-        assertTrue(result.isSuccess)
-    }
+            assertTrue(result.isSuccess)
+        }
 
     @Test
-    fun `returns failure when revocation fails`() = runTest {
-        coEvery {
-            invitationRepository.revokeAccess("pid-1", InvitationType.PERSON, "uid-2")
-        } returns Result.failure(Exception("permission denied"))
+    fun `returns failure when revocation fails`() =
+        runTest {
+            coEvery {
+                invitationRepository.revokeAccess("pid-1", InvitationType.PERSON, "uid-2")
+            } returns Result.failure(Exception("permission denied"))
 
-        val result = useCase("pid-1", InvitationType.PERSON, "uid-2")
+            val result = useCase("pid-1", InvitationType.PERSON, "uid-2")
 
-        assertTrue(result.isFailure)
-    }
+            assertTrue(result.isFailure)
+        }
 }

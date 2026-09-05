@@ -1,7 +1,6 @@
 package com.fpculcasi.carezze.ui.dashboard
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -61,10 +60,11 @@ fun QuickLogSheet(
         sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .navigationBarsPadding(),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .navigationBarsPadding(),
         ) {
             Text(
                 "Registra evento per $personId",
@@ -96,15 +96,16 @@ fun QuickLogSheet(
 
 @Composable
 private fun TypeSelectionGrid(onSelectType: (ActivityLogType) -> Unit) {
-    val types = listOf(
-        ActivityLogType.MEAL to "🍼 Pasto",
-        ActivityLogType.DIAPER to "👶 Pannolino",
-        ActivityLogType.SLEEP_START to "🌙 Inizio sonno",
-        ActivityLogType.SLEEP_END to "☀️ Fine sonno",
-        ActivityLogType.TEMPERATURE to "🌡️ Temperatura",
-        ActivityLogType.WEIGHT to "⚖️ Peso",
-        ActivityLogType.HYGIENE to "🛁 Igiene",
-    )
+    val types =
+        listOf(
+            ActivityLogType.MEAL to "🍼 Pasto",
+            ActivityLogType.DIAPER to "👶 Pannolino",
+            ActivityLogType.SLEEP_START to "🌙 Inizio sonno",
+            ActivityLogType.SLEEP_END to "☀️ Fine sonno",
+            ActivityLogType.TEMPERATURE to "🌡️ Temperatura",
+            ActivityLogType.WEIGHT to "⚖️ Peso",
+            ActivityLogType.HYGIENE to "🛁 Igiene",
+        )
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         types.chunked(2).forEach { row ->
             Row(
@@ -139,17 +140,20 @@ private fun TypeForm(
         when (type) {
             ActivityLogType.MEAL -> MealForm(personId = personId, isLoading = isLoading, viewModel = viewModel)
             ActivityLogType.DIAPER -> DiaperForm(personId = personId, isLoading = isLoading, viewModel = viewModel)
-            ActivityLogType.SLEEP_START -> QuickSaveForm(
-                label = "Inizio sonno registrato",
-                isLoading = isLoading,
-                onSave = { viewModel.logSleep(personId, isStart = true) },
-            )
-            ActivityLogType.SLEEP_END -> QuickSaveForm(
-                label = "Fine sonno registrata",
-                isLoading = isLoading,
-                onSave = { viewModel.logSleep(personId, isStart = false) },
-            )
-            ActivityLogType.TEMPERATURE -> TemperatureForm(personId = personId, isLoading = isLoading, viewModel = viewModel)
+            ActivityLogType.SLEEP_START ->
+                QuickSaveForm(
+                    label = "Inizio sonno registrato",
+                    isLoading = isLoading,
+                    onSave = { viewModel.logSleep(personId, isStart = true) },
+                )
+            ActivityLogType.SLEEP_END ->
+                QuickSaveForm(
+                    label = "Fine sonno registrata",
+                    isLoading = isLoading,
+                    onSave = { viewModel.logSleep(personId, isStart = false) },
+                )
+            ActivityLogType.TEMPERATURE ->
+                TemperatureForm(personId = personId, isLoading = isLoading, viewModel = viewModel)
             ActivityLogType.WEIGHT -> WeightForm(personId = personId, isLoading = isLoading, viewModel = viewModel)
             ActivityLogType.HYGIENE -> {
                 OutlinedTextField(
@@ -166,7 +170,11 @@ private fun TypeForm(
 }
 
 @Composable
-private fun MealForm(personId: String, isLoading: Boolean, viewModel: QuickLogViewModel) {
+private fun MealForm(
+    personId: String,
+    isLoading: Boolean,
+    viewModel: QuickLogViewModel,
+) {
     var amount by remember { mutableStateOf("") }
     var selectedUnit by remember { mutableStateOf(MealUnit.ML) }
     var selectedType by remember { mutableStateOf(MealType.FORMULA) }
@@ -174,7 +182,12 @@ private fun MealForm(personId: String, isLoading: Boolean, viewModel: QuickLogVi
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             MealType.entries.forEach { t ->
                 FilterToggle(
-                    label = when (t) { MealType.BREAST -> "Seno"; MealType.FORMULA -> "Formula"; MealType.SOLID -> "Solido" },
+                    label =
+                        when (t) {
+                            MealType.BREAST -> "Seno"
+                            MealType.FORMULA -> "Formula"
+                            MealType.SOLID -> "Solido"
+                        },
                     selected = selectedType == t,
                     onClick = { selectedType = t },
                     modifier = Modifier.weight(1f),
@@ -204,12 +217,27 @@ private fun MealForm(personId: String, isLoading: Boolean, viewModel: QuickLogVi
 }
 
 @Composable
-private fun DiaperForm(personId: String, isLoading: Boolean, viewModel: QuickLogViewModel) {
+private fun DiaperForm(
+    personId: String,
+    isLoading: Boolean,
+    viewModel: QuickLogViewModel,
+) {
     var selected by remember { mutableStateOf(DiaperType.WET) }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(DiaperType.WET to "Pipì", DiaperType.DIRTY to "Pupù", DiaperType.BOTH to "Entrambi", DiaperType.DRY to "Asciutto").forEach { (t, label) ->
-                FilterToggle(label = label, selected = selected == t, onClick = { selected = t }, modifier = Modifier.weight(1f))
+            listOf(
+                DiaperType.WET to "Pipì",
+                DiaperType.DIRTY to "Pupù",
+                DiaperType.BOTH to "Entrambi",
+                DiaperType.DRY to "Asciutto",
+            ).forEach {
+                    (t, label) ->
+                FilterToggle(
+                    label = label,
+                    selected = selected == t,
+                    onClick = { selected = t },
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
         SaveButton(isLoading = isLoading, onSave = { viewModel.logDiaper(personId, selected, null) })
@@ -217,7 +245,11 @@ private fun DiaperForm(personId: String, isLoading: Boolean, viewModel: QuickLog
 }
 
 @Composable
-private fun TemperatureForm(personId: String, isLoading: Boolean, viewModel: QuickLogViewModel) {
+private fun TemperatureForm(
+    personId: String,
+    isLoading: Boolean,
+    viewModel: QuickLogViewModel,
+) {
     var temp by remember { mutableStateOf("") }
     var unit by remember { mutableStateOf(TemperatureUnit.C) }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -240,7 +272,11 @@ private fun TemperatureForm(personId: String, isLoading: Boolean, viewModel: Qui
 }
 
 @Composable
-private fun WeightForm(personId: String, isLoading: Boolean, viewModel: QuickLogViewModel) {
+private fun WeightForm(
+    personId: String,
+    isLoading: Boolean,
+    viewModel: QuickLogViewModel,
+) {
     var weight by remember { mutableStateOf("") }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         OutlinedTextField(
@@ -251,13 +287,19 @@ private fun WeightForm(personId: String, isLoading: Boolean, viewModel: QuickLog
             modifier = Modifier.fillMaxWidth(),
         )
         SaveButton(isLoading = isLoading, onSave = {
-            weight.toDoubleOrNull()?.let { viewModel.logWeight(personId, it, com.fpculcasi.carezze.domain.model.WeightUnit.KG, null) }
+            weight.toDoubleOrNull()?.let {
+                viewModel.logWeight(personId, it, com.fpculcasi.carezze.domain.model.WeightUnit.KG, null)
+            }
         })
     }
 }
 
 @Composable
-private fun QuickSaveForm(label: String, isLoading: Boolean, onSave: () -> Unit) {
+private fun QuickSaveForm(
+    label: String,
+    isLoading: Boolean,
+    onSave: () -> Unit,
+) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(label, style = MaterialTheme.typography.bodyMedium)
         SaveButton(isLoading = isLoading, onSave = onSave)
@@ -265,14 +307,21 @@ private fun QuickSaveForm(label: String, isLoading: Boolean, onSave: () -> Unit)
 }
 
 @Composable
-private fun SaveButton(isLoading: Boolean, onSave: () -> Unit) {
+private fun SaveButton(
+    isLoading: Boolean,
+    onSave: () -> Unit,
+) {
     Button(
         onClick = onSave,
         enabled = !isLoading,
         modifier = Modifier.fillMaxWidth(),
     ) {
         if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
+            CircularProgressIndicator(
+                modifier = Modifier.size(18.dp),
+                strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.onPrimary,
+            )
             Spacer(Modifier.width(8.dp))
         } else {
             Icon(Icons.Default.Check, contentDescription = null)
@@ -283,13 +332,23 @@ private fun SaveButton(isLoading: Boolean, onSave: () -> Unit) {
 }
 
 @Composable
-private fun FilterToggle(label: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun FilterToggle(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     ElevatedButton(
         onClick = onClick,
         modifier = modifier,
-        colors = if (selected) androidx.compose.material3.ButtonDefaults.elevatedButtonColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        ) else androidx.compose.material3.ButtonDefaults.elevatedButtonColors(),
+        colors =
+            if (selected) {
+                androidx.compose.material3.ButtonDefaults.elevatedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                )
+            } else {
+                androidx.compose.material3.ButtonDefaults.elevatedButtonColors()
+            },
     ) {
         Text(label, style = MaterialTheme.typography.labelSmall)
     }

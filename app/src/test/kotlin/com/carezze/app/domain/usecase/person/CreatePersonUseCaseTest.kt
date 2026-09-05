@@ -11,35 +11,39 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class CreatePersonUseCaseTest {
-
     private val personRepository = mockk<PersonRepository>()
     private val useCase = CreatePersonUseCase(personRepository)
 
     @Test
-    fun `returns created person on success`() = runTest {
-        val person = fakePerson()
-        coEvery { personRepository.createPerson("Vittoria", null, "uid-1") } returns Result.success(person)
+    fun `returns created person on success`() =
+        runTest {
+            val person = fakePerson()
+            coEvery { personRepository.createPerson("Vittoria", null, "uid-1") } returns Result.success(person)
 
-        val result = useCase("Vittoria", null, "uid-1")
+            val result = useCase("Vittoria", null, "uid-1")
 
-        assertTrue(result.isSuccess)
-        assertEquals(person, result.getOrNull())
-    }
+            assertTrue(result.isSuccess)
+            assertEquals(person, result.getOrNull())
+        }
 
     @Test
-    fun `returns failure when repository throws`() = runTest {
-        coEvery { personRepository.createPerson("Vittoria", null, "uid-1") } returns Result.failure(Exception("network error"))
+    fun `returns failure when repository throws`() =
+        runTest {
+            coEvery {
+                personRepository.createPerson("Vittoria", null, "uid-1")
+            } returns Result.failure(Exception("network error"))
 
-        val result = useCase("Vittoria", null, "uid-1")
+            val result = useCase("Vittoria", null, "uid-1")
 
-        assertTrue(result.isFailure)
-    }
+            assertTrue(result.isFailure)
+        }
 
-    private fun fakePerson() = Person(
-        id = "pid-1",
-        name = "Vittoria",
-        nickname = null,
-        createdBy = "uid-1",
-        members = mapOf("uid-1" to MemberRole.OWNER),
-    )
+    private fun fakePerson() =
+        Person(
+            id = "pid-1",
+            name = "Vittoria",
+            nickname = null,
+            createdBy = "uid-1",
+            members = mapOf("uid-1" to MemberRole.OWNER),
+        )
 }

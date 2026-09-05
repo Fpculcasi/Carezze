@@ -53,7 +53,9 @@ fun AddTherapyScreen(
                 title = { Text(if (form.step == 1) "Nuova terapia" else "Farmaci") },
                 navigationIcon = {
                     IconButton(onClick = {
-                        if (form.step > 1) viewModel.prevStep() else {
+                        if (form.step > 1) {
+                            viewModel.prevStep()
+                        } else {
                             viewModel.resetForm()
                             onNavigateBack()
                         }
@@ -65,10 +67,11 @@ fun AddTherapyScreen(
         },
     ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 16.dp),
         ) {
             LinearProgressIndicator(
                 progress = { form.step / 2f },
@@ -85,11 +88,15 @@ fun AddTherapyScreen(
 }
 
 @Composable
-private fun StepOneContent(form: AddTherapyFormState, viewModel: TherapyViewModel) {
+private fun StepOneContent(
+    form: AddTherapyFormState,
+    viewModel: TherapyViewModel,
+) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         OutlinedTextField(
@@ -147,9 +154,10 @@ private fun StepTwoContent(
     onDone: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         form.medications.forEachIndexed { index, med ->

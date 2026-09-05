@@ -43,10 +43,11 @@ private suspend fun launchGoogleSignIn(
     onError: (String?) -> Unit,
 ) {
     val credentialManager = CredentialManager.create(context)
-    val googleIdOption = GetGoogleIdOption.Builder()
-        .setFilterByAuthorizedAccounts(false)
-        .setServerClientId(BuildConfig.GOOGLE_WEB_CLIENT_ID)
-        .build()
+    val googleIdOption =
+        GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(false)
+            .setServerClientId(BuildConfig.GOOGLE_WEB_CLIENT_ID)
+            .build()
     val request = GetCredentialRequest(listOf(googleIdOption))
 
     try {

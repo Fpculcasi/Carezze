@@ -8,7 +8,12 @@ import java.time.LocalDate
 
 interface TherapyRepository {
     fun observeTherapies(personId: String): Flow<List<Therapy>>
-    suspend fun getTherapy(personId: String, therapyId: String): Result<Therapy>
+
+    suspend fun getTherapy(
+        personId: String,
+        therapyId: String,
+    ): Result<Therapy>
+
     suspend fun createTherapy(
         personId: String,
         name: String,
@@ -17,6 +22,11 @@ interface TherapyRepository {
         medications: List<Medication>,
         userId: String,
     ): Result<Therapy>
+
     suspend fun updateTherapy(therapy: Therapy): Result<Unit>
-    suspend fun deleteTherapy(personId: String, therapyId: String): Result<Unit>
+
+    suspend fun deleteTherapy(
+        personId: String,
+        therapyId: String,
+    ): Result<Unit>
 }

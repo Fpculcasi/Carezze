@@ -22,37 +22,46 @@ import javax.inject.Inject
 enum class DashboardViewMode { CARD, FEED }
 
 @HiltViewModel
-class DashboardViewModel @Inject constructor(
-    private val observePersons: ObservePersonsUseCase,
-    private val observeActivityLogs: ObserveActivityLogsUseCase,
-    private val authRepository: AuthRepository,
-) : ViewModel() {
+class DashboardViewModel
+    @Inject
+    constructor(
+        private val observePersons: ObservePersonsUseCase,
+        private val observeActivityLogs: ObserveActivityLogsUseCase,
+        private val authRepository: AuthRepository,
+    ) : ViewModel() {
+        private val userId: String? get() = authRepository.currentUser?.id
 
-    private val userId: String? get() = authRepository.currentUser?.id
+        val persons: StateFlow<List<Person>> =
+            userId
+                ?.let { observePersons(it) }
+                ?.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+                ?: MutableStateFlow(emptyList())
 
-    val persons: StateFlow<List<Person>> = userId
-        ?.let { observePersons(it) }
-        ?.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-        ?: MutableStateFlow(emptyList())
+        val selectedPersonId = MutableStateFlow<String?>(null)
 
-    val selectedPersonId = MutableStateFlow<String?>(null)
+        val viewMode = MutableStateFlow(DashboardViewMode.CARD)
 
-    val viewMode = MutableStateFlow(DashboardViewMode.CARD)
+        val recentLogs: StateFlow<List<ActivityLog>> =
+            combine(persons, selectedPersonId) { personList, selectedId ->
+                if (selectedId == null) personList else personList.filter { it.id == selectedId }
+            }.flatMapLatest { relevant ->
+                if (relevant.isEmpty()) return@flatMapLatest flowOf(emptyList())
+                val from = Instant.now().minus(7, ChronoUnit.DAYS)
+                val to = Instant.now()
+                val flows = relevant.map { observeActivityLogs(it.id, from, to) }
+                if (flows.size == 1) {
+                    flows[0]
+                } else {
+                    combine(flows) { arrays -> arrays.flatMap { it }.sortedByDescending { it.timestamp } }
+                }
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    val recentLogs: StateFlow<List<ActivityLog>> = combine(persons, selectedPersonId) { personList, selectedId ->
-        if (selectedId == null) personList else personList.filter { it.id == selectedId }
-    }.flatMapLatest { relevant ->
-        if (relevant.isEmpty()) return@flatMapLatest flowOf(emptyList())
-        val from = Instant.now().minus(7, ChronoUnit.DAYS)
-        val to = Instant.now()
-        val flows = relevant.map { observeActivityLogs(it.id, from, to) }
-        if (flows.size == 1) flows[0]
-        else combine(flows) { arrays -> arrays.flatMap { it }.sortedByDescending { it.timestamp } }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+        fun selectPerson(id: String?) {
+            selectedPersonId.value = id
+        }
 
-    fun selectPerson(id: String?) { selectedPersonId.value = id }
-
-    fun toggleViewMode() {
-        viewMode.value = if (viewMode.value == DashboardViewMode.CARD) DashboardViewMode.FEED else DashboardViewMode.CARD
+        fun toggleViewMode() {
+            viewMode.value =
+                if (viewMode.value == DashboardViewMode.CARD) DashboardViewMode.FEED else DashboardViewMode.CARD
+        }
     }
-}

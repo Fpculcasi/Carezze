@@ -15,27 +15,29 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(
-    private val observeUser: ObserveUserUseCase,
-    private val syncUser: SyncUserUseCase,
-    private val authRepository: com.fpculcasi.carezze.domain.repository.AuthRepository,
-) : ViewModel() {
+class SettingsViewModel
+    @Inject
+    constructor(
+        private val observeUser: ObserveUserUseCase,
+        private val syncUser: SyncUserUseCase,
+        private val authRepository: com.fpculcasi.carezze.domain.repository.AuthRepository,
+    ) : ViewModel() {
+        val settingsState: StateFlow<User?> =
+            authRepository.currentUser?.id
+                ?.let { observeUser(it) }
+                ?.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+                ?: kotlinx.coroutines.flow.MutableStateFlow(null)
 
-    val settingsState: StateFlow<User?> = authRepository.currentUser?.id
-        ?.let { observeUser(it) }
-        ?.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-        ?: kotlinx.coroutines.flow.MutableStateFlow(null)
+        fun setLanguage(language: Language) = updateUser { copy(language = language) }
 
-    fun setLanguage(language: Language) = updateUser { copy(language = language) }
+        fun setTemperatureUnit(unit: TemperatureUnit) = updateUser { copy(temperatureUnit = unit) }
 
-    fun setTemperatureUnit(unit: TemperatureUnit) = updateUser { copy(temperatureUnit = unit) }
+        fun setQuietHoursStart(time: String) = updateUser { copy(quietHoursStart = time) }
 
-    fun setQuietHoursStart(time: String) = updateUser { copy(quietHoursStart = time) }
+        fun setQuietHoursEnd(time: String) = updateUser { copy(quietHoursEnd = time) }
 
-    fun setQuietHoursEnd(time: String) = updateUser { copy(quietHoursEnd = time) }
-
-    private fun updateUser(transform: User.() -> User) {
-        val current = settingsState.value ?: return
-        viewModelScope.launch { syncUser(current.transform()) }
+        private fun updateUser(transform: User.() -> User) {
+            val current = settingsState.value ?: return
+            viewModelScope.launch { syncUser(current.transform()) }
+        }
     }
-}

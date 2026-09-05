@@ -17,6 +17,7 @@ data class Therapy(
 
 sealed class TherapyDuration {
     object Indefinite : TherapyDuration()
+
     data class Fixed(val days: Int) : TherapyDuration()
 }
 

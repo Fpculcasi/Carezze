@@ -12,40 +12,42 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class SignInAnonymouslyUseCaseTest {
-
     private val authRepository = mockk<AuthRepository>()
     private val useCase = SignInAnonymouslyUseCase(authRepository)
 
     @Test
-    fun `returns success with anonymous user on successful sign-in`() = runTest {
-        val anonymousUser = fakeUser(isAnonymous = true)
-        coEvery { authRepository.signInAnonymously() } returns Result.success(anonymousUser)
+    fun `returns success with anonymous user on successful sign-in`() =
+        runTest {
+            val anonymousUser = fakeUser(isAnonymous = true)
+            coEvery { authRepository.signInAnonymously() } returns Result.success(anonymousUser)
 
-        val result = useCase()
+            val result = useCase()
 
-        assertTrue(result.isSuccess)
-        assertEquals(anonymousUser, result.getOrNull())
-    }
+            assertTrue(result.isSuccess)
+            assertEquals(anonymousUser, result.getOrNull())
+        }
 
     @Test
-    fun `returns failure when repository throws exception`() = runTest {
-        coEvery { authRepository.signInAnonymously() } returns Result.failure(RuntimeException("Network error"))
+    fun `returns failure when repository throws exception`() =
+        runTest {
+            coEvery { authRepository.signInAnonymously() } returns Result.failure(RuntimeException("Network error"))
 
-        val result = useCase()
+            val result = useCase()
 
-        assertTrue(result.isFailure)
-    }
+            assertTrue(result.isFailure)
+        }
 
-    private fun fakeUser(isAnonymous: Boolean) = User(
-        id = "uid-anon",
-        email = null,
-        displayName = "Utente",
-        language = Language.IT,
-        temperatureUnit = TemperatureUnit.C,
-        quietHoursStart = "22:00",
-        quietHoursEnd = "07:00",
-        personAccess = emptyList(),
-        therapyAccess = emptyList(),
-        isAnonymous = isAnonymous,
-    )
+    private fun fakeUser(isAnonymous: Boolean) =
+        User(
+            id = "uid-anon",
+            email = null,
+            displayName = "Utente",
+            language = Language.IT,
+            temperatureUnit = TemperatureUnit.C,
+            quietHoursStart = "22:00",
+            quietHoursEnd = "07:00",
+            personAccess = emptyList(),
+            therapyAccess = emptyList(),
+            isAnonymous = isAnonymous,
+        )
 }

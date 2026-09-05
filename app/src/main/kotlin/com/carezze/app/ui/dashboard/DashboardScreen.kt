@@ -22,9 +22,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -51,7 +49,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.fpculcasi.carezze.domain.model.ActivityLog
 import com.fpculcasi.carezze.domain.model.DiaperType
 import com.fpculcasi.carezze.domain.model.Person
-import com.fpculcasi.carezze.domain.model.MemberRole
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 import java.time.Instant
 import java.time.ZoneId
@@ -135,9 +132,10 @@ internal fun DashboardContent(
         },
     ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding),
         ) {
             PersonFilterRow(
                 persons = persons,
@@ -247,9 +245,10 @@ private fun PersonCard(
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             BadgedBox(
@@ -277,8 +276,11 @@ private fun PersonCard(
                     )
                 }
                 Text(
-                    if (recentLogCount == 0) "Nessun evento negli ultimi 7 giorni"
-                    else "$recentLogCount eventi negli ultimi 7 giorni",
+                    if (recentLogCount == 0) {
+                        "Nessun evento negli ultimi 7 giorni"
+                    } else {
+                        "$recentLogCount eventi negli ultimi 7 giorni"
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -335,36 +337,42 @@ private fun ActivityLogFeedItem(
     )
 }
 
-private fun ActivityLog.label(): String = when (this) {
-    is ActivityLog.Meal -> buildString {
+private fun ActivityLog.label(): String =
+    when (this) {
+        is ActivityLog.Meal -> mealLabel()
+        is ActivityLog.Diaper ->
+            "Pannolino · ${
+                when (diaperType) {
+                    DiaperType.WET -> "Pipì"
+                    DiaperType.DIRTY -> "Pupù"
+                    DiaperType.BOTH -> "Pipì e pupù"
+                    DiaperType.DRY -> "Asciutto"
+                }
+            }"
+        is ActivityLog.SleepStart -> "Inizio sonno"
+        is ActivityLog.SleepEnd -> "Fine sonno"
+        is ActivityLog.Temperature -> "Temperatura · $temperature°${unit.name}"
+        is ActivityLog.Weight -> "Peso · $weight ${weightUnit.name.lowercase()}"
+        is ActivityLog.Hygiene -> "Igiene"
+    }
+
+private fun ActivityLog.Meal.mealLabel(): String =
+    buildString {
         append("Pasto")
         if (mealType != null) append(" · ${mealType.name.lowercase().replaceFirstChar { it.uppercaseChar() }}")
         if (amount != null && amountUnit != null) append(" · $amount ${amountUnit.name.lowercase()}")
     }
-    is ActivityLog.Diaper -> "Pannolino · ${
-        when (diaperType) {
-            DiaperType.WET -> "Pipì"
-            DiaperType.DIRTY -> "Pupù"
-            DiaperType.BOTH -> "Pipì e pupù"
-            DiaperType.DRY -> "Asciutto"
-        }
-    }"
-    is ActivityLog.SleepStart -> "Inizio sonno"
-    is ActivityLog.SleepEnd -> "Fine sonno"
-    is ActivityLog.Temperature -> "Temperatura · ${temperature}°${unit.name}"
-    is ActivityLog.Weight -> "Peso · ${weight} ${weightUnit.name.lowercase()}"
-    is ActivityLog.Hygiene -> "Igiene"
-}
 
-private fun ActivityLog.emoji(): String = when (this) {
-    is ActivityLog.Meal -> "🍼"
-    is ActivityLog.Diaper -> "👶"
-    is ActivityLog.SleepStart -> "🌙"
-    is ActivityLog.SleepEnd -> "☀️"
-    is ActivityLog.Temperature -> "🌡️"
-    is ActivityLog.Weight -> "⚖️"
-    is ActivityLog.Hygiene -> "🛁"
-}
+private fun ActivityLog.emoji(): String =
+    when (this) {
+        is ActivityLog.Meal -> "🍼"
+        is ActivityLog.Diaper -> "👶"
+        is ActivityLog.SleepStart -> "🌙"
+        is ActivityLog.SleepEnd -> "☀️"
+        is ActivityLog.Temperature -> "🌡️"
+        is ActivityLog.Weight -> "⚖️"
+        is ActivityLog.Hygiene -> "🛁"
+    }
 
 @Preview(showBackground = true)
 @Composable
@@ -387,7 +395,6 @@ private fun DashboardContentPreview() {
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 private fun DashboardContentPreview2() {
@@ -408,8 +415,6 @@ private fun DashboardContentPreview2() {
         )
     }
 }
-
-
 
 @Preview(showBackground = true)
 @Composable

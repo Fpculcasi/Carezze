@@ -27,7 +27,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.fpculcasi.carezze.domain.model.MedicationLog
 import com.fpculcasi.carezze.domain.model.Medication
 import com.fpculcasi.carezze.domain.model.Therapy
 import com.fpculcasi.carezze.domain.model.TherapyDuration
@@ -59,7 +58,6 @@ fun TherapyDetailScreen(
         if (therapy == null) return@Scaffold
         TherapyDetailContent(
             therapy = therapy,
-            logs = logs,
             progress = viewModel.progressFor(therapy, logs),
             remaining = viewModel.remainingDoses(therapy, logs),
             modifier = Modifier.padding(padding),
@@ -70,15 +68,15 @@ fun TherapyDetailScreen(
 @Composable
 private fun TherapyDetailContent(
     therapy: Therapy,
-    logs: List<MedicationLog>,
     progress: Float,
     remaining: Int,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
@@ -89,16 +87,21 @@ private fun TherapyDetailContent(
             }
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text("Inizio: ${therapy.startDate}", style = MaterialTheme.typography.bodyMedium)
-                val durationText = when (val d = therapy.duration) {
-                    is TherapyDuration.Indefinite -> "Durata: illimitata"
-                    is TherapyDuration.Fixed -> "Durata: ${d.days} giorni"
-                }
+                val durationText =
+                    when (val d = therapy.duration) {
+                        is TherapyDuration.Indefinite -> "Durata: illimitata"
+                        is TherapyDuration.Fixed -> "Durata: ${d.days} giorni"
+                    }
                 Text(durationText, style = MaterialTheme.typography.bodyMedium)
                 Text(
                     if (therapy.isActive) "Stato: attiva" else "Stato: terminata",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (therapy.isActive) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color =
+                        if (therapy.isActive) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
                 )
             }
             Spacer(Modifier.height(8.dp))
@@ -112,7 +115,10 @@ private fun TherapyDetailContent(
 }
 
 @Composable
-private fun TherapyProgressSection(progress: Float, remaining: Int) {
+private fun TherapyProgressSection(
+    progress: Float,
+    remaining: Int,
+) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),

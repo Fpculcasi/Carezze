@@ -13,36 +13,38 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class ObservePersonsUseCaseTest {
-
     private val personRepository = mockk<PersonRepository>()
     private val useCase = ObservePersonsUseCase(personRepository)
 
     @Test
-    fun `emits empty list when user has no persons`() = runTest {
-        every { personRepository.observePersons("uid-1") } returns flowOf(emptyList())
+    fun `emits empty list when user has no persons`() =
+        runTest {
+            every { personRepository.observePersons("uid-1") } returns flowOf(emptyList())
 
-        useCase("uid-1").test {
-            assertTrue(awaitItem().isEmpty())
-            awaitComplete()
+            useCase("uid-1").test {
+                assertTrue(awaitItem().isEmpty())
+                awaitComplete()
+            }
         }
-    }
 
     @Test
-    fun `emits persons when user has access`() = runTest {
-        val persons = listOf(fakePerson("pid-1"), fakePerson("pid-2"))
-        every { personRepository.observePersons("uid-1") } returns flowOf(persons)
+    fun `emits persons when user has access`() =
+        runTest {
+            val persons = listOf(fakePerson("pid-1"), fakePerson("pid-2"))
+            every { personRepository.observePersons("uid-1") } returns flowOf(persons)
 
-        useCase("uid-1").test {
-            assertEquals(persons, awaitItem())
-            awaitComplete()
+            useCase("uid-1").test {
+                assertEquals(persons, awaitItem())
+                awaitComplete()
+            }
         }
-    }
 
-    private fun fakePerson(id: String) = Person(
-        id = id,
-        name = "Vittoria",
-        nickname = null,
-        createdBy = "uid-1",
-        members = mapOf("uid-1" to MemberRole.OWNER),
-    )
+    private fun fakePerson(id: String) =
+        Person(
+            id = id,
+            name = "Vittoria",
+            nickname = null,
+            createdBy = "uid-1",
+            members = mapOf("uid-1" to MemberRole.OWNER),
+        )
 }

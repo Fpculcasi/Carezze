@@ -33,10 +33,10 @@ import com.fpculcasi.carezze.domain.model.ActivityLog
 import com.fpculcasi.carezze.domain.model.DiaperType
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
 import java.util.Locale
 
-private val dateHeaderFormatter = DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.ITALIAN).withZone(ZoneId.systemDefault())
+private val dateHeaderFormatter =
+    DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.ITALIAN).withZone(ZoneId.systemDefault())
 private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault())
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,10 +82,14 @@ fun HistoryListScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun GroupedFeed(logs: List<ActivityLog>, contentPadding: PaddingValues) {
-    val grouped = logs.groupBy { log ->
-        log.timestamp.atZone(ZoneId.systemDefault()).toLocalDate()
-    }.entries.sortedByDescending { it.key }
+private fun GroupedFeed(
+    logs: List<ActivityLog>,
+    contentPadding: PaddingValues,
+) {
+    val grouped =
+        logs.groupBy { log ->
+            log.timestamp.atZone(ZoneId.systemDefault()).toLocalDate()
+        }.entries.sortedByDescending { it.key }
 
     LazyColumn(contentPadding = contentPadding) {
         grouped.forEach { (date, dayLogs) ->
@@ -95,8 +99,9 @@ private fun GroupedFeed(logs: List<ActivityLog>, contentPadding: PaddingValues) 
                     color = MaterialTheme.colorScheme.surfaceVariant,
                 ) {
                     Text(
-                        text = dateHeaderFormatter.format(date.atStartOfDay(ZoneId.systemDefault()).toInstant())
-                            .replaceFirstChar { it.uppercaseChar() },
+                        text =
+                            dateHeaderFormatter.format(date.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                                .replaceFirstChar { it.uppercaseChar() },
                         style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -117,31 +122,39 @@ private fun GroupedFeed(logs: List<ActivityLog>, contentPadding: PaddingValues) 
     }
 }
 
-private fun ActivityLog.label(): String = when (this) {
-    is ActivityLog.Meal -> buildString {
+private fun ActivityLog.label(): String =
+    when (this) {
+        is ActivityLog.Meal -> mealLabel()
+        is ActivityLog.Diaper ->
+            "Pannolino · ${
+                when (diaperType) {
+                    DiaperType.WET -> "Pipì"
+                    DiaperType.DIRTY -> "Pupù"
+                    DiaperType.BOTH -> "Pipì e pupù"
+                    DiaperType.DRY -> "Asciutto"
+                }
+            }"
+        is ActivityLog.SleepStart -> "Inizio sonno"
+        is ActivityLog.SleepEnd -> "Fine sonno"
+        is ActivityLog.Temperature -> "Temperatura · $temperature°${unit.name}"
+        is ActivityLog.Weight -> "Peso · $weight ${weightUnit.name.lowercase()}"
+        is ActivityLog.Hygiene -> "Igiene"
+    }
+
+private fun ActivityLog.Meal.mealLabel(): String =
+    buildString {
         append("Pasto")
         if (mealType != null) append(" · ${mealType.name.lowercase().replaceFirstChar { it.uppercaseChar() }}")
         if (amount != null && amountUnit != null) append(" · $amount ${amountUnit.name.lowercase()}")
     }
-    is ActivityLog.Diaper -> "Pannolino · ${
-        when (diaperType) {
-            DiaperType.WET -> "Pipì"; DiaperType.DIRTY -> "Pupù"
-            DiaperType.BOTH -> "Pipì e pupù"; DiaperType.DRY -> "Asciutto"
-        }
-    }"
-    is ActivityLog.SleepStart -> "Inizio sonno"
-    is ActivityLog.SleepEnd -> "Fine sonno"
-    is ActivityLog.Temperature -> "Temperatura · ${temperature}°${unit.name}"
-    is ActivityLog.Weight -> "Peso · ${weight} ${weightUnit.name.lowercase()}"
-    is ActivityLog.Hygiene -> "Igiene"
-}
 
-private fun ActivityLog.emoji(): String = when (this) {
-    is ActivityLog.Meal -> "🍼"
-    is ActivityLog.Diaper -> "👶"
-    is ActivityLog.SleepStart -> "🌙"
-    is ActivityLog.SleepEnd -> "☀️"
-    is ActivityLog.Temperature -> "🌡️"
-    is ActivityLog.Weight -> "⚖️"
-    is ActivityLog.Hygiene -> "🛁"
-}
+private fun ActivityLog.emoji(): String =
+    when (this) {
+        is ActivityLog.Meal -> "🍼"
+        is ActivityLog.Diaper -> "👶"
+        is ActivityLog.SleepStart -> "🌙"
+        is ActivityLog.SleepEnd -> "☀️"
+        is ActivityLog.Temperature -> "🌡️"
+        is ActivityLog.Weight -> "⚖️"
+        is ActivityLog.Hygiene -> "🛁"
+    }

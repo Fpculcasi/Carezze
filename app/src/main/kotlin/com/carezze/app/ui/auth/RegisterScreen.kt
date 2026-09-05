@@ -89,17 +89,21 @@ internal fun RegisterContent(
         },
     ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 24.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it; onClearError() },
+                onValueChange = {
+                    email = it
+                    onClearError()
+                },
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -108,7 +112,10 @@ internal fun RegisterContent(
 
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it; onClearError() },
+                onValueChange = {
+                    password = it
+                    onClearError()
+                },
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = PasswordVisualTransformation(),
@@ -124,9 +131,12 @@ internal fun RegisterContent(
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 isError = passwordMismatch,
-                supportingText = if (passwordMismatch) {
-                    { Text("Le password non corrispondono") }
-                } else null,
+                supportingText =
+                    if (passwordMismatch) {
+                        { Text("Le password non corrispondono") }
+                    } else {
+                        null
+                    },
                 singleLine = true,
             )
 

@@ -15,81 +15,98 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class PersonRepositoryImpl @Inject constructor(
-    private val firestore: FirebaseFirestore,
-) : PersonRepository {
+class PersonRepositoryImpl
+    @Inject
+    constructor(
+        private val firestore: FirebaseFirestore,
+    ) : PersonRepository {
+        private fun personsCollection() = firestore.collection("persons")
 
-    private fun personsCollection() = firestore.collection("persons")
-
-    override fun observePersons(userId: String): Flow<List<Person>> = callbackFlow {
-        val listener = personsCollection()
-            .whereArrayContains("memberIds", userId)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
-                }
-                val persons = snapshot?.documents?.mapNotNull { it.toDomain() } ?: emptyList()
-                trySend(persons)
+        override fun observePersons(userId: String): Flow<List<Person>> =
+            callbackFlow {
+                val listener =
+                    personsCollection()
+                        .whereArrayContains("memberIds", userId)
+                        .addSnapshotListener { snapshot, error ->
+                            if (error != null) {
+                                close(error)
+                                return@addSnapshotListener
+                            }
+                            val persons = snapshot?.documents?.mapNotNull { it.toDomain() } ?: emptyList()
+                            trySend(persons)
+                        }
+                awaitClose { listener.remove() }
             }
-        awaitClose { listener.remove() }
-    }
 
-    override suspend fun getPerson(personId: String): Result<Person> = runCatching {
-        val snapshot = personsCollection().document(personId).get().await()
-        snapshot.toDomain() ?: error("Person not found: $personId")
-    }
+        override suspend fun getPerson(personId: String): Result<Person> =
+            runCatching {
+                val snapshot = personsCollection().document(personId).get().await()
+                snapshot.toDomain() ?: error("Person not found: $personId")
+            }
 
-    override suspend fun createPerson(name: String, nickname: String?, userId: String): Result<Person> = runCatching {
-        val personId = UUID.randomUUID().toString()
-        val data = mapOf(
-            "name" to name,
-            "nickname" to nickname,
-            "createdBy" to userId,
-            "members" to mapOf(userId to "OWNER"),
-            "memberIds" to listOf(userId),
-            "createdAt" to FieldValue.serverTimestamp(),
-            "updatedAt" to FieldValue.serverTimestamp(),
-        )
-        personsCollection().document(personId).set(data).await()
-        Person(
-            id = personId,
-            name = name,
-            nickname = nickname,
-            createdBy = userId,
-            members = mapOf(userId to MemberRole.OWNER),
-        )
-    }
+        override suspend fun createPerson(
+            name: String,
+            nickname: String?,
+            userId: String,
+        ): Result<Person> =
+            runCatching {
+                val personId = UUID.randomUUID().toString()
+                val data =
+                    mapOf(
+                        "name" to name,
+                        "nickname" to nickname,
+                        "createdBy" to userId,
+                        "members" to mapOf(userId to "OWNER"),
+                        "memberIds" to listOf(userId),
+                        "createdAt" to FieldValue.serverTimestamp(),
+                        "updatedAt" to FieldValue.serverTimestamp(),
+                    )
+                personsCollection().document(personId).set(data).await()
+                Person(
+                    id = personId,
+                    name = name,
+                    nickname = nickname,
+                    createdBy = userId,
+                    members = mapOf(userId to MemberRole.OWNER),
+                )
+            }
 
-    override suspend fun updatePerson(person: Person): Result<Unit> = runCatching {
-        val data = mapOf(
-            "name" to person.name,
-            "nickname" to person.nickname,
-            "updatedAt" to FieldValue.serverTimestamp(),
-        )
-        personsCollection().document(person.id).set(data, SetOptions.merge()).await()
-    }
+        override suspend fun updatePerson(person: Person): Result<Unit> =
+            runCatching {
+                val data =
+                    mapOf(
+                        "name" to person.name,
+                        "nickname" to person.nickname,
+                        "updatedAt" to FieldValue.serverTimestamp(),
+                    )
+                personsCollection().document(person.id).set(data, SetOptions.merge()).await()
+            }
 
-    override suspend fun deletePerson(personId: String): Result<Unit> = runCatching {
-        personsCollection().document(personId).delete().await()
-    }
+        override suspend fun deletePerson(personId: String): Result<Unit> =
+            runCatching {
+                personsCollection().document(personId).delete().await()
+            }
 
-    private fun com.google.firebase.firestore.DocumentSnapshot.toDomain(): Person? {
-        if (!exists()) return null
-        val rawMembers = (get("members") as? Map<*, *>)
-            ?.mapNotNull { (k, v) ->
-                val key = k as? String ?: return@mapNotNull null
-                val role = (v as? String)?.let { runCatching { MemberRole.valueOf(it) }.getOrNull() }
-                    ?: return@mapNotNull null
-                key to role
-            }?.toMap() ?: emptyMap()
+        private fun com.google.firebase.firestore.DocumentSnapshot.toDomain(): Person? {
+            if (!exists()) return null
+            val name = getString("name") ?: return null
+            val createdBy = getString("createdBy") ?: return null
+            val rawMembers =
+                (get("members") as? Map<*, *>)
+                    ?.mapNotNull { (k, v) ->
+                        val key = k as? String ?: return@mapNotNull null
+                        val role =
+                            (v as? String)?.let { runCatching { MemberRole.valueOf(it) }.getOrNull() }
+                                ?: return@mapNotNull null
+                        key to role
+                    }?.toMap() ?: emptyMap()
 
-        return Person(
-            id = id,
-            name = getString("name") ?: return null,
-            nickname = getString("nickname"),
-            createdBy = getString("createdBy") ?: return null,
-            members = rawMembers,
-        )
+            return Person(
+                id = id,
+                name = name,
+                nickname = getString("nickname"),
+                createdBy = createdBy,
+                members = rawMembers,
+            )
+        }
     }
-}

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -48,12 +47,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.fpculcasi.carezze.domain.model.ActivityLog
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
 import java.util.Locale
 
 private val monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ITALIAN)
@@ -69,9 +66,10 @@ fun HistoryCalendarScreen(
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
     var selectedDay by remember { mutableStateOf<LocalDate?>(null) }
 
-    val logsByDate = logs.groupBy { log ->
-        log.timestamp.atZone(ZoneId.systemDefault()).toLocalDate()
-    }
+    val logsByDate =
+        logs.groupBy { log ->
+            log.timestamp.atZone(ZoneId.systemDefault()).toLocalDate()
+        }
 
     Scaffold(
         topBar = {
@@ -86,10 +84,11 @@ fun HistoryCalendarScreen(
         },
     ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 16.dp),
         ) {
             MonthHeader(
                 month = currentMonth,
@@ -123,7 +122,11 @@ fun HistoryCalendarScreen(
 }
 
 @Composable
-private fun MonthHeader(month: YearMonth, onPrevious: () -> Unit, onNext: () -> Unit) {
+private fun MonthHeader(
+    month: YearMonth,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -185,36 +188,46 @@ private fun CalendarGrid(
                 val isSelected = date == selectedDay
                 val isToday = date == LocalDate.now()
                 Box(
-                    modifier = Modifier
-                        .aspectRatio(1f)
-                        .padding(2.dp)
-                        .clip(CircleShape)
-                        .background(
-                            when {
-                                isSelected -> MaterialTheme.colorScheme.primary
-                                isToday -> MaterialTheme.colorScheme.secondaryContainer
-                                else -> androidx.compose.ui.graphics.Color.Transparent
-                            }
-                        )
-                        .clickable { onDayClick(date) },
+                    modifier =
+                        Modifier
+                            .aspectRatio(1f)
+                            .padding(2.dp)
+                            .clip(CircleShape)
+                            .background(
+                                when {
+                                    isSelected -> MaterialTheme.colorScheme.primary
+                                    isToday -> MaterialTheme.colorScheme.secondaryContainer
+                                    else -> androidx.compose.ui.graphics.Color.Transparent
+                                },
+                            )
+                            .clickable { onDayClick(date) },
                     contentAlignment = Alignment.Center,
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = date.dayOfMonth.toString(),
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                            color =
+                                if (isSelected) {
+                                    MaterialTheme.colorScheme.onPrimary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface
+                                },
                             fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
                         )
                         if (hasLogs) {
                             Box(
-                                modifier = Modifier
-                                    .size(4.dp)
-                                    .clip(CircleShape)
-                                    .background(
-                                        if (isSelected) MaterialTheme.colorScheme.onPrimary
-                                        else MaterialTheme.colorScheme.primary
-                                    ),
+                                modifier =
+                                    Modifier
+                                        .size(4.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            if (isSelected) {
+                                                MaterialTheme.colorScheme.onPrimary
+                                            } else {
+                                                MaterialTheme.colorScheme.primary
+                                            },
+                                        ),
                             )
                         }
                     }
@@ -225,12 +238,16 @@ private fun CalendarGrid(
 }
 
 @Composable
-private fun DayDetail(day: LocalDate, logs: List<ActivityLog>) {
+private fun DayDetail(
+    day: LocalDate,
+    logs: List<ActivityLog>,
+) {
     val dateFormatter = DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.ITALIAN)
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
@@ -255,22 +272,24 @@ private fun DayDetail(day: LocalDate, logs: List<ActivityLog>) {
     }
 }
 
-private fun ActivityLog.label(): String = when (this) {
-    is ActivityLog.Meal -> "Pasto"
-    is ActivityLog.Diaper -> "Pannolino"
-    is ActivityLog.SleepStart -> "Inizio sonno"
-    is ActivityLog.SleepEnd -> "Fine sonno"
-    is ActivityLog.Temperature -> "Temperatura · ${temperature}°${unit.name}"
-    is ActivityLog.Weight -> "Peso · ${weight} ${weightUnit.name.lowercase()}"
-    is ActivityLog.Hygiene -> "Igiene"
-}
+private fun ActivityLog.label(): String =
+    when (this) {
+        is ActivityLog.Meal -> "Pasto"
+        is ActivityLog.Diaper -> "Pannolino"
+        is ActivityLog.SleepStart -> "Inizio sonno"
+        is ActivityLog.SleepEnd -> "Fine sonno"
+        is ActivityLog.Temperature -> "Temperatura · $temperature°${unit.name}"
+        is ActivityLog.Weight -> "Peso · $weight ${weightUnit.name.lowercase()}"
+        is ActivityLog.Hygiene -> "Igiene"
+    }
 
-private fun ActivityLog.emoji(): String = when (this) {
-    is ActivityLog.Meal -> "🍼"
-    is ActivityLog.Diaper -> "👶"
-    is ActivityLog.SleepStart -> "🌙"
-    is ActivityLog.SleepEnd -> "☀️"
-    is ActivityLog.Temperature -> "🌡️"
-    is ActivityLog.Weight -> "⚖️"
-    is ActivityLog.Hygiene -> "🛁"
-}
+private fun ActivityLog.emoji(): String =
+    when (this) {
+        is ActivityLog.Meal -> "🍼"
+        is ActivityLog.Diaper -> "👶"
+        is ActivityLog.SleepStart -> "🌙"
+        is ActivityLog.SleepEnd -> "☀️"
+        is ActivityLog.Temperature -> "🌡️"
+        is ActivityLog.Weight -> "⚖️"
+        is ActivityLog.Hygiene -> "🛁"
+    }

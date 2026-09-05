@@ -15,7 +15,6 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 class ObserveActivityLogsUseCaseTest {
-
     private val repository = mockk<ActivityLogRepository>()
     private val useCase = ObserveActivityLogsUseCase(repository)
 
@@ -23,30 +22,33 @@ class ObserveActivityLogsUseCaseTest {
     private val to = Instant.now()
 
     @Test
-    fun `emits list from repository`() = runTest {
-        val logs = listOf(fakeLog())
-        every { repository.observeActivityLogs("pid-1", from, to) } returns flowOf(logs)
+    fun `emits list from repository`() =
+        runTest {
+            val logs = listOf(fakeLog())
+            every { repository.observeActivityLogs("pid-1", from, to) } returns flowOf(logs)
 
-        val result = useCase("pid-1", from, to).first()
+            val result = useCase("pid-1", from, to).first()
 
-        assertEquals(1, result.size)
-    }
+            assertEquals(1, result.size)
+        }
 
     @Test
-    fun `emits empty list when no logs`() = runTest {
-        every { repository.observeActivityLogs("pid-1", from, to) } returns flowOf(emptyList())
+    fun `emits empty list when no logs`() =
+        runTest {
+            every { repository.observeActivityLogs("pid-1", from, to) } returns flowOf(emptyList())
 
-        val result = useCase("pid-1", from, to).first()
+            val result = useCase("pid-1", from, to).first()
 
-        assertTrue(result.isEmpty())
-    }
+            assertTrue(result.isEmpty())
+        }
 
-    private fun fakeLog() = ActivityLog.Diaper(
-        id = "log-1",
-        personId = "pid-1",
-        timestamp = Instant.now(),
-        loggedBy = "uid-1",
-        diaperType = DiaperType.WET,
-        notes = null,
-    )
+    private fun fakeLog() =
+        ActivityLog.Diaper(
+            id = "log-1",
+            personId = "pid-1",
+            timestamp = Instant.now(),
+            loggedBy = "uid-1",
+            diaperType = DiaperType.WET,
+            notes = null,
+        )
 }

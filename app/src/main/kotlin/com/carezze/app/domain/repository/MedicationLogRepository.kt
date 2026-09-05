@@ -5,7 +5,11 @@ import com.fpculcasi.carezze.domain.model.MedicationStatus
 import kotlinx.coroutines.flow.Flow
 
 interface MedicationLogRepository {
-    fun observeLogs(personId: String, therapyId: String): Flow<List<MedicationLog>>
+    fun observeLogs(
+        personId: String,
+        therapyId: String,
+    ): Flow<List<MedicationLog>>
+
     suspend fun logMedication(
         personId: String,
         therapyId: String,

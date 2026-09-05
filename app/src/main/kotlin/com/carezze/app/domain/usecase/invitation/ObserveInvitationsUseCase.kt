@@ -5,9 +5,10 @@ import com.fpculcasi.carezze.domain.repository.InvitationRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class ObserveInvitationsUseCase @Inject constructor(
-    private val invitationRepository: InvitationRepository,
-) {
-    operator fun invoke(userId: String): Flow<List<Invitation>> =
-        invitationRepository.observeInvitations(userId)
-}
+class ObserveInvitationsUseCase
+    @Inject
+    constructor(
+        private val invitationRepository: InvitationRepository,
+    ) {
+        operator fun invoke(userId: String): Flow<List<Invitation>> = invitationRepository.observeInvitations(userId)
+    }

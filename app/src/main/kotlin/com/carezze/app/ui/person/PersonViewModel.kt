@@ -17,33 +17,38 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PersonViewModel @Inject constructor(
-    private val observePersons: ObservePersonsUseCase,
-    private val createPerson: CreatePersonUseCase,
-    private val updatePersonUseCase: UpdatePersonUseCase,
-    private val deletePersonUseCase: DeletePersonUseCase,
-    private val authRepository: AuthRepository,
-) : ViewModel() {
+class PersonViewModel
+    @Inject
+    constructor(
+        private val observePersons: ObservePersonsUseCase,
+        private val createPerson: CreatePersonUseCase,
+        private val updatePersonUseCase: UpdatePersonUseCase,
+        private val deletePersonUseCase: DeletePersonUseCase,
+        private val authRepository: AuthRepository,
+    ) : ViewModel() {
+        private val userId: String? get() = authRepository.currentUser?.id
 
-    private val userId: String? get() = authRepository.currentUser?.id
+        val persons: StateFlow<List<Person>> =
+            userId
+                ?.let { observePersons(it) }
+                ?.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+                ?: MutableStateFlow(emptyList())
 
-    val persons: StateFlow<List<Person>> = userId
-        ?.let { observePersons(it) }
-        ?.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-        ?: MutableStateFlow(emptyList())
+        fun createPerson(
+            name: String,
+            nickname: String?,
+        ) {
+            val uid = userId ?: return
+            viewModelScope.launch {
+                createPerson(name, nickname?.takeIf { it.isNotBlank() }, uid)
+            }
+        }
 
-    fun createPerson(name: String, nickname: String?) {
-        val uid = userId ?: return
-        viewModelScope.launch {
-            createPerson(name, nickname?.takeIf { it.isNotBlank() }, uid)
+        fun updatePerson(person: Person) {
+            viewModelScope.launch { updatePersonUseCase(person) }
+        }
+
+        fun deletePerson(personId: String) {
+            viewModelScope.launch { deletePersonUseCase(personId) }
         }
     }
-
-    fun updatePerson(person: Person) {
-        viewModelScope.launch { updatePersonUseCase(person) }
-    }
-
-    fun deletePerson(personId: String) {
-        viewModelScope.launch { deletePersonUseCase(personId) }
-    }
-}

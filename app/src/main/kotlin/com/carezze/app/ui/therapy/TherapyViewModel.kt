@@ -10,8 +10,8 @@ import com.fpculcasi.carezze.domain.model.TherapyDuration
 import com.fpculcasi.carezze.domain.repository.AuthRepository
 import com.fpculcasi.carezze.domain.usecase.therapy.CreateTherapyUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.DeleteTherapyUseCase
-import com.fpculcasi.carezze.domain.usecase.therapy.ObserveTherapiesUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.ObserveLogsUseCase
+import com.fpculcasi.carezze.domain.usecase.therapy.ObserveTherapiesUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.ScheduleCalculator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,107 +43,142 @@ data class AddTherapyFormState(
 )
 
 @HiltViewModel
-class TherapyViewModel @Inject constructor(
-    private val observeTherapies: ObserveTherapiesUseCase,
-    private val observeLogs: ObserveLogsUseCase,
-    private val createTherapy: CreateTherapyUseCase,
-    private val deleteTherapyUseCase: DeleteTherapyUseCase,
-    private val authRepository: AuthRepository,
-) : ViewModel() {
+class TherapyViewModel
+    @Inject
+    constructor(
+        private val observeTherapies: ObserveTherapiesUseCase,
+        private val observeLogs: ObserveLogsUseCase,
+        private val createTherapy: CreateTherapyUseCase,
+        private val deleteTherapyUseCase: DeleteTherapyUseCase,
+        private val authRepository: AuthRepository,
+    ) : ViewModel() {
+        private val userId: String? get() = authRepository.currentUser?.id
 
-    private val userId: String? get() = authRepository.currentUser?.id
+        private val therapiesCache = mutableMapOf<String, StateFlow<List<Therapy>>>()
+        private val logsCache = mutableMapOf<String, StateFlow<List<MedicationLog>>>()
 
-    private val _therapiesMap = mutableMapOf<String, StateFlow<List<Therapy>>>()
-    private val _logsMap = mutableMapOf<String, StateFlow<List<MedicationLog>>>()
+        fun therapiesFor(personId: String): StateFlow<List<Therapy>> =
+            therapiesCache.getOrPut(personId) {
+                observeTherapies(personId)
+                    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+            }
 
-    fun therapiesFor(personId: String): StateFlow<List<Therapy>> =
-        _therapiesMap.getOrPut(personId) {
-            observeTherapies(personId)
-                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+        fun logsFor(
+            personId: String,
+            therapyId: String,
+        ): StateFlow<List<MedicationLog>> =
+            logsCache.getOrPut("$personId/$therapyId") {
+                observeLogs(personId, therapyId)
+                    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+            }
+
+        fun progressFor(
+            therapy: Therapy,
+            logs: List<MedicationLog>,
+        ): Float {
+            val fixed = therapy.duration as? TherapyDuration.Fixed ?: return -1f
+            val totalDoses =
+                therapy.medications.sumOf { med ->
+                    val dosesPerDay = if (med.frequencyHours > 0) 24 / med.frequencyHours else 1
+                    dosesPerDay * fixed.days
+                }
+            if (totalDoses == 0) return 0f
+            val taken = logs.count { it.status == MedicationStatus.TAKEN }
+            return (taken.toFloat() / totalDoses).coerceIn(0f, 1f)
         }
 
-    fun logsFor(personId: String, therapyId: String): StateFlow<List<MedicationLog>> =
-        _logsMap.getOrPut("$personId/$therapyId") {
-            observeLogs(personId, therapyId)
-                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+        fun remainingDoses(
+            therapy: Therapy,
+            logs: List<MedicationLog>,
+        ): Int {
+            val fixed = therapy.duration as? TherapyDuration.Fixed ?: return -1
+            val totalDoses =
+                therapy.medications.sumOf { med ->
+                    val dosesPerDay = if (med.frequencyHours > 0) 24 / med.frequencyHours else 1
+                    dosesPerDay * fixed.days
+                }
+            val completed = logs.count { it.status == MedicationStatus.TAKEN || it.status == MedicationStatus.SKIPPED }
+            return (totalDoses - completed).coerceAtLeast(0)
         }
 
-    fun progressFor(therapy: Therapy, logs: List<MedicationLog>): Float {
-        val fixed = therapy.duration as? TherapyDuration.Fixed ?: return -1f
-        val totalDoses = therapy.medications.sumOf { med ->
-            val dosesPerDay = if (med.frequencyHours > 0) 24 / med.frequencyHours else 1
-            dosesPerDay * fixed.days
+        private val _form = MutableStateFlow(AddTherapyFormState())
+        val form: StateFlow<AddTherapyFormState> = _form.asStateFlow()
+
+        fun resetForm() {
+            _form.value = AddTherapyFormState()
         }
-        if (totalDoses == 0) return 0f
-        val taken = logs.count { it.status == MedicationStatus.TAKEN }
-        return (taken.toFloat() / totalDoses).coerceIn(0f, 1f)
+
+        fun updateTherapyName(name: String) = _form.update { it.copy(therapyName = name) }
+
+        fun updateStartDate(date: LocalDate) = _form.update { it.copy(startDate = date) }
+
+        fun updateIsFixed(fixed: Boolean) = _form.update { it.copy(isFixed = fixed) }
+
+        fun updateFixedDays(days: String) = _form.update { it.copy(fixedDays = days) }
+
+        fun addMedication() = _form.update { it.copy(medications = it.medications + MedicationFormState()) }
+
+        fun removeMedication(id: String) =
+            _form.update {
+                it.copy(
+                    medications = it.medications.filter { m -> m.id != id },
+                )
+            }
+
+        fun updateMedication(updated: MedicationFormState) =
+            _form.update {
+                it.copy(medications = it.medications.map { m -> if (m.id == updated.id) updated else m })
+            }
+
+        fun nextStep() = _form.update { it.copy(step = it.step + 1) }
+
+        fun prevStep() = _form.update { it.copy(step = it.step - 1) }
+
+        fun submitTherapy(
+            personId: String,
+            onDone: () -> Unit,
+        ) {
+            val uid = userId ?: return
+            val state = _form.value
+            val duration =
+                if (state.isFixed) {
+                    TherapyDuration.Fixed(state.fixedDays.toIntOrNull() ?: 7)
+                } else {
+                    TherapyDuration.Indefinite
+                }
+            val medications =
+                state.medications.mapNotNull { m ->
+                    if (m.name.isBlank()) return@mapNotNull null
+                    val dosage = m.dosage.toDoubleOrNull() ?: 1.0
+                    Medication(
+                        id = m.id,
+                        name = m.name,
+                        dosage = dosage,
+                        dosageUnit = m.dosageUnit,
+                        frequencyHours = m.frequencyHours,
+                        scheduledTimes = ScheduleCalculator.computeScheduledTimes(m.frequencyHours),
+                        startDate = state.startDate,
+                        notes = null,
+                    )
+                }
+            viewModelScope.launch {
+                createTherapy(
+                    personId = personId,
+                    name = state.therapyName,
+                    startDate = state.startDate,
+                    duration = duration,
+                    medications = medications,
+                    userId = uid,
+                )
+                resetForm()
+                onDone()
+            }
+        }
+
+        fun deleteTherapy(
+            personId: String,
+            therapyId: String,
+        ) {
+            viewModelScope.launch { deleteTherapyUseCase(personId, therapyId) }
+        }
     }
-
-    fun remainingDoses(therapy: Therapy, logs: List<MedicationLog>): Int {
-        val fixed = therapy.duration as? TherapyDuration.Fixed ?: return -1
-        val totalDoses = therapy.medications.sumOf { med ->
-            val dosesPerDay = if (med.frequencyHours > 0) 24 / med.frequencyHours else 1
-            dosesPerDay * fixed.days
-        }
-        val completed = logs.count { it.status == MedicationStatus.TAKEN || it.status == MedicationStatus.SKIPPED }
-        return (totalDoses - completed).coerceAtLeast(0)
-    }
-
-    private val _form = MutableStateFlow(AddTherapyFormState())
-    val form: StateFlow<AddTherapyFormState> = _form.asStateFlow()
-
-    fun resetForm() { _form.value = AddTherapyFormState() }
-
-    fun updateTherapyName(name: String) = _form.update { it.copy(therapyName = name) }
-    fun updateStartDate(date: LocalDate) = _form.update { it.copy(startDate = date) }
-    fun updateIsFixed(fixed: Boolean) = _form.update { it.copy(isFixed = fixed) }
-    fun updateFixedDays(days: String) = _form.update { it.copy(fixedDays = days) }
-
-    fun addMedication() = _form.update { it.copy(medications = it.medications + MedicationFormState()) }
-    fun removeMedication(id: String) = _form.update { it.copy(medications = it.medications.filter { m -> m.id != id }) }
-    fun updateMedication(updated: MedicationFormState) = _form.update {
-        it.copy(medications = it.medications.map { m -> if (m.id == updated.id) updated else m })
-    }
-
-    fun nextStep() = _form.update { it.copy(step = it.step + 1) }
-    fun prevStep() = _form.update { it.copy(step = it.step - 1) }
-
-    fun submitTherapy(personId: String, onDone: () -> Unit) {
-        val uid = userId ?: return
-        val state = _form.value
-        val duration = if (state.isFixed)
-            TherapyDuration.Fixed(state.fixedDays.toIntOrNull() ?: 7)
-        else
-            TherapyDuration.Indefinite
-        val medications = state.medications.mapNotNull { m ->
-            if (m.name.isBlank()) return@mapNotNull null
-            val dosage = m.dosage.toDoubleOrNull() ?: 1.0
-            Medication(
-                id = m.id,
-                name = m.name,
-                dosage = dosage,
-                dosageUnit = m.dosageUnit,
-                frequencyHours = m.frequencyHours,
-                scheduledTimes = ScheduleCalculator.computeScheduledTimes(m.frequencyHours),
-                startDate = state.startDate,
-                notes = null,
-            )
-        }
-        viewModelScope.launch {
-            createTherapy(
-                personId = personId,
-                name = state.therapyName,
-                startDate = state.startDate,
-                duration = duration,
-                medications = medications,
-                userId = uid,
-            )
-            resetForm()
-            onDone()
-        }
-    }
-
-    fun deleteTherapy(personId: String, therapyId: String) {
-        viewModelScope.launch { deleteTherapyUseCase(personId, therapyId) }
-    }
-}

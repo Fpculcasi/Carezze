@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 
 class ScheduleCalculatorTest {
-
     @Test
     fun `24h frequency returns single dose at start hour`() {
         assertEquals(listOf("08:00"), ScheduleCalculator.computeScheduledTimes(24, 8))

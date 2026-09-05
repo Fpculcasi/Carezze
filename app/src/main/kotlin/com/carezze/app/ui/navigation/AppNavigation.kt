@@ -43,7 +43,9 @@ import kotlinx.serialization.Serializable
 
 // -- Auth flow routes (outer NavHost) --
 @Serializable object Welcome
+
 @Serializable object Login
+
 @Serializable object Register
 
 // -- Main shell route: contains Scaffold + BottomBar + inner NavHost --
@@ -51,16 +53,24 @@ import kotlinx.serialization.Serializable
 
 // -- Bottom navigation tab routes (inner NavHost root destinations) --
 @Serializable object Dashboard
+
 @Serializable object PersonList
+
 @Serializable object Profile
+
 @Serializable object Settings
 
 // -- Detail screen routes (inner NavHost, bottom bar hidden) --
 @Serializable data class PersonDetail(val personId: String)
+
 @Serializable data class EditPerson(val personId: String? = null)
+
 @Serializable data class AddTherapy(val personId: String)
+
 @Serializable data class TherapyDetail(val personId: String, val therapyId: String)
+
 @Serializable data class HistoryList(val personId: String)
+
 @Serializable data class HistoryCalendar(val personId: String)
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -78,12 +88,13 @@ data class BottomNavItem<T : Any>(
 )
 
 /** The four bottom navigation tabs displayed after authentication. */
-val bottomNavItems = listOf(
-    BottomNavItem(label = "Home", icon = Icons.Default.Home, route = Dashboard),
-    BottomNavItem(label = "Persone", icon = Icons.Default.Face, route = PersonList),
-    BottomNavItem(label = "Profilo", icon = Icons.Default.Person, route = Profile),
-    BottomNavItem(label = "Impostazioni", icon = Icons.Default.Settings, route = Settings),
-)
+val bottomNavItems =
+    listOf(
+        BottomNavItem(label = "Home", icon = Icons.Default.Home, route = Dashboard),
+        BottomNavItem(label = "Persone", icon = Icons.Default.Face, route = PersonList),
+        BottomNavItem(label = "Profilo", icon = Icons.Default.Person, route = Profile),
+        BottomNavItem(label = "Impostazioni", icon = Icons.Default.Settings, route = Settings),
+    )
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Root navigation — handles authentication flow and the main shell
@@ -189,9 +200,10 @@ fun MainScreen() {
 
     // Determine whether to show the bottom bar:
     // only visible on the four root tab destinations
-    val showBottomBar = bottomNavItems.any { item ->
-        currentDestination?.hasRoute(item.route::class) == true
-    }
+    val showBottomBar =
+        bottomNavItems.any { item ->
+            currentDestination?.hasRoute(item.route::class) == true
+        }
 
     Scaffold(
         bottomBar = {
@@ -213,7 +225,7 @@ fun MainScreen() {
                     },
                 )
             }
-        }
+        },
     ) { innerPadding ->
         // ── Inner NavHost: tab content + detail screens ──
         NavHost(
@@ -246,7 +258,7 @@ fun MainScreen() {
             }
 
             composable<Profile> {
-                // TODO: Replace placeholder with actual ProfileScreen composable
+                // Placeholder: la schermata Profilo/Account arriva con il rework UX (vedi 06-implementation-plan)
                 Text("Profilo")
             }
 
@@ -343,9 +355,10 @@ private fun BottomNavigationBar(
         bottomNavItems.forEach { item ->
             // Check whether this tab is selected by walking the destination hierarchy;
             // this ensures correct highlighting for nested detail screens as well
-            val selected = currentDestination?.hierarchy?.any {
-                it.hasRoute(item.route::class)
-            } == true
+            val selected =
+                currentDestination?.hierarchy?.any {
+                    it.hasRoute(item.route::class)
+                } == true
 
             NavigationBarItem(
                 selected = selected,

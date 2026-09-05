@@ -23,80 +23,93 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(
-    private val signInAnonymously: SignInAnonymouslyUseCase,
-    private val signInWithEmail: SignInWithEmailUseCase,
-    private val createUserWithEmail: CreateUserWithEmailUseCase,
-    private val linkWithEmail: LinkWithEmailUseCase,
-    private val signInWithGoogle: SignInWithGoogleUseCase,
-    private val linkWithGoogle: LinkWithGoogleUseCase,
-    private val getCurrentUser: GetCurrentUserUseCase,
-    private val observeAuthState: ObserveAuthStateUseCase,
-    private val syncUser: SyncUserUseCase,
-) : ViewModel() {
+class AuthViewModel
+    @Inject
+    constructor(
+        private val signInAnonymously: SignInAnonymouslyUseCase,
+        private val signInWithEmail: SignInWithEmailUseCase,
+        private val createUserWithEmail: CreateUserWithEmailUseCase,
+        private val linkWithEmail: LinkWithEmailUseCase,
+        private val signInWithGoogle: SignInWithGoogleUseCase,
+        private val linkWithGoogle: LinkWithGoogleUseCase,
+        private val getCurrentUser: GetCurrentUserUseCase,
+        private val observeAuthState: ObserveAuthStateUseCase,
+        private val syncUser: SyncUserUseCase,
+    ) : ViewModel() {
+        val authState: StateFlow<AuthUiState> =
+            observeAuthState()
+                .map { user ->
+                    if (user != null) viewModelScope.launch { syncUser(user) }
+                    when {
+                        user == null -> AuthUiState.SignedOut
+                        user.isAnonymous -> AuthUiState.Anonymous(user)
+                        else -> AuthUiState.Authenticated(user)
+                    }
+                }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5_000),
+                    initialValue = AuthUiState.Loading,
+                )
 
-    val authState: StateFlow<AuthUiState> = observeAuthState()
-        .map { user ->
-            if (user != null) viewModelScope.launch { syncUser(user) }
-            when {
-                user == null -> AuthUiState.SignedOut
-                user.isAnonymous -> AuthUiState.Anonymous(user)
-                else -> AuthUiState.Authenticated(user)
+        private val _errorMessage = MutableStateFlow<String?>(null)
+        val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+
+        fun clearError() {
+            _errorMessage.value = null
+        }
+
+        fun continueLocally() {
+            viewModelScope.launch {
+                signInAnonymously().onFailure { _errorMessage.value = it.localizedMessage }
             }
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = AuthUiState.Loading,
-        )
 
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
-
-    fun clearError() {
-        _errorMessage.value = null
-    }
-
-    fun continueLocally() {
-        viewModelScope.launch {
-            signInAnonymously().onFailure { _errorMessage.value = it.localizedMessage }
-        }
-    }
-
-    fun signIn(email: String, password: String) {
-        viewModelScope.launch {
-            signInWithEmail(email, password).onFailure { _errorMessage.value = it.localizedMessage }
-        }
-    }
-
-    fun registerOrLink(email: String, password: String) {
-        viewModelScope.launch {
-            val currentUser = getCurrentUser()
-            val result = if (currentUser?.isAnonymous == true) {
-                linkWithEmail(email, password)
-            } else {
-                createUserWithEmail(email, password)
+        fun signIn(
+            email: String,
+            password: String,
+        ) {
+            viewModelScope.launch {
+                signInWithEmail(email, password).onFailure { _errorMessage.value = it.localizedMessage }
             }
-            result.onFailure { _errorMessage.value = it.localizedMessage }
         }
-    }
 
-    fun signInOrLinkWithGoogle(idToken: String) {
-        viewModelScope.launch {
-            val currentUser = getCurrentUser()
-            val result = if (currentUser?.isAnonymous == true) {
-                linkWithGoogle(idToken)
-            } else {
-                signInWithGoogle(idToken)
+        fun registerOrLink(
+            email: String,
+            password: String,
+        ) {
+            viewModelScope.launch {
+                val currentUser = getCurrentUser()
+                val result =
+                    if (currentUser?.isAnonymous == true) {
+                        linkWithEmail(email, password)
+                    } else {
+                        createUserWithEmail(email, password)
+                    }
+                result.onFailure { _errorMessage.value = it.localizedMessage }
             }
-            result.onFailure { _errorMessage.value = it.localizedMessage }
+        }
+
+        fun signInOrLinkWithGoogle(idToken: String) {
+            viewModelScope.launch {
+                val currentUser = getCurrentUser()
+                val result =
+                    if (currentUser?.isAnonymous == true) {
+                        linkWithGoogle(idToken)
+                    } else {
+                        signInWithGoogle(idToken)
+                    }
+                result.onFailure { _errorMessage.value = it.localizedMessage }
+            }
         }
     }
-}
 
 sealed interface AuthUiState {
     data object Loading : AuthUiState
+
     data object SignedOut : AuthUiState
+
     data class Anonymous(val user: User) : AuthUiState
+
     data class Authenticated(val user: User) : AuthUiState
 }

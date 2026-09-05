@@ -13,41 +13,43 @@ import org.junit.jupiter.api.Test
 import java.time.Instant
 
 class ObserveInvitationsUseCaseTest {
-
     private val invitationRepository = mockk<InvitationRepository>()
     private val useCase = ObserveInvitationsUseCase(invitationRepository)
 
     @Test
-    fun `emits invitation list for user`() = runTest {
-        val invitations = listOf(fakeInvitation())
-        every { invitationRepository.observeInvitations("uid-1") } returns flowOf(invitations)
+    fun `emits invitation list for user`() =
+        runTest {
+            val invitations = listOf(fakeInvitation())
+            every { invitationRepository.observeInvitations("uid-1") } returns flowOf(invitations)
 
-        val result = useCase("uid-1").first()
+            val result = useCase("uid-1").first()
 
-        assertEquals(invitations, result)
-    }
+            assertEquals(invitations, result)
+        }
 
     @Test
-    fun `emits empty list when no invitations`() = runTest {
-        every { invitationRepository.observeInvitations("uid-1") } returns flowOf(emptyList())
+    fun `emits empty list when no invitations`() =
+        runTest {
+            every { invitationRepository.observeInvitations("uid-1") } returns flowOf(emptyList())
 
-        val result = useCase("uid-1").first()
+            val result = useCase("uid-1").first()
 
-        assertEquals(emptyList<Invitation>(), result)
-    }
+            assertEquals(emptyList<Invitation>(), result)
+        }
 
-    private fun fakeInvitation() = Invitation(
-        id = "inv-1",
-        type = InvitationType.PERSON,
-        targetId = "pid-1",
-        personId = null,
-        targetName = "Vittoria",
-        createdBy = "uid-1",
-        createdByName = "Mario",
-        code = "AB12CD34",
-        expiresAt = Instant.now().plusSeconds(86400),
-        used = false,
-        usedBy = null,
-        usedAt = null,
-    )
+    private fun fakeInvitation() =
+        Invitation(
+            id = "inv-1",
+            type = InvitationType.PERSON,
+            targetId = "pid-1",
+            personId = null,
+            targetName = "Vittoria",
+            createdBy = "uid-1",
+            createdByName = "Francesco",
+            code = "AB12CD34",
+            expiresAt = Instant.now().plusSeconds(86400),
+            used = false,
+            usedBy = null,
+            usedAt = null,
+        )
 }

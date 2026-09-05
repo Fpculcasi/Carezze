@@ -31,55 +31,151 @@ data class QuickLogUiState(
 )
 
 @HiltViewModel
-class QuickLogViewModel @Inject constructor(
-    private val logActivity: LogActivityUseCase,
-    private val authRepository: AuthRepository,
-) : ViewModel() {
+class QuickLogViewModel
+    @Inject
+    constructor(
+        private val logActivity: LogActivityUseCase,
+        private val authRepository: AuthRepository,
+    ) : ViewModel() {
+        private val _state = MutableStateFlow(QuickLogUiState())
+        val state: StateFlow<QuickLogUiState> = _state.asStateFlow()
 
-    private val _state = MutableStateFlow(QuickLogUiState())
-    val state: StateFlow<QuickLogUiState> = _state.asStateFlow()
+        private val userId: String get() = authRepository.currentUser?.id ?: ""
 
-    private val userId: String get() = authRepository.currentUser?.id ?: ""
+        fun selectType(type: ActivityLogType) {
+            _state.update { it.copy(selectedType = type) }
+        }
 
-    fun selectType(type: ActivityLogType) { _state.update { it.copy(selectedType = type) } }
-    fun clearType() { _state.update { it.copy(selectedType = null, error = null) } }
+        fun clearType() {
+            _state.update { it.copy(selectedType = null, error = null) }
+        }
 
-    fun logMeal(personId: String, amount: Double?, amountUnit: MealUnit?, mealType: MealType?, notes: String?) {
-        save(personId, ActivityLog.Meal(UUID.randomUUID().toString(), personId, Instant.now(), userId, amount, amountUnit, mealType, notes?.ifBlank { null }))
-    }
+        fun logMeal(
+            personId: String,
+            amount: Double?,
+            amountUnit: MealUnit?,
+            mealType: MealType?,
+            notes: String?,
+        ) {
+            save(
+                personId,
+                ActivityLog.Meal(
+                    UUID.randomUUID().toString(),
+                    personId,
+                    Instant.now(),
+                    userId,
+                    amount,
+                    amountUnit,
+                    mealType,
+                    notes?.ifBlank {
+                        null
+                    },
+                ),
+            )
+        }
 
-    fun logDiaper(personId: String, diaperType: DiaperType, notes: String?) {
-        save(personId, ActivityLog.Diaper(UUID.randomUUID().toString(), personId, Instant.now(), userId, diaperType, notes?.ifBlank { null }))
-    }
+        fun logDiaper(
+            personId: String,
+            diaperType: DiaperType,
+            notes: String?,
+        ) {
+            save(
+                personId,
+                ActivityLog.Diaper(
+                    UUID.randomUUID().toString(),
+                    personId,
+                    Instant.now(),
+                    userId,
+                    diaperType,
+                    notes?.ifBlank { null },
+                ),
+            )
+        }
 
-    fun logSleep(personId: String, isStart: Boolean) {
-        val log = if (isStart)
-            ActivityLog.SleepStart(UUID.randomUUID().toString(), personId, Instant.now(), userId)
-        else
-            ActivityLog.SleepEnd(UUID.randomUUID().toString(), personId, Instant.now(), userId)
-        save(personId, log)
-    }
+        fun logSleep(
+            personId: String,
+            isStart: Boolean,
+        ) {
+            val log =
+                if (isStart) {
+                    ActivityLog.SleepStart(UUID.randomUUID().toString(), personId, Instant.now(), userId)
+                } else {
+                    ActivityLog.SleepEnd(UUID.randomUUID().toString(), personId, Instant.now(), userId)
+                }
+            save(personId, log)
+        }
 
-    fun logTemperature(personId: String, temp: Double, unit: TemperatureUnit, method: MeasurementMethod?, notes: String?) {
-        save(personId, ActivityLog.Temperature(UUID.randomUUID().toString(), personId, Instant.now(), userId, temp, unit, method, notes?.ifBlank { null }))
-    }
+        fun logTemperature(
+            personId: String,
+            temp: Double,
+            unit: TemperatureUnit,
+            method: MeasurementMethod?,
+            notes: String?,
+        ) {
+            save(
+                personId,
+                ActivityLog.Temperature(
+                    UUID.randomUUID().toString(),
+                    personId,
+                    Instant.now(),
+                    userId,
+                    temp,
+                    unit,
+                    method,
+                    notes?.ifBlank {
+                        null
+                    },
+                ),
+            )
+        }
 
-    fun logWeight(personId: String, weight: Double, weightUnit: WeightUnit, notes: String?) {
-        save(personId, ActivityLog.Weight(UUID.randomUUID().toString(), personId, Instant.now(), userId, weight, weightUnit, null, null, notes?.ifBlank { null }))
-    }
+        fun logWeight(
+            personId: String,
+            weight: Double,
+            weightUnit: WeightUnit,
+            notes: String?,
+        ) {
+            save(
+                personId,
+                ActivityLog.Weight(
+                    UUID.randomUUID().toString(), personId, Instant.now(), userId, weight, weightUnit, null, null,
+                    notes?.ifBlank {
+                        null
+                    },
+                ),
+            )
+        }
 
-    fun logHygiene(personId: String, notes: String?) {
-        save(personId, ActivityLog.Hygiene(UUID.randomUUID().toString(), personId, Instant.now(), userId, notes?.ifBlank { null }))
-    }
+        fun logHygiene(
+            personId: String,
+            notes: String?,
+        ) {
+            save(
+                personId,
+                ActivityLog.Hygiene(
+                    UUID.randomUUID().toString(),
+                    personId,
+                    Instant.now(),
+                    userId,
+                    notes?.ifBlank { null },
+                ),
+            )
+        }
 
-    private fun save(personId: String, log: ActivityLog) {
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null) }
-            val result = logActivity(personId, log)
-            _state.update { state ->
-                if (result.isSuccess) state.copy(isLoading = false, isSaved = true)
-                else state.copy(isLoading = false, error = result.exceptionOrNull()?.message ?: "Errore")
+        private fun save(
+            personId: String,
+            log: ActivityLog,
+        ) {
+            viewModelScope.launch {
+                _state.update { it.copy(isLoading = true, error = null) }
+                val result = logActivity(personId, log)
+                _state.update { state ->
+                    if (result.isSuccess) {
+                        state.copy(isLoading = false, isSaved = true)
+                    } else {
+                        state.copy(isLoading = false, error = result.exceptionOrNull()?.message ?: "Errore")
+                    }
+                }
             }
         }
     }
-}

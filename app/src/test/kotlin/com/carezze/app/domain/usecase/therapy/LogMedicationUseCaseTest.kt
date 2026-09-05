@@ -11,40 +11,42 @@ import org.junit.jupiter.api.Test
 import java.time.Instant
 
 class LogMedicationUseCaseTest {
-
     private val repository = mockk<MedicationLogRepository>()
     private val useCase = LogMedicationUseCase(repository)
 
     @Test
-    fun `returns log on success`() = runTest {
-        val log = fakeLog()
-        coEvery {
-            repository.logMedication("pid-1", "tid-1", "med-1", any(), MedicationStatus.TAKEN, "uid-1")
-        } returns Result.success(log)
+    fun `returns log on success`() =
+        runTest {
+            val log = fakeLog()
+            coEvery {
+                repository.logMedication("pid-1", "tid-1", "med-1", any(), MedicationStatus.TAKEN, "uid-1")
+            } returns Result.success(log)
 
-        val result = useCase("pid-1", "tid-1", "med-1", Instant.now(), MedicationStatus.TAKEN, "uid-1")
+            val result = useCase("pid-1", "tid-1", "med-1", Instant.now(), MedicationStatus.TAKEN, "uid-1")
 
-        assertTrue(result.isSuccess)
-    }
+            assertTrue(result.isSuccess)
+        }
 
     @Test
-    fun `returns failure when repository throws`() = runTest {
-        coEvery {
-            repository.logMedication(any(), any(), any(), any(), any(), any())
-        } returns Result.failure(Exception("error"))
+    fun `returns failure when repository throws`() =
+        runTest {
+            coEvery {
+                repository.logMedication(any(), any(), any(), any(), any(), any())
+            } returns Result.failure(Exception("error"))
 
-        val result = useCase("pid-1", "tid-1", "med-1", Instant.now(), MedicationStatus.TAKEN, "uid-1")
+            val result = useCase("pid-1", "tid-1", "med-1", Instant.now(), MedicationStatus.TAKEN, "uid-1")
 
-        assertTrue(result.isFailure)
-    }
+            assertTrue(result.isFailure)
+        }
 
-    private fun fakeLog() = MedicationLog(
-        id = "log-1",
-        therapyId = "tid-1",
-        medicationId = "med-1",
-        scheduledTime = Instant.now(),
-        actualTime = Instant.now(),
-        status = MedicationStatus.TAKEN,
-        loggedBy = "uid-1",
-    )
+    private fun fakeLog() =
+        MedicationLog(
+            id = "log-1",
+            therapyId = "tid-1",
+            medicationId = "med-1",
+            scheduledTime = Instant.now(),
+            actualTime = Instant.now(),
+            status = MedicationStatus.TAKEN,
+            loggedBy = "uid-1",
+        )
 }

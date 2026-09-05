@@ -75,8 +75,13 @@ sealed class ActivityLog {
 }
 
 enum class MealUnit { ML, MIN, G }
+
 enum class MealType { BREAST, FORMULA, SOLID }
+
 enum class DiaperType { DRY, WET, DIRTY, BOTH }
+
 enum class MeasurementMethod { AXILLARY, RECTAL, EAR, FOREHEAD }
+
 enum class WeightUnit { KG, LB }
+
 enum class HeightUnit { CM, IN }

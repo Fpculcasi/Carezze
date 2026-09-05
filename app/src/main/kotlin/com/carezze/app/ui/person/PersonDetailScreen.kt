@@ -33,8 +33,8 @@ import com.fpculcasi.carezze.domain.model.MemberRole
 import com.fpculcasi.carezze.domain.model.Person
 import com.fpculcasi.carezze.domain.model.Therapy
 import com.fpculcasi.carezze.domain.model.TherapyDuration
-import com.fpculcasi.carezze.ui.therapy.TherapyViewModel
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
+import com.fpculcasi.carezze.ui.therapy.TherapyViewModel
 import java.time.LocalDate
 
 @Composable
@@ -96,10 +96,11 @@ internal fun PersonDetailContent(
         },
     ) { padding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             if (therapies.isEmpty()) {
@@ -111,7 +112,13 @@ internal fun PersonDetailContent(
                     )
                 }
             } else {
-                item { Text("Terapie", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 8.dp)) }
+                item {
+                    Text(
+                        "Terapie",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
                 items(therapies) { therapy ->
                     TherapyListItem(
                         therapy = therapy,
@@ -124,11 +131,15 @@ internal fun PersonDetailContent(
 }
 
 @Composable
-private fun TherapyListItem(therapy: Therapy, onClick: () -> Unit) {
+private fun TherapyListItem(
+    therapy: Therapy,
+    onClick: () -> Unit,
+) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick),
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -136,17 +147,22 @@ private fun TherapyListItem(therapy: Therapy, onClick: () -> Unit) {
         ) {
             Column {
                 Text(therapy.name, style = MaterialTheme.typography.titleSmall)
-                val durationText = when (val d = therapy.duration) {
-                    is TherapyDuration.Indefinite -> "Illimitata"
-                    is TherapyDuration.Fixed -> "${d.days} giorni"
-                }
+                val durationText =
+                    when (val d = therapy.duration) {
+                        is TherapyDuration.Indefinite -> "Illimitata"
+                        is TherapyDuration.Fixed -> "${d.days} giorni"
+                    }
                 Text(durationText, style = MaterialTheme.typography.bodySmall)
             }
             Text(
                 if (therapy.isActive) "Attiva" else "Terminata",
                 style = MaterialTheme.typography.labelMedium,
-                color = if (therapy.isActive) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.onSurfaceVariant,
+                color =
+                    if (therapy.isActive) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
             )
         }
     }
@@ -159,13 +175,14 @@ private fun PersonDetailContentPreview() {
         PersonDetailContent(
             person = Person("1", "Vittoria", "Vicky", "uid1", mapOf("uid1" to MemberRole.OWNER)),
             personId = "1",
-            therapies = listOf(
-                Therapy(
-                    id = "t1", personId = "1", name = "Amoxicillina", createdBy = "uid1",
-                    startDate = LocalDate.now(), duration = TherapyDuration.Fixed(7),
-                    isActive = true, members = emptyMap(), medications = emptyList(),
+            therapies =
+                listOf(
+                    Therapy(
+                        id = "t1", personId = "1", name = "Amoxicillina", createdBy = "uid1",
+                        startDate = LocalDate.now(), duration = TherapyDuration.Fixed(7),
+                        isActive = true, members = emptyMap(), medications = emptyList(),
+                    ),
                 ),
-            ),
             onNavigateBack = {},
             onNavigateToEdit = {},
             onNavigateToAddTherapy = {},

@@ -127,10 +127,11 @@ private fun PersonItem(
     onDelete: () -> Unit,
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
-            .clickable(onClick = onClick),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp)
+                .clickable(onClick = onClick),
     ) {
         ListItem(
             headlineContent = { Text(person.name) },
@@ -144,10 +145,11 @@ private fun PersonItem(
     }
 }
 
-private val previewPersons = listOf(
-    Person("1", "Vittoria", "Vicky", "uid1", mapOf("uid1" to MemberRole.OWNER)),
-    Person("2", "Christian", null, "uid1", mapOf("uid1" to MemberRole.OWNER)),
-)
+private val previewPersons =
+    listOf(
+        Person("1", "Vittoria", "Vicky", "uid1", mapOf("uid1" to MemberRole.OWNER)),
+        Person("2", "Christian", null, "uid1", mapOf("uid1" to MemberRole.OWNER)),
+    )
 
 @Preview(showBackground = true)
 @Composable

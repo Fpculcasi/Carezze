@@ -11,36 +11,38 @@ import org.junit.jupiter.api.Test
 import java.time.Instant
 
 class LogActivityUseCaseTest {
-
     private val repository = mockk<ActivityLogRepository>()
     private val useCase = LogActivityUseCase(repository)
 
     @Test
-    fun `returns log on success`() = runTest {
-        val log = fakeLog()
-        coEvery { repository.logActivity("pid-1", log) } returns Result.success(log)
+    fun `returns log on success`() =
+        runTest {
+            val log = fakeLog()
+            coEvery { repository.logActivity("pid-1", log) } returns Result.success(log)
 
-        val result = useCase("pid-1", log)
+            val result = useCase("pid-1", log)
 
-        assertTrue(result.isSuccess)
-    }
+            assertTrue(result.isSuccess)
+        }
 
     @Test
-    fun `returns failure when repository throws`() = runTest {
-        val log = fakeLog()
-        coEvery { repository.logActivity(any(), any()) } returns Result.failure(Exception("error"))
+    fun `returns failure when repository throws`() =
+        runTest {
+            val log = fakeLog()
+            coEvery { repository.logActivity(any(), any()) } returns Result.failure(Exception("error"))
 
-        val result = useCase("pid-1", log)
+            val result = useCase("pid-1", log)
 
-        assertTrue(result.isFailure)
-    }
+            assertTrue(result.isFailure)
+        }
 
-    private fun fakeLog() = ActivityLog.Diaper(
-        id = "log-1",
-        personId = "pid-1",
-        timestamp = Instant.now(),
-        loggedBy = "uid-1",
-        diaperType = DiaperType.WET,
-        notes = null,
-    )
+    private fun fakeLog() =
+        ActivityLog.Diaper(
+            id = "log-1",
+            personId = "pid-1",
+            timestamp = Instant.now(),
+            loggedBy = "uid-1",
+            diaperType = DiaperType.WET,
+            notes = null,
+        )
 }

@@ -5,9 +5,13 @@ import com.fpculcasi.carezze.domain.repository.MedicationLogRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class ObserveLogsUseCase @Inject constructor(
-    private val medicationLogRepository: MedicationLogRepository,
-) {
-    operator fun invoke(personId: String, therapyId: String): Flow<List<MedicationLog>> =
-        medicationLogRepository.observeLogs(personId, therapyId)
-}
+class ObserveLogsUseCase
+    @Inject
+    constructor(
+        private val medicationLogRepository: MedicationLogRepository,
+    ) {
+        operator fun invoke(
+            personId: String,
+            therapyId: String,
+        ): Flow<List<MedicationLog>> = medicationLogRepository.observeLogs(personId, therapyId)
+    }
