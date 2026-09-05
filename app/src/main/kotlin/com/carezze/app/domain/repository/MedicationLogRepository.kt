@@ -17,5 +17,6 @@ interface MedicationLogRepository {
         scheduledTime: java.time.Instant,
         status: MedicationStatus,
         userId: String,
+        isManual: Boolean = false,
     ): Result<MedicationLog>
 }

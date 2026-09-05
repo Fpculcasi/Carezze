@@ -3,6 +3,8 @@ package com.fpculcasi.carezze.domain.model
 import java.time.Instant
 import java.time.LocalDate
 
+enum class TherapyStatus { ACTIVE, COMPLETED }
+
 data class Therapy(
     val id: String,
     val personId: String,
@@ -11,9 +13,12 @@ data class Therapy(
     val startDate: LocalDate,
     val duration: TherapyDuration,
     val isActive: Boolean,
+    val endDate: LocalDate? = null,
     val members: Map<String, MemberRole>,
     val medications: List<Medication>,
-)
+) {
+    val status: TherapyStatus get() = if (isActive) TherapyStatus.ACTIVE else TherapyStatus.COMPLETED
+}
 
 sealed class TherapyDuration {
     object Indefinite : TherapyDuration()
@@ -40,6 +45,7 @@ data class MedicationLog(
     val actualTime: Instant?,
     val status: MedicationStatus,
     val loggedBy: String?,
+    val isManual: Boolean = false,
 )
 
 enum class MedicationStatus { TAKEN, SKIPPED, PENDING }

@@ -68,34 +68,24 @@ Carezze/
 ## Comandi Rapidi
 
 ```bash
+export JAVA_HOME="/c/Program Files/Android/Android Studio/jbr"
+
 # Build debug APK
-./gradlew assembleDebug
+JAVA_HOME="$JAVA_HOME" ./gradlew assembleDebug
 
 # Run unit tests
-./gradlew test
+JAVA_HOME="$JAVA_HOME" ./gradlew :app:testDebugUnitTest
 
-# Run lint
-./gradlew lint
-
-# Static analysis (Detekt)
-./gradlew detekt
-
-# Code style check (Ktlint)
-./gradlew ktlintCheck
+# Run lint + static analysis + code style
+JAVA_HOME="$JAVA_HOME" ./gradlew :app:compileDebugKotlin :app:ktlintCheck detekt :app:testDebugUnitTest
 
 # Auto-fix code style
-./gradlew ktlintFormat
+JAVA_HOME="$JAVA_HOME" ./gradlew ktlintFormat
 
 # Build release APK (richiede keystore)
-./gradlew assembleRelease
+JAVA_HOME="$JAVA_HOME" ./gradlew assembleRelease
 ```
 
-> JDK di sistema non configurato — usare il JBR bundled di Android Studio:
-> `export JAVA_HOME="/c/Program Files/Android/Android Studio/jbr"`
->
-> Comando completo verificato (build + ktlint + detekt + unit test):
-> `JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew :app:compileDebugKotlin :app:ktlintCheck detekt :app:testDebugUnitTest`
->
 > Nota: `detekt` è task root (non `:app:detekt`)
 
 ## Variabili d'Ambiente / Firebase Config

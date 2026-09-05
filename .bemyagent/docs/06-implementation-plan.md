@@ -130,7 +130,7 @@ Progress shown as bar, calendar, and remaining dose counter.
 
 | Task | Descrizione | Status |
 |---|---|---|
-| 4.5.1 | Domain: `TherapyStatus` enum (ACTIVE, COMPLETED) + Use Cases `updateTherapy`, `terminateTherapy`, `deleteTherapy`, `addManualMedicationLog` | todo |
+| 4.5.1 | Domain: `TherapyStatus` enum (ACTIVE, COMPLETED) + Use Cases `updateTherapy`, `terminateTherapy`, `deleteTherapy`, `addManualMedicationLog` | done |
 | 4.5.2 | Data: `TherapyRepositoryImpl` — update (tutti i campi) + terminate (endDate=today, status=COMPLETED) + delete (hard, cascade `MedicationLog`) | todo |
 | 4.5.3 | UI: `EditTherapyScreen` — wizard pre-popolato, tutti i campi modificabili | todo |
 | 4.5.4 | UI: `TherapyDetailScreen` — FAB "Modifica" + menu overflow con "Termina" (dialog soft) e "Elimina" (dialog hard con warning perdita dati) | todo |

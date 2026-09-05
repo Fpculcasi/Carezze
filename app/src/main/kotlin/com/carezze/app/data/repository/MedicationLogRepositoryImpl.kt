@@ -54,6 +54,7 @@ class MedicationLogRepositoryImpl
             scheduledTime: Instant,
             status: MedicationStatus,
             userId: String,
+            isManual: Boolean,
         ): Result<MedicationLog> =
             runCatching {
                 val logId = UUID.randomUUID().toString()
@@ -64,6 +65,7 @@ class MedicationLogRepositoryImpl
                         "actualTime" to Timestamp.now(),
                         "status" to status.name,
                         "loggedBy" to userId,
+                        "isManual" to isManual,
                         "createdAt" to FieldValue.serverTimestamp(),
                     )
                 logsCollection(personId, therapyId).document(logId).set(data).await()
@@ -75,6 +77,7 @@ class MedicationLogRepositoryImpl
                     actualTime = Instant.now(),
                     status = status,
                     loggedBy = userId,
+                    isManual = isManual,
                 )
             }
 
