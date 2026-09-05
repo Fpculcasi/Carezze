@@ -1,0 +1,23 @@
+# EXECUTE — 4.5.2
+
+## 2026-09-05
+
+### Step 1 — TherapyRepositoryImpl: updateTherapy + deleteTherapy cascade + toDomain endDate
+Edit `app/src/main/kotlin/com/fpculcasi/carezze/data/repository/TherapyRepositoryImpl.kt`:
+- `updateTherapy`: payload esteso con `startDate` e `endDate` (condizionale)
+- `deleteTherapy`: loop batch-delete `medicationLogs` con `limit(500)` poi delete therapy doc
+- `toDomain`: aggiunto `endDate = getTimestamp("endDate")?.toLocalDate()`
+
+→ Edit applicato con successo
+
+### Step 2 — MedicationLogRepositoryImpl: toDomain legge isManual
+Edit `app/src/main/kotlin/com/fpculcasi/carezze/data/repository/MedicationLogRepositoryImpl.kt`:
+- `toDomain`: aggiunto `isManual = getBoolean("isManual") ?: false`
+
+→ Edit applicato con successo
+
+### Step 3 — Build verification
+`JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew :app:compileDebugKotlin`
+→ BUILD SUCCESSFUL in 22s (exit 0)
+
+Next: scrivere 04_verify.md

@@ -93,13 +93,15 @@ class TherapyRepositoryImpl
         override suspend fun updateTherapy(therapy: Therapy): Result<Unit> =
             runCatching {
                 val data =
-                    mapOf(
+                    mutableMapOf<String, Any?>(
                         "name" to therapy.name,
+                        "startDate" to therapy.startDate.toTimestamp(),
                         "duration" to therapy.duration.toMap(),
                         "isActive" to therapy.isActive,
                         "medications" to therapy.medications.map { it.toMap() },
                         "updatedAt" to FieldValue.serverTimestamp(),
                     )
+                therapy.endDate?.let { data["endDate"] = it.toTimestamp() }
                 therapiesCollection(therapy.personId).document(therapy.id).set(data, SetOptions.merge()).await()
             }
 
@@ -108,7 +110,17 @@ class TherapyRepositoryImpl
             therapyId: String,
         ): Result<Unit> =
             runCatching {
-                therapiesCollection(personId).document(therapyId).delete().await()
+                val therapyRef = therapiesCollection(personId).document(therapyId)
+                val logsCollection = therapyRef.collection("medicationLogs")
+                var query = logsCollection.limit(500)
+                var snapshot = query.get().await()
+                while (snapshot.documents.isNotEmpty()) {
+                    val batch = firestore.batch()
+                    snapshot.documents.forEach { batch.delete(it.reference) }
+                    batch.commit().await()
+                    snapshot = query.get().await()
+                }
+                therapyRef.delete().await()
             }
 
         private fun com.google.firebase.firestore.DocumentSnapshot.toDomain(): Therapy? {
@@ -126,6 +138,7 @@ class TherapyRepositoryImpl
                 startDate = startDate,
                 duration = duration,
                 isActive = getBoolean("isActive") ?: true,
+                endDate = getTimestamp("endDate")?.toLocalDate(),
                 members = membersFrom(get("members")),
                 medications = medicationsFrom(get("medications")),
             )

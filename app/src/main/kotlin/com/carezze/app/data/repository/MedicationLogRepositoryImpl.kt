@@ -97,6 +97,7 @@ class MedicationLogRepositoryImpl
                 actualTime = actualTime,
                 status = status,
                 loggedBy = getString("loggedBy"),
+                isManual = getBoolean("isManual") ?: false,
             )
         }
     }
