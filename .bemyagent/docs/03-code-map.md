@@ -29,6 +29,8 @@
 
 ## Navigazione / Schermate
 
+**Struttura (post bottom-bar):** `AppNavigation` (root NavHost): Welcome → Login/Register → `Main`. `MainScreen` = shell con `Scaffold` + `NavigationBar` a 4 tab (Home/Dashboard, Persone, Profilo, Impostazioni) + inner NavHost; la bottom bar è visibile solo sulle 4 route radice, nascosta sulle schermate di dettaglio. Tab `Profilo` = placeholder da implementare.
+
 | Schermata | File (futuro) | Auth richiesta | Descrizione |
 |---|---|---|---|
 | Splash / Welcome | `ui/auth/WelcomeScreen.kt` ✅ | No | Entry point: locale o registrazione |
@@ -78,8 +80,8 @@
 
 | Campo | Tipo | Esempio | Owner |
 |---|---|---|---|
-| `email` | `String?` | `"mario@email.it"` | Auth |
-| `displayName` | `String` | `"Mario Rossi"` | User |
+| `email` | `String?` | `"Francesco@email.it"` | Auth |
+| `displayName` | `String` | `"Francesco Rossi"` | User |
 | `language` | `String` (`"it"` \| `"en"`) | `"it"` | User |
 | `temperatureUnit` | `String` (`"C"` \| `"F"`) | `"C"` | User |
 | `quietHoursStart` | `String` (`"HH:mm"`) | `"22:00"` | User |
@@ -94,8 +96,8 @@
 
 | Campo | Tipo | Esempio | Owner |
 |---|---|---|---|
-| `name` | `String` | `"Sofia"` | User |
-| `nickname` | `String?` | `"Sofi"` | User |
+| `name` | `String` | `"Vittoria"` | User |
+| `nickname` | `String?` | `"Vicky"` | User |
 | `createdBy` | `String` (userId) | `"uid123"` | System |
 | `members` | `Map<String, String>` | `{"uid1":"owner","uid2":"editor"}` | System |
 | `memberIds` | `List<String>` | `["uid1","uid2"]` | System (denorm. per `arrayContains` query) |
@@ -170,9 +172,9 @@
 | `type` | `String` (`"person"` \| `"therapy"`) | `"person"` | User |
 | `targetId` | `String` | `"pid1"` | System |
 | `personId` | `String?` | `"pid1"` | System (se type=therapy) |
-| `targetName` | `String` | `"Sofia"` | System (denorm.) |
+| `targetName` | `String` | `"Vittoria"` | System (denorm.) |
 | `createdBy` | `String` | `"uid1"` | System |
-| `createdByName` | `String` | `"Mario"` | System (denorm.) |
+| `createdByName` | `String` | `"Francesco"` | System (denorm.) |
 | `code` | `String` (8 char) | `"AB12CD34"` | System |
 | `expiresAt` | `Timestamp` | createdAt + 24h | System |
 | `used` | `Boolean` | `false` | System |

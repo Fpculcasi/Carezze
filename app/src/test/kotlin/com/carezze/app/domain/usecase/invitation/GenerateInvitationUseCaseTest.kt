@@ -20,10 +20,10 @@ class GenerateInvitationUseCaseTest {
     fun `returns generated invitation on success`() = runTest {
         val invitation = fakeInvitation()
         coEvery {
-            invitationRepository.generateInvitation(InvitationType.PERSON, "pid-1", null, "uid-1", "Mario", "Sofia")
+            invitationRepository.generateInvitation(InvitationType.PERSON, "pid-1", null, "uid-1", "Mario", "Vittoria")
         } returns Result.success(invitation)
 
-        val result = useCase(InvitationType.PERSON, "pid-1", null, "uid-1", "Mario", "Sofia")
+        val result = useCase(InvitationType.PERSON, "pid-1", null, "uid-1", "Mario", "Vittoria")
 
         assertTrue(result.isSuccess)
         assertEquals(invitation, result.getOrNull())
@@ -32,10 +32,10 @@ class GenerateInvitationUseCaseTest {
     @Test
     fun `returns failure when repository throws`() = runTest {
         coEvery {
-            invitationRepository.generateInvitation(InvitationType.PERSON, "pid-1", null, "uid-1", "Mario", "Sofia")
+            invitationRepository.generateInvitation(InvitationType.PERSON, "pid-1", null, "uid-1", "Mario", "Vittoria")
         } returns Result.failure(Exception("network error"))
 
-        val result = useCase(InvitationType.PERSON, "pid-1", null, "uid-1", "Mario", "Sofia")
+        val result = useCase(InvitationType.PERSON, "pid-1", null, "uid-1", "Mario", "Vittoria")
 
         assertTrue(result.isFailure)
     }
@@ -45,7 +45,7 @@ class GenerateInvitationUseCaseTest {
         type = InvitationType.PERSON,
         targetId = "pid-1",
         personId = null,
-        targetName = "Sofia",
+        targetName = "Vittoria",
         createdBy = "uid-1",
         createdByName = "Mario",
         code = "AB12CD34",

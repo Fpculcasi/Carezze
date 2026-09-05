@@ -149,6 +149,22 @@ card and feed view. History shows 30 days in list or calendar mode.
 
 ---
 
+## Milestone 5.5 — UX Rework: Dashboard, Navigazione, Persone
+**Goal**: Quick Log per-persona (incluso farmaco), pagina Account, navigazione coerente, persone distinguibili | **Status**: in-progress | **Spec**: [ux-rework](specs/ux-rework.md) — ⚠️ open questions OQ1–OQ5 da chiudere prima di 5.5.2+
+
+| Task | Descrizione | Status |
+|---|---|---|
+| 5.5.1 | Bottom navigation shell 4 tab (Home, Persone, Profilo, Impostazioni) + inner NavHost | done |
+| 5.5.2 | Quick Log per-persona: azione "+" nella card, sheet vincolato alla persona, header con nome (R2) | todo |
+| 5.5.3 | Evento "Farmaco" nel Quick Log: dosi schedulate terapie attive → conferma TAKEN (R3) | todo |
+| 5.5.4 | Tab Profilo/Account: vedi/modifica profilo se loggato, CTA login se anonimo (R4) | todo |
+| 5.5.5 | Navigazione: no back su tab radice; PersonDetail unica pagina persona, EditPersonScreen assorbita (R5) | todo |
+| 5.5.6 | Distinzione persone: colore locale per-utente e/o icona fascia d'età (R6) | todo |
+| 5.5.7 | Filtro Home: card singola su selezione + search bar nome/nickname (R7) | todo |
+| 5.5.8 | Pulizia: preview duplicate Dashboard, titolo QuickLogSheet con nome, test unit nuovi ViewModel | todo |
+
+---
+
 ## Milestone 6 — Condivisione & Inviti
 **Goal**: Utente può condividere Persona o Terapia tramite QR/codice, revocare accesso | **Status**: in-progress
 

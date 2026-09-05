@@ -157,7 +157,7 @@ private fun TherapyListItem(therapy: Therapy, onClick: () -> Unit) {
 private fun PersonDetailContentPreview() {
     CarezzeTheme {
         PersonDetailContent(
-            person = Person("1", "Sofia", "Sofi", "uid1", mapOf("uid1" to MemberRole.OWNER)),
+            person = Person("1", "Vittoria", "Vicky", "uid1", mapOf("uid1" to MemberRole.OWNER)),
             personId = "1",
             therapies = listOf(
                 Therapy(

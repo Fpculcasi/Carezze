@@ -40,7 +40,7 @@ class ObservePersonsUseCaseTest {
 
     private fun fakePerson(id: String) = Person(
         id = id,
-        name = "Sofia",
+        name = "Vittoria",
         nickname = null,
         createdBy = "uid-1",
         members = mapOf("uid-1" to MemberRole.OWNER),

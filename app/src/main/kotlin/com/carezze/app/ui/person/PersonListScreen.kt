@@ -145,8 +145,8 @@ private fun PersonItem(
 }
 
 private val previewPersons = listOf(
-    Person("1", "Sofia", "Sofi", "uid1", mapOf("uid1" to MemberRole.OWNER)),
-    Person("2", "Marco", null, "uid1", mapOf("uid1" to MemberRole.OWNER)),
+    Person("1", "Vittoria", "Vicky", "uid1", mapOf("uid1" to MemberRole.OWNER)),
+    Person("2", "Christian", null, "uid1", mapOf("uid1" to MemberRole.OWNER)),
 )
 
 @Preview(showBackground = true)

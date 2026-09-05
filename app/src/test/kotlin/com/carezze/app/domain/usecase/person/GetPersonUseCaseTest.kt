@@ -37,8 +37,8 @@ class GetPersonUseCaseTest {
 
     private fun fakePerson() = Person(
         id = "pid-1",
-        name = "Sofia",
-        nickname = "Sofi",
+        name = "Vittoria",
+        nickname = "Vicky",
         createdBy = "uid-1",
         members = mapOf("uid-1" to MemberRole.OWNER),
     )

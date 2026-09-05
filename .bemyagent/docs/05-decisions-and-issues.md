@@ -19,6 +19,7 @@
 | D-12 | Nome app | Carezze (working name, può cambiare) | inline |
 | D-13 | GitFlow | `main`, `develop`, `feature/*`, `release/*`, `hotfix/*` | inline |
 | D-14 | TDD | Test-Driven Development obbligatorio, coverage ≥ 80% | inline |
+| D-16 | Bottom navigation shell | NavHost annidato: root (auth) + `MainScreen` con NavigationBar 4 tab | inline |
 
 ## Decisioni Inline
 
@@ -92,6 +93,11 @@
 - **Decisione**: GitFlow standard con branch naming `bma/X.Y` per task agente
 - **Trade-off**: Overhead merge; in compenso history pulita, milestones chiaramente isolate, PR review possibile a ogni task
 
+### D-16 — Bottom Navigation Shell (NavHost annidato)
+- **Problema**: la navigazione piatta metteva Dashboard, Persone e Impostazioni sullo stesso livello con back-stack confuso (freccia "indietro" da schermate che sono pari-livello)
+- **Decisione**: shell `MainScreen` post-auth con `NavigationBar` Material 3 a 4 tab (Home, Persone, Profilo, Impostazioni) e inner NavHost; root NavHost gestisce solo il flusso auth. Tab switch con `saveState`/`restoreState` + `launchSingleTop`; bottom bar nascosta sulle schermate di dettaglio
+- **Trade-off**: due NavController da coordinare; in compenso back-stack corretto per tab e gerarchia visiva chiara
+
 ### D-14 — TDD Obbligatorio
 - **Problema**: Progetto portfolio deve dimostrare qualità ingegneristica
 - **Decisione**: Test scritti prima dell'implementazione (red-green-refactor); coverage minima 80%
@@ -112,4 +118,9 @@
 
 ## Known Issues
 
-> Nessun problema noto al momento del bootstrap.
+- **QuickLogSheet senza selezione persona**: il sheet riceve `selectedPersonId ?: persons.first()` — con filtro "Tutti" l'evento viene attribuito silenziosamente alla prima persona. Manca un picker esplicito. (UX rework in pianificazione)
+- **QuickLog senza evento "farmaco"**: `ActivityLogType` non include l'assunzione farmaco; le dosi si confermano solo da TherapyDetail. (UX rework in pianificazione)
+- **Titolo QuickLogSheet temporaneo**: mostra il `personId` grezzo ("Registra evento per $personId") — placeholder in attesa del rework.
+- **Tab radice con freccia back**: `PersonListScreen` e `SettingsScreen` espongono ancora `onNavigateBack` pur essendo destinazioni radice della bottom bar.
+- **Preview duplicate in DashboardScreen**: `DashboardContentPreview2` e `DashboardContentPreviewQuickLog` sono identiche — residuo di sperimentazione, da ripulire nel rework.
+- **Tab Profilo placeholder**: `composable<Profile>` renderizza solo `Text("Profilo")`.

@@ -136,7 +136,7 @@ private fun EditPersonContentCreatePreview() {
 private fun EditPersonContentEditPreview() {
     CarezzeTheme {
         EditPersonContent(
-            existing = Person("1", "Sofia", "Sofi", "uid1", mapOf("uid1" to MemberRole.OWNER)),
+            existing = Person("1", "Vittoria", "Vicky", "uid1", mapOf("uid1" to MemberRole.OWNER)),
             onSave = { _, _ -> },
             onNavigateBack = {},
         )

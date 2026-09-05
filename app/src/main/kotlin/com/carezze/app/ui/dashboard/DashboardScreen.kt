@@ -369,13 +369,58 @@ private fun ActivityLog.emoji(): String = when (this) {
 @Preview(showBackground = true)
 @Composable
 private fun DashboardContentPreview() {
-    val person = Person("p1", "Sofia", "Sofi", "uid1", emptyMap())
+    val person = Person("p1", "Vittoria", "Vicky", "uid1", emptyMap())
     val log = ActivityLog.Diaper("l1", "p1", Instant.now(), "uid1", DiaperType.WET, null)
     CarezzeTheme {
         DashboardContent(
             persons = listOf(person),
             recentLogs = listOf(log),
             selectedPersonId = null,
+            viewMode = DashboardViewMode.CARD,
+            onSelectPerson = {},
+            onToggleViewMode = {},
+            onNavigateToSettings = {},
+            onNavigateToPersons = {},
+            onNavigateToHistory = {},
+            onOpenQuickLog = {},
+        )
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun DashboardContentPreview2() {
+    val person = Person("p1", "Vittoria", "Vicky", "uid1", emptyMap())
+    val log = ActivityLog.Diaper("l1", "p1", Instant.now(), "uid1", DiaperType.WET, null)
+    CarezzeTheme {
+        DashboardContent(
+            persons = listOf(person),
+            recentLogs = listOf(log),
+            selectedPersonId = "p1",
+            viewMode = DashboardViewMode.CARD,
+            onSelectPerson = {},
+            onToggleViewMode = {},
+            onNavigateToSettings = {},
+            onNavigateToPersons = {},
+            onNavigateToHistory = {},
+            onOpenQuickLog = {},
+        )
+    }
+}
+
+
+
+@Preview(showBackground = true)
+@Composable
+private fun DashboardContentPreviewQuickLog() {
+    val person = Person("p1", "Vittoria", "Vicky", "uid1", emptyMap())
+    val log = ActivityLog.Diaper("l1", "p1", Instant.now(), "uid1", DiaperType.WET, null)
+    CarezzeTheme {
+        DashboardContent(
+            persons = listOf(person),
+            recentLogs = listOf(log),
+            selectedPersonId = "p1",
             viewMode = DashboardViewMode.CARD,
             onSelectPerson = {},
             onToggleViewMode = {},

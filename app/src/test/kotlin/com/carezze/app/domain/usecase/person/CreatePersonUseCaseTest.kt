@@ -18,9 +18,9 @@ class CreatePersonUseCaseTest {
     @Test
     fun `returns created person on success`() = runTest {
         val person = fakePerson()
-        coEvery { personRepository.createPerson("Sofia", null, "uid-1") } returns Result.success(person)
+        coEvery { personRepository.createPerson("Vittoria", null, "uid-1") } returns Result.success(person)
 
-        val result = useCase("Sofia", null, "uid-1")
+        val result = useCase("Vittoria", null, "uid-1")
 
         assertTrue(result.isSuccess)
         assertEquals(person, result.getOrNull())
@@ -28,16 +28,16 @@ class CreatePersonUseCaseTest {
 
     @Test
     fun `returns failure when repository throws`() = runTest {
-        coEvery { personRepository.createPerson("Sofia", null, "uid-1") } returns Result.failure(Exception("network error"))
+        coEvery { personRepository.createPerson("Vittoria", null, "uid-1") } returns Result.failure(Exception("network error"))
 
-        val result = useCase("Sofia", null, "uid-1")
+        val result = useCase("Vittoria", null, "uid-1")
 
         assertTrue(result.isFailure)
     }
 
     private fun fakePerson() = Person(
         id = "pid-1",
-        name = "Sofia",
+        name = "Vittoria",
         nickname = null,
         createdBy = "uid-1",
         members = mapOf("uid-1" to MemberRole.OWNER),

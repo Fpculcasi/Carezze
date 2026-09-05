@@ -67,7 +67,7 @@ fun QuickLogSheet(
                 .navigationBarsPadding(),
         ) {
             Text(
-                "Registra evento",
+                "Registra evento per $personId",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
             )

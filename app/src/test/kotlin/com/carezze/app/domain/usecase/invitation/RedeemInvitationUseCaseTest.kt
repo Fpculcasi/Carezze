@@ -43,7 +43,7 @@ class RedeemInvitationUseCaseTest {
         type = InvitationType.PERSON,
         targetId = "pid-1",
         personId = null,
-        targetName = "Sofia",
+        targetName = "Vittoria",
         createdBy = "uid-1",
         createdByName = "Mario",
         code = "AB12CD34",
