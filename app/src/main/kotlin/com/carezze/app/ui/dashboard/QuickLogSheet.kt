@@ -10,18 +10,22 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,10 +51,14 @@ fun QuickLogSheet(
     personId: String,
     personName: String,
     onDismiss: () -> Unit,
+    onNavigateToAddTherapy: (personId: String) -> Unit = {},
+    onNavigateToTherapyLog: (personId: String, therapyId: String) -> Unit = { _, _ -> },
     viewModel: QuickLogViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+
+    LaunchedEffect(Unit) { viewModel.clearType() }
 
     LaunchedEffect(state.isSaved) {
         if (state.isSaved) onDismiss()
@@ -65,7 +73,8 @@ fun QuickLogSheet(
                 Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
-                    .navigationBarsPadding(),
+                    .navigationBarsPadding()
+                    .verticalScroll(rememberScrollState()),
         ) {
             Text(
                 "Registra evento per $personName",
@@ -74,16 +83,33 @@ fun QuickLogSheet(
             )
             Spacer(Modifier.height(16.dp))
 
-            if (state.selectedType == null) {
-                TypeSelectionGrid(onSelectType = viewModel::selectType)
-            } else {
-                TypeForm(
-                    type = state.selectedType!!,
-                    isLoading = state.isLoading,
-                    personId = personId,
-                    viewModel = viewModel,
-                    onBack = viewModel::clearType,
-                )
+            when {
+                state.selectedType == null ->
+                    TypeSelectionGrid(
+                        onSelectType = { type ->
+                            viewModel.selectType(
+                                type,
+                                if (type == ActivityLogType.THERAPY) personId else null,
+                            )
+                        },
+                    )
+                state.selectedType == ActivityLogType.THERAPY ->
+                    TherapyStepContent(
+                        state = state,
+                        personId = personId,
+                        viewModel = viewModel,
+                        onBack = viewModel::clearType,
+                        onNavigateToAddTherapy = onNavigateToAddTherapy,
+                        onNavigateToTherapyLog = onNavigateToTherapyLog,
+                    )
+                else ->
+                    TypeForm(
+                        type = state.selectedType!!,
+                        isLoading = state.isLoading,
+                        personId = personId,
+                        viewModel = viewModel,
+                        onBack = viewModel::clearType,
+                    )
             }
 
             if (state.error != null) {
@@ -106,6 +132,7 @@ private fun TypeSelectionGrid(onSelectType: (ActivityLogType) -> Unit) {
             ActivityLogType.TEMPERATURE to "🌡️ Temperatura",
             ActivityLogType.WEIGHT to "⚖️ Peso",
             ActivityLogType.HYGIENE to "🛁 Igiene",
+            ActivityLogType.THERAPY to "💊 Farmaci",
         )
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         types.chunked(2).forEach { row ->
@@ -124,6 +151,129 @@ private fun TypeSelectionGrid(onSelectType: (ActivityLogType) -> Unit) {
                 if (row.size == 1) Spacer(Modifier.weight(1f))
             }
         }
+    }
+}
+
+@Composable
+private fun TherapyStepContent(
+    state: QuickLogUiState,
+    personId: String,
+    viewModel: QuickLogViewModel,
+    onBack: () -> Unit,
+    onNavigateToAddTherapy: (String) -> Unit,
+    onNavigateToTherapyLog: (String, String) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        when {
+            state.selectedTherapyId == null -> {
+                Text("Terapie attive", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                if (state.therapies.isEmpty()) {
+                    Text(
+                        "Nessuna terapia attiva",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Button(
+                        onClick = { onNavigateToAddTherapy(personId) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Aggiungi terapia")
+                    }
+                } else {
+                    state.therapies.forEach { therapy ->
+                        ElevatedCard(
+                            onClick = { viewModel.selectTherapy(therapy.id) },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text(therapy.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                                Text(
+                                    "${therapy.medications.size} farmaco/i",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            state.selectedMedicationId == null -> {
+                val therapy = state.therapies.find { it.id == state.selectedTherapyId }
+                TextButton(
+                    onClick = viewModel::clearTherapy,
+                    modifier = Modifier.align(Alignment.Start),
+                ) {
+                    Text("← ${therapy?.name ?: "Terapia"}")
+                }
+                Text("Seleziona farmaco", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                therapy?.medications?.forEach { med ->
+                    ElevatedCard(
+                        onClick = { viewModel.selectMedication(med.id) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(med.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                            Text(
+                                "${med.dosage} ${med.dosageUnit}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+            }
+            else -> {
+                val therapy = state.therapies.find { it.id == state.selectedTherapyId }
+                val med = therapy?.medications?.find { it.id == state.selectedMedicationId }
+                TextButton(
+                    onClick = viewModel::clearMedication,
+                    modifier = Modifier.align(Alignment.Start),
+                ) {
+                    Text("← ${med?.name ?: "Farmaco"}")
+                }
+                Text(
+                    med?.name ?: "",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    "${med?.dosage} ${med?.dosageUnit}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(4.dp))
+                Button(
+                    onClick = {
+                        viewModel.logMedication(personId, state.selectedTherapyId!!, state.selectedMedicationId!!)
+                    },
+                    enabled = !state.isLoading,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    if (state.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                        )
+                        Spacer(Modifier.width(8.dp))
+                    } else {
+                        Icon(Icons.Default.Check, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                    }
+                    Text("Segna presa")
+                }
+                TextButton(
+                    onClick = {
+                        onNavigateToTherapyLog(personId, state.selectedTherapyId!!)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text("Vai allo storico →")
+                }
+            }
+        }
+        ElevatedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("← Indietro") }
     }
 }
 
@@ -165,6 +315,7 @@ private fun TypeForm(
                 )
                 SaveButton(isLoading = isLoading, onSave = { viewModel.logHygiene(personId, notes) })
             }
+            ActivityLogType.THERAPY -> {}
         }
         ElevatedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("← Indietro") }
     }

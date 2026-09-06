@@ -250,6 +250,12 @@ fun MainScreen() {
                     onNavigateToHistory = { personId ->
                         navController.navigate(HistoryList(personId))
                     },
+                    onNavigateToAddTherapy = { personId ->
+                        navController.navigate(AddTherapy(personId))
+                    },
+                    onNavigateToTherapyLog = { personId, therapyId ->
+                        navController.navigate(TherapyLog(personId, therapyId))
+                    },
                 )
             }
 

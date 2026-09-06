@@ -61,6 +61,8 @@ fun DashboardScreen(
     onNavigateToSettings: () -> Unit = {},
     onNavigateToPersons: () -> Unit = {},
     onNavigateToHistory: (personId: String) -> Unit = {},
+    onNavigateToAddTherapy: (personId: String) -> Unit = {},
+    onNavigateToTherapyLog: (personId: String, therapyId: String) -> Unit = { _, _ -> },
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
     val persons by viewModel.persons.collectAsState()
@@ -88,6 +90,14 @@ fun DashboardScreen(
             personId = pid,
             personName = personName,
             onDismiss = { quickLogPersonId = null },
+            onNavigateToAddTherapy = { personId ->
+                quickLogPersonId = null
+                onNavigateToAddTherapy(personId)
+            },
+            onNavigateToTherapyLog = { personId, therapyId ->
+                quickLogPersonId = null
+                onNavigateToTherapyLog(personId, therapyId)
+            },
         )
     }
 }

@@ -136,7 +136,8 @@ Progress shown as bar, calendar, and remaining dose counter.
 | 4.5.4 | UI: `TherapyDetailScreen` — FAB "Modifica" + menu overflow con "Termina" (dialog soft) e "Elimina" (dialog hard con warning perdita dati) | done |
 | 4.5.5 | UI: `TherapyLogScreen` — lista cronologica dosi prese (da `MedicationLog`) + FAB aggiunta manuale con DateTimePicker e selezione farmaco | done |
 | 4.5.6 | Firestore Security Rules: permesso `delete` su `therapies/{id}` + `medicationLogs` cascade | done |
-| 4.5.7 | Test unitari: Use Cases `updateTherapy`, `terminateTherapy`, `deleteTherapy`, `addManualMedicationLog` | todo |
+| 4.5.7 | UI: QuickLogSheet — tile "Farmaci", flusso terapia→farmaco→azione (segna presa / vai storico), nessuna terapia→naviga a AddTherapy | done |
+| 4.5.8 | Test unitari: Use Cases `updateTherapy`, `terminateTherapy`, `deleteTherapy`, `addManualMedicationLog` + `QuickLogViewModel` metodi terapia (`selectType(THERAPY)`, `logMedication`, `loadTherapies` con fakes) | todo |
 
 **Scelte architetturali:**
 - Termina = soft-stop: `endDate = today`, `status = COMPLETED`; terapia rimane visibile in lista con badge "Conclusa"; log esistenti conservati
