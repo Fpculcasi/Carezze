@@ -10,9 +10,12 @@ import com.fpculcasi.carezze.domain.model.TherapyDuration
 import com.fpculcasi.carezze.domain.repository.AuthRepository
 import com.fpculcasi.carezze.domain.usecase.therapy.CreateTherapyUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.DeleteTherapyUseCase
+import com.fpculcasi.carezze.domain.usecase.therapy.GetTherapyUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.ObserveLogsUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.ObserveTherapiesUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.ScheduleCalculator
+import com.fpculcasi.carezze.domain.usecase.therapy.TerminateTherapyUseCase
+import com.fpculcasi.carezze.domain.usecase.therapy.UpdateTherapyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -50,6 +53,9 @@ class TherapyViewModel
         private val observeLogs: ObserveLogsUseCase,
         private val createTherapy: CreateTherapyUseCase,
         private val deleteTherapyUseCase: DeleteTherapyUseCase,
+        private val terminateTherapyUseCase: TerminateTherapyUseCase,
+        private val getTherapyUseCase: GetTherapyUseCase,
+        private val updateTherapyUseCase: UpdateTherapyUseCase,
         private val authRepository: AuthRepository,
     ) : ViewModel() {
         private val userId: String? get() = authRepository.currentUser?.id
@@ -180,5 +186,78 @@ class TherapyViewModel
             therapyId: String,
         ) {
             viewModelScope.launch { deleteTherapyUseCase(personId, therapyId) }
+        }
+
+        fun terminateTherapy(
+            personId: String,
+            therapyId: String,
+        ) {
+            viewModelScope.launch { terminateTherapyUseCase(personId, therapyId) }
+        }
+
+        private var editingTherapy: Therapy? = null
+
+        fun loadTherapyForEdit(
+            personId: String,
+            therapyId: String,
+        ) {
+            viewModelScope.launch {
+                val therapy = getTherapyUseCase(personId, therapyId).getOrNull() ?: return@launch
+                editingTherapy = therapy
+                _form.value = AddTherapyFormState(
+                    step = 1,
+                    therapyName = therapy.name,
+                    startDate = therapy.startDate,
+                    isFixed = therapy.duration is TherapyDuration.Fixed,
+                    fixedDays = (therapy.duration as? TherapyDuration.Fixed)?.days?.toString() ?: "7",
+                    medications = therapy.medications.map { med ->
+                        MedicationFormState(
+                            id = med.id,
+                            name = med.name,
+                            dosage = med.dosage.toString(),
+                            dosageUnit = med.dosageUnit,
+                            frequencyHours = med.frequencyHours,
+                        )
+                    }.ifEmpty { listOf(MedicationFormState()) },
+                )
+            }
+        }
+
+        fun submitEditTherapy(onDone: () -> Unit) {
+            val base = editingTherapy ?: return
+            val state = _form.value
+            val duration =
+                if (state.isFixed) {
+                    TherapyDuration.Fixed(state.fixedDays.toIntOrNull() ?: 7)
+                } else {
+                    TherapyDuration.Indefinite
+                }
+            val medications =
+                state.medications.mapNotNull { m ->
+                    if (m.name.isBlank()) return@mapNotNull null
+                    Medication(
+                        id = m.id,
+                        name = m.name,
+                        dosage = m.dosage.toDoubleOrNull() ?: 1.0,
+                        dosageUnit = m.dosageUnit,
+                        frequencyHours = m.frequencyHours,
+                        scheduledTimes = ScheduleCalculator.computeScheduledTimes(m.frequencyHours),
+                        startDate = state.startDate,
+                        notes = null,
+                    )
+                }
+            viewModelScope.launch {
+                updateTherapyUseCase(
+                    base.copy(
+                        name = state.therapyName,
+                        startDate = state.startDate,
+                        duration = duration,
+                        medications = medications,
+                    ),
+                )
+                editingTherapy = null
+                resetForm()
+                onDone()
+            }
         }
     }

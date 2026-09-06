@@ -132,8 +132,8 @@ Progress shown as bar, calendar, and remaining dose counter.
 |---|---|---|
 | 4.5.1 | Domain: `TherapyStatus` enum (ACTIVE, COMPLETED) + Use Cases `updateTherapy`, `terminateTherapy`, `deleteTherapy`, `addManualMedicationLog` | done |
 | 4.5.2 | Data: `TherapyRepositoryImpl` — update (tutti i campi) + terminate (endDate=today, status=COMPLETED) + delete (hard, cascade `MedicationLog`) | done |
-| 4.5.3 | UI: `EditTherapyScreen` — wizard pre-popolato, tutti i campi modificabili | todo |
-| 4.5.4 | UI: `TherapyDetailScreen` — FAB "Modifica" + menu overflow con "Termina" (dialog soft) e "Elimina" (dialog hard con warning perdita dati) | todo |
+| 4.5.3 | UI: `EditTherapyScreen` — wizard pre-popolato, tutti i campi modificabili | done |
+| 4.5.4 | UI: `TherapyDetailScreen` — FAB "Modifica" + menu overflow con "Termina" (dialog soft) e "Elimina" (dialog hard con warning perdita dati) | done |
 | 4.5.5 | UI: `TherapyLogScreen` — lista cronologica dosi prese (da `MedicationLog`) + FAB aggiunta manuale con DateTimePicker e selezione farmaco | todo |
 | 4.5.6 | Firestore Security Rules: permesso `delete` su `therapies/{id}` + `medicationLogs` cascade | todo |
 | 4.5.7 | Test unitari: Use Cases `updateTherapy`, `terminateTherapy`, `deleteTherapy`, `addManualMedicationLog` | todo |

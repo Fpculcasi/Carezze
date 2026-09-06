@@ -34,6 +34,7 @@ import com.fpculcasi.carezze.ui.person.PersonDetailScreen
 import com.fpculcasi.carezze.ui.person.PersonListScreen
 import com.fpculcasi.carezze.ui.settings.SettingsScreen
 import com.fpculcasi.carezze.ui.therapy.AddTherapyScreen
+import com.fpculcasi.carezze.ui.therapy.EditTherapyScreen
 import com.fpculcasi.carezze.ui.therapy.TherapyDetailScreen
 import kotlinx.serialization.Serializable
 
@@ -68,6 +69,8 @@ import kotlinx.serialization.Serializable
 @Serializable data class AddTherapy(val personId: String)
 
 @Serializable data class TherapyDetail(val personId: String, val therapyId: String)
+
+@Serializable data class EditTherapy(val personId: String, val therapyId: String)
 
 @Serializable data class HistoryList(val personId: String)
 
@@ -308,6 +311,16 @@ fun MainScreen() {
             composable<TherapyDetail> { backStackEntry ->
                 val route = backStackEntry.toRoute<TherapyDetail>()
                 TherapyDetailScreen(
+                    personId = route.personId,
+                    therapyId = route.therapyId,
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateToEdit = { navController.navigate(EditTherapy(route.personId, route.therapyId)) },
+                )
+            }
+
+            composable<EditTherapy> { backStackEntry ->
+                val route = backStackEntry.toRoute<EditTherapy>()
+                EditTherapyScreen(
                     personId = route.personId,
                     therapyId = route.therapyId,
                     onNavigateBack = { navController.popBackStack() },

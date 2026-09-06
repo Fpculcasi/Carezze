@@ -1,6 +1,7 @@
 package com.fpculcasi.carezze.ui.therapy
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,18 +13,28 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,11 +48,16 @@ fun TherapyDetailScreen(
     personId: String,
     therapyId: String,
     onNavigateBack: () -> Unit,
+    onNavigateToEdit: () -> Unit,
     viewModel: TherapyViewModel = hiltViewModel(),
 ) {
     val therapies by viewModel.therapiesFor(personId).collectAsState()
     val therapy = therapies.firstOrNull { it.id == therapyId }
     val logs by viewModel.logsFor(personId, therapyId).collectAsState()
+
+    var showMenu by rememberSaveable { mutableStateOf(false) }
+    var showTerminateDialog by rememberSaveable { mutableStateOf(false) }
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -52,7 +68,40 @@ fun TherapyDetailScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
                     }
                 },
+                actions = {
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "Altre azioni")
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false },
+                        ) {
+                            if (therapy?.isActive == true) {
+                                DropdownMenuItem(
+                                    text = { Text("Termina") },
+                                    onClick = {
+                                        showMenu = false
+                                        showTerminateDialog = true
+                                    },
+                                )
+                            }
+                            DropdownMenuItem(
+                                text = { Text("Elimina") },
+                                onClick = {
+                                    showMenu = false
+                                    showDeleteDialog = true
+                                },
+                            )
+                        }
+                    }
+                },
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onNavigateToEdit) {
+                Icon(Icons.Default.Edit, contentDescription = "Modifica terapia")
+            }
         },
     ) { padding ->
         if (therapy == null) return@Scaffold
@@ -61,6 +110,46 @@ fun TherapyDetailScreen(
             progress = viewModel.progressFor(therapy, logs),
             remaining = viewModel.remainingDoses(therapy, logs),
             modifier = Modifier.padding(padding),
+        )
+    }
+
+    if (showTerminateDialog) {
+        AlertDialog(
+            onDismissRequest = { showTerminateDialog = false },
+            title = { Text("Termina terapia") },
+            text = { Text("Vuoi terminare questa terapia? I log esistenti saranno conservati.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showTerminateDialog = false
+                        viewModel.terminateTherapy(personId, therapyId)
+                        onNavigateBack()
+                    },
+                ) { Text("Termina") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTerminateDialog = false }) { Text("Annulla") }
+            },
+        )
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Elimina terapia") },
+            text = { Text("Eliminare la terapia rimuoverà anche tutti i log associati. Questa azione è irreversibile.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        viewModel.deleteTherapy(personId, therapyId)
+                        onNavigateBack()
+                    },
+                ) { Text("Elimina") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) { Text("Annulla") }
+            },
         )
     }
 }
