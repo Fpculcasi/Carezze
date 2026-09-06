@@ -67,6 +67,7 @@ Carezze/
 
 ## Comandi Rapidi
 
+### Android build e run
 ```bash
 export JAVA_HOME="/c/Program Files/Android/Android Studio/jbr"
 
@@ -87,6 +88,12 @@ JAVA_HOME="$JAVA_HOME" ./gradlew assembleRelease
 ```
 
 > Nota: `detekt` è task root (non `:app:detekt`)
+
+### Firebase deploy
+
+```bash
+firebase deploy --only firestore:rules --project carezze-5a3b0
+```
 
 ## Variabili d'Ambiente / Firebase Config
 
