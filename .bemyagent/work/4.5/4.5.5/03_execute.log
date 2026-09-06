@@ -1,0 +1,25 @@
+# EXECUTE — 4.5.5 TherapyLogScreen
+
+## Step 1 — TherapyViewModel: inject AddManualMedicationLogUseCase + addManualLog()
+action: modifica TherapyViewModel.kt
+result: OK — import aggiunto, Instant importato, costruttore aggiornato, metodo addManualLog() aggiunto
+next: creare TherapyLogScreen.kt
+
+## Step 2 — TherapyLogScreen.kt
+action: nuovo file ui/therapy/TherapyLogScreen.kt
+result: OK — schermata con LazyColumn logs, MedicationLogCard, StatusBadge, AddManualLogDialog (dropdown farmaco + date text field + ora/minuti)
+next: aggiornare AppNavigation
+
+## Step 3 — AppNavigation: route TherapyLog + composable
+action: modifica AppNavigation.kt
+result: OK — TherapyLog route aggiunta, import TherapyLogScreen, composable wired, TherapyDetail ora chiama onNavigateToLog
+next: aggiornare TherapyDetailScreen
+
+## Step 4 — TherapyDetailScreen: parametro onNavigateToLog + voce overflow
+action: modifica TherapyDetailScreen.kt
+result: OK — parametro con default {}, voce "Storico dosi" in testa al DropdownMenu
+next: build
+
+## Step 5 — assembleDebug / compileDebugKotlin
+command: JAVA_HOME="..." ./gradlew :app:compileDebugKotlin
+result: BUILD SUCCESSFUL in 32s — nessun errore Kotlin

@@ -49,6 +49,7 @@ fun TherapyDetailScreen(
     therapyId: String,
     onNavigateBack: () -> Unit,
     onNavigateToEdit: () -> Unit,
+    onNavigateToLog: () -> Unit = {},
     viewModel: TherapyViewModel = hiltViewModel(),
 ) {
     val therapies by viewModel.therapiesFor(personId).collectAsState()
@@ -77,6 +78,13 @@ fun TherapyDetailScreen(
                             expanded = showMenu,
                             onDismissRequest = { showMenu = false },
                         ) {
+                            DropdownMenuItem(
+                                text = { Text("Storico dosi") },
+                                onClick = {
+                                    showMenu = false
+                                    onNavigateToLog()
+                                },
+                            )
                             if (therapy?.isActive == true) {
                                 DropdownMenuItem(
                                     text = { Text("Termina") },

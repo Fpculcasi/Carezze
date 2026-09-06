@@ -8,6 +8,7 @@ import com.fpculcasi.carezze.domain.model.MedicationStatus
 import com.fpculcasi.carezze.domain.model.Therapy
 import com.fpculcasi.carezze.domain.model.TherapyDuration
 import com.fpculcasi.carezze.domain.repository.AuthRepository
+import com.fpculcasi.carezze.domain.usecase.therapy.AddManualMedicationLogUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.CreateTherapyUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.DeleteTherapyUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.GetTherapyUseCase
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 import javax.inject.Inject
@@ -56,6 +58,7 @@ class TherapyViewModel
         private val terminateTherapyUseCase: TerminateTherapyUseCase,
         private val getTherapyUseCase: GetTherapyUseCase,
         private val updateTherapyUseCase: UpdateTherapyUseCase,
+        private val addManualMedicationLogUseCase: AddManualMedicationLogUseCase,
         private val authRepository: AuthRepository,
     ) : ViewModel() {
         private val userId: String? get() = authRepository.currentUser?.id
@@ -220,6 +223,18 @@ class TherapyViewModel
                         )
                     }.ifEmpty { listOf(MedicationFormState()) },
                 )
+            }
+        }
+
+        fun addManualLog(
+            personId: String,
+            therapyId: String,
+            medicationId: String,
+            takenAt: Instant,
+        ) {
+            val uid = userId ?: return
+            viewModelScope.launch {
+                addManualMedicationLogUseCase(personId, therapyId, medicationId, takenAt, uid)
             }
         }
 

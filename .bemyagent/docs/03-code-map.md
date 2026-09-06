@@ -41,7 +41,8 @@
 | Lista Persone | `ui/person/PersonListScreen.kt` ✅ | No | Tutte le Persone accessibili |
 | Dettaglio Persona | `ui/person/PersonDetailScreen.kt` ✅ (stub) | No | Tab: Terapie / Log Attività (M4/M5) |
 | Aggiungi/Modifica Persona | `ui/person/EditPersonScreen.kt` ✅ | No | Form Persona |
-| Dettaglio Terapia | `ui/therapy/TherapyDetailScreen.kt` ✅ | No | Farmaci, barra progresso, contatore dosi rimanenti; FAB Modifica → EditTherapyScreen; overflow "Termina" (dialog soft) + "Elimina" (dialog hard) |
+| Dettaglio Terapia | `ui/therapy/TherapyDetailScreen.kt` ✅ | No | Farmaci, barra progresso, contatore dosi rimanenti; FAB Modifica → EditTherapyScreen; overflow "Storico dosi" → TherapyLogScreen + "Termina" (dialog soft) + "Elimina" (dialog hard) |
+| Storico Dosi | `ui/therapy/TherapyLogScreen.kt` ✅ | No | Lista cronologica MedicationLog con nome farmaco + badge stato (TAKEN/SKIPPED/PENDING) + badge "Manuale"; FAB aggiunta dose manuale (dropdown farmaco + data + ora) |
 | Aggiungi Terapia | `ui/therapy/AddTherapyScreen.kt` ✅ | No | Wizard 2-step (info + farmaci) |
 | Modifica Terapia | `ui/therapy/EditTherapyScreen.kt` ✅ | No | Wizard 2-step pre-popolato; salva via `UpdateTherapyUseCase` |
 | Storico Lista | `ui/history/HistoryListScreen.kt` | No | Feed cronologico filtrato |
