@@ -39,9 +39,11 @@ service cloud.firestore {
                          resource.data.members[request.auth.uid] == 'OWNER';
 
         match /medicationLogs/{logId} {
-          allow read, write: if isAuthenticated() &&
-                                request.auth.uid in
-                                  get(/databases/$(database)/documents/persons/$(personId)/therapies/$(therapyId)).data.memberIds;
+          allow read, create, update: if isAuthenticated() &&
+                                         request.auth.uid in
+                                           get(/databases/$(database)/documents/persons/$(personId)/therapies/$(therapyId)).data.memberIds;
+          allow delete: if isAuthenticated() &&
+                           get(/databases/$(database)/documents/persons/$(personId)/therapies/$(therapyId)).data.members[request.auth.uid] == 'OWNER';
         }
       }
     }
