@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fpculcasi.carezze.domain.model.ActivityLog
 import com.fpculcasi.carezze.domain.usecase.activity.ObserveActivityLogsUseCase
+import android.util.Log
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -27,5 +29,9 @@ class HistoryViewModel
 
         val logs: StateFlow<List<ActivityLog>> =
             observeActivityLogs(personId, from, to)
+                .catch { e ->
+                    Log.e("HistoryViewModel", "logs($personId) error", e)
+                    emit(emptyList())
+                }
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     }

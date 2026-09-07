@@ -18,10 +18,12 @@ import com.fpculcasi.carezze.domain.usecase.therapy.ScheduleCalculator
 import com.fpculcasi.carezze.domain.usecase.therapy.TerminateTherapyUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.UpdateTherapyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -69,6 +71,10 @@ class TherapyViewModel
         fun therapiesFor(personId: String): StateFlow<List<Therapy>> =
             therapiesCache.getOrPut(personId) {
                 observeTherapies(personId)
+                    .catch { e ->
+                        Log.e("TherapyViewModel", "therapiesFor($personId) error", e)
+                        emit(emptyList())
+                    }
                     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
             }
 
@@ -78,6 +84,10 @@ class TherapyViewModel
         ): StateFlow<List<MedicationLog>> =
             logsCache.getOrPut("$personId/$therapyId") {
                 observeLogs(personId, therapyId)
+                    .catch { e ->
+                        Log.e("TherapyViewModel", "logsFor($personId/$therapyId) error", e)
+                        emit(emptyList())
+                    }
                     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
             }
 

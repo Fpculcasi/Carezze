@@ -10,6 +10,7 @@ import com.fpculcasi.carezze.domain.repository.MedicationLogRepository
 import com.fpculcasi.carezze.domain.repository.PersonRepository
 import com.fpculcasi.carezze.domain.repository.TherapyRepository
 import com.fpculcasi.carezze.domain.repository.UserRepository
+import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Binds
 import dagger.Module
@@ -44,6 +45,7 @@ abstract class FirestoreModule {
     companion object {
         @Provides
         @Singleton
-        fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+        fun provideFirebaseFirestore(): FirebaseFirestore =
+            FirebaseFirestore.getInstance(FirebaseApp.getInstance(), "carezze-prod")
     }
 }

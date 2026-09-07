@@ -8,9 +8,11 @@ import com.fpculcasi.carezze.domain.repository.AuthRepository
 import com.fpculcasi.carezze.domain.usecase.activity.ObserveActivityLogsUseCase
 import com.fpculcasi.carezze.domain.usecase.person.ObservePersonsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -33,7 +35,7 @@ class DashboardViewModel
 
         val persons: StateFlow<List<Person>> =
             userId
-                ?.let { observePersons(it) }
+                ?.let { uid -> observePersons(uid).catch { e -> Log.e("DashboardViewModel", "observePersons error", e); emit(emptyList()) } }
                 ?.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
                 ?: MutableStateFlow(emptyList())
 
@@ -54,6 +56,9 @@ class DashboardViewModel
                 } else {
                     combine(flows) { arrays -> arrays.flatMap { it }.sortedByDescending { it.timestamp } }
                 }
+            }.catch { e ->
+                Log.e("DashboardViewModel", "recentLogs error", e)
+                emit(emptyList())
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
         fun selectPerson(id: String?) {

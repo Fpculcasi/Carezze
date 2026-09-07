@@ -15,6 +15,7 @@
 | D-09 | Indici denormalizzati | `personAccess[]` e `therapyAccess[]` su `users/{id}` | inline |
 | D-10 | Dose saltata: logica lazy | Dosi non confermate → marcate `SKIPPED` alla successiva somministrazione | inline |
 | D-15 | No Cloud Functions (Spark plan) | M6 → Firestore transactions; M7 → WorkManager on-device | inline |
+| D-17 | Accesso terapie: livello Persona (MVP) | Person members vedono tutte le terapie di quella persona; M6 estende con OR therapy-level | inline |
 | D-11 | Regione Firebase | `europe-west1` per GDPR | inline |
 | D-12 | Nome app | Carezze (working name, può cambiare) | inline |
 | D-13 | GitFlow | `main`, `develop`, `feature/*`, `release/*`, `hotfix/*` | inline |
@@ -73,6 +74,13 @@
 - **Decisione**: Non marcare automaticamente a orario fisso; alla successiva apertura app (o tick WorkManager), il repository crea retrospettivamente i `MedicationLog` con `status=SKIPPED` per tutti gli Orari Schedulati passati non confermati
 - **Trade-off**: Lo storico non è aggiornato in tempo reale se il dispositivo è spento; accettabile perché l'importante è che il progresso totale della terapia sia sempre corretto alla riapertura
 
+### D-17 — Accesso Terapie: Livello Persona (MVP) → OR Therapy-Level (M6)
+- **Problema**: Le therapy security rules usavano `uid in resource.data.memberIds` (therapy-level), ma la query `therapiesCollection(personId)` non ha filtro su `memberIds` → Firestore non può verificare staticamente l'autorizzazione → PERMISSION_DENIED.
+- **Decisione (MVP)**: `allow read/update: uid in get(person).data.memberIds` — qualsiasi membro della Persona può vedere tutte le sue Terapie. Elimina il problema della query authorization perché `personId` è fisso nel path e la condizione non dipende da campi del documento Therapy.
+- **Evoluzione (M6 — Share)**: quando si aggiunge la condivisione a livello Terapia, la rule diventa `uid in person.memberIds OR uid in therapy.memberIds`. I MedicationLogs dovranno analogamente accettare sia l'accesso person-level che therapy-level (due `get()` per operazione — costo accettabile dato il volume atteso).
+- **Trade-off**: In MVP tutti i caregiver di una Persona vedono tutte le sue Terapie (no privacy granulare tra terapie). Accettabile perché la condivisione a livello Terapia è M6; nel frattempo un unico caregiver usa l'app.
+- **Pattern `members` (Map) + `memberIds` (Array)**: entrambi i campi coesistono in Person e Therapy. La Map (`{"uid": "OWNER"}`) serve per i role-check (`members[uid] == "OWNER"`). L'Array (`["uid"]`) serve per `whereArrayContains` queries e `in` checks nelle rules. Devono essere sempre tenuti in sync ad ogni write (create/update/revoke).
+
 ### D-15 — No Cloud Functions: Spark Plan + Scelta Architetturale
 - **Problema**: Cloud Functions richiedono piano Blaze (pay-as-you-go); ma c'è anche una ragione di design
 - **Decisione**: Zero Cloud Functions per v1. M6 usa Firestore transactions atomiche lato client; M7 usa WorkManager per scheduling on-device. La logica server-side è garantita dalle Security Rules.
@@ -107,6 +115,8 @@
 
 > Aggiornare durante lo sviluppo con pattern e gotcha scoperti.
 
+- **Firestore query authorization**: per una query `list`, la rule deve essere verificabile staticamente da Firestore dato il set di filtri della query. Se la rule controlla `uid in resource.data.memberIds` ma la query non ha `.whereArrayContains("memberIds", uid)`, Firestore restituisce PERMISSION_DENIED sull'intera query. Soluzioni: (a) aggiungere `whereArrayContains` alla query, oppure (b) cambiare la rule con `get()` su un documento padre il cui path è fisso nel match — in quel caso Firestore valuta la condizione una volta sola per tutta la query.
+- **Subcollection path nelle Firestore rules**: una rule su `match /activityLogs/{id}` copre solo la collezione top-level `/activityLogs`. Le subcollection (es. `persons/{personId}/activityLogs`) cadono nel catch-all `allow read, write: if false` se non esplicitamente coperte nel blocco `match /persons/{personId}`. Verificare sempre che il path nella rule rispecchi il path usato nel codice.
 - **Firestore Timestamp**: mai esporre `com.google.firebase.Timestamp` al domain layer — mappare sempre in `java.time.Instant` nel data layer
 - **Glance + Hilt**: usare `EntryPointAccessors.fromApplication()` per inject in GlanceAppWidget
 - **Anonymous → Linked Auth**: `FirebaseAuth.currentUser.linkWithCredential()` preserva l'UID e quindi tutti i documenti Firestore esistenti

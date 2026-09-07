@@ -16,7 +16,7 @@ service cloud.firestore {
 
     match /persons/{personId} {
       allow read: if isAuthenticated() &&
-                     request.auth.uid in resource.data.members;
+                     request.auth.uid in resource.data.memberIds;
       allow create: if isAuthenticated() &&
                        request.auth.uid == request.resource.data.createdBy &&
                        request.resource.data.members[request.auth.uid] == 'OWNER';
@@ -26,15 +26,17 @@ service cloud.firestore {
                        resource.data.members[request.auth.uid] == 'OWNER';
 
       match /therapies/{therapyId} {
-        // Person members can create therapies; therapy members can read/update; therapy owners can delete
+        // Person members can create/read/update therapies; therapy owners can delete
         allow create: if isAuthenticated() &&
                          request.auth.uid in
-                           get(/databases/$(database)/documents/persons/$(personId)).data.members &&
+                           get(/databases/$(database)/documents/persons/$(personId)).data.memberIds &&
                          request.resource.data.members[request.auth.uid] == 'OWNER';
         allow read: if isAuthenticated() &&
-                       request.auth.uid in resource.data.memberIds;
+                       request.auth.uid in
+                         get(/databases/$(database)/documents/persons/$(personId)).data.memberIds;
         allow update: if isAuthenticated() &&
-                         request.auth.uid in resource.data.members;
+                         request.auth.uid in
+                           get(/databases/$(database)/documents/persons/$(personId)).data.memberIds;
         allow delete: if isAuthenticated() &&
                          resource.data.members[request.auth.uid] == 'OWNER';
 
@@ -46,11 +48,12 @@ service cloud.firestore {
                            get(/databases/$(database)/documents/persons/$(personId)/therapies/$(therapyId)).data.members[request.auth.uid] == 'OWNER';
         }
       }
-    }
 
-    // Activity logs — TODO(M5): restrict to person members
-    match /activityLogs/{logId} {
-      allow read, write: if isAuthenticated();
+      match /activityLogs/{logId} {
+        allow read, write: if isAuthenticated() &&
+                              request.auth.uid in
+                                get(/databases/$(database)/documents/persons/$(personId)).data.memberIds;
+      }
     }
 
     // Invitations — TODO(M6): restrict creation to person owner

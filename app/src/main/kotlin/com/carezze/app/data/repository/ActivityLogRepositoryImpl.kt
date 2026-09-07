@@ -13,6 +13,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import android.util.Log
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -65,6 +66,7 @@ class ActivityLogRepositoryImpl
                         .orderBy("timestamp", Query.Direction.DESCENDING)
                         .addSnapshotListener { snapshot, error ->
                             if (error != null) {
+                                Log.e("ActivityLogRepository", "observeActivityLogs($personId) failed", error)
                                 close(error)
                                 return@addSnapshotListener
                             }

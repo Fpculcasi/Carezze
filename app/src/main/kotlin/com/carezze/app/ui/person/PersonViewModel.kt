@@ -9,9 +9,11 @@ import com.fpculcasi.carezze.domain.usecase.person.DeletePersonUseCase
 import com.fpculcasi.carezze.domain.usecase.person.ObservePersonsUseCase
 import com.fpculcasi.carezze.domain.usecase.person.UpdatePersonUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,7 +32,7 @@ class PersonViewModel
 
         val persons: StateFlow<List<Person>> =
             userId
-                ?.let { observePersons(it) }
+                ?.let { uid -> observePersons(uid).catch { e -> Log.e("PersonViewModel", "observePersons error", e); emit(emptyList()) } }
                 ?.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
                 ?: MutableStateFlow(emptyList())
 

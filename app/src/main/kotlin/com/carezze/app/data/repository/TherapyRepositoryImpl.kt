@@ -9,6 +9,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import android.util.Log
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -34,6 +35,7 @@ class TherapyRepositoryImpl
                     therapiesCollection(personId)
                         .addSnapshotListener { snapshot, error ->
                             if (error != null) {
+                                Log.e("TherapyRepository", "observeTherapies failed", error)
                                 close(error)
                                 return@addSnapshotListener
                             }

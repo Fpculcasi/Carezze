@@ -6,6 +6,7 @@ import com.fpculcasi.carezze.domain.repository.MedicationLogRepository
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import android.util.Log
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -38,6 +39,7 @@ class MedicationLogRepositoryImpl
                         .orderBy("scheduledTime", com.google.firebase.firestore.Query.Direction.DESCENDING)
                         .addSnapshotListener { snapshot, error ->
                             if (error != null) {
+                                Log.e("MedicationLogRepository", "observeLogs($personId/$therapyId) failed", error)
                                 close(error)
                                 return@addSnapshotListener
                             }

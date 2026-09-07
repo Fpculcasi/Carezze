@@ -14,11 +14,13 @@ import com.fpculcasi.carezze.domain.repository.AuthRepository
 import com.fpculcasi.carezze.domain.usecase.activity.LogActivityUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.AddManualMedicationLogUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.ObserveTherapiesUseCase
+import android.util.Log
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -107,9 +109,14 @@ class QuickLogViewModel
         private fun loadTherapies(personId: String) {
             therapiesJob?.cancel()
             therapiesJob = viewModelScope.launch {
-                observeTherapies(personId).collect { list ->
-                    _state.update { it.copy(therapies = list.filter { t -> t.isActive }) }
-                }
+                observeTherapies(personId)
+                    .catch { e ->
+                        Log.e("QuickLogViewModel", "loadTherapies($personId) error", e)
+                        _state.update { it.copy(error = e.message) }
+                    }
+                    .collect { list ->
+                        _state.update { it.copy(therapies = list.filter { t -> t.isActive }) }
+                    }
             }
         }
 

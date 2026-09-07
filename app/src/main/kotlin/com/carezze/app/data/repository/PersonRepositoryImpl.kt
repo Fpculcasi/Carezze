@@ -6,6 +6,7 @@ import com.fpculcasi.carezze.domain.repository.PersonRepository
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import android.util.Log
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -29,6 +30,7 @@ class PersonRepositoryImpl
                         .whereArrayContains("memberIds", userId)
                         .addSnapshotListener { snapshot, error ->
                             if (error != null) {
+                                Log.e("PersonRepository", "observePersons failed", error)
                                 close(error)
                                 return@addSnapshotListener
                             }
