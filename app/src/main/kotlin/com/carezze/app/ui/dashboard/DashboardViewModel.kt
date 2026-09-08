@@ -1,5 +1,6 @@
 package com.fpculcasi.carezze.ui.dashboard
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fpculcasi.carezze.domain.model.ActivityLog
@@ -8,7 +9,6 @@ import com.fpculcasi.carezze.domain.repository.AuthRepository
 import com.fpculcasi.carezze.domain.usecase.activity.ObserveActivityLogsUseCase
 import com.fpculcasi.carezze.domain.usecase.person.ObservePersonsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -35,7 +35,14 @@ class DashboardViewModel
 
         val persons: StateFlow<List<Person>> =
             userId
-                ?.let { uid -> observePersons(uid).catch { e -> Log.e("DashboardViewModel", "observePersons error", e); emit(emptyList()) } }
+                ?.let {
+                        uid ->
+                    observePersons(uid).catch {
+                            e ->
+                        Log.e("DashboardViewModel", "observePersons error", e)
+                        emit(emptyList())
+                    }
+                }
                 ?.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
                 ?: MutableStateFlow(emptyList())
 

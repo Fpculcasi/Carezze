@@ -1,5 +1,6 @@
 package com.fpculcasi.carezze.ui.dashboard
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fpculcasi.carezze.domain.model.ActivityLog
@@ -14,7 +15,6 @@ import com.fpculcasi.carezze.domain.repository.AuthRepository
 import com.fpculcasi.carezze.domain.usecase.activity.LogActivityUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.AddManualMedicationLogUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.ObserveTherapiesUseCase
-import android.util.Log
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,7 +54,10 @@ class QuickLogViewModel
         private val userId: String get() = authRepository.currentUser?.id ?: ""
         private var therapiesJob: Job? = null
 
-        fun selectType(type: ActivityLogType, personId: String? = null) {
+        fun selectType(
+            type: ActivityLogType,
+            personId: String? = null,
+        ) {
             _state.update { it.copy(selectedType = type) }
             if (type == ActivityLogType.THERAPY && personId != null) loadTherapies(personId)
         }
@@ -100,24 +103,28 @@ class QuickLogViewModel
                 _state.update { it.copy(isLoading = true, error = null) }
                 val result = addManualMedicationLog(personId, therapyId, medicationId, Instant.now(), uid)
                 _state.update { state ->
-                    if (result.isSuccess) state.copy(isLoading = false, isSaved = true)
-                    else state.copy(isLoading = false, error = result.exceptionOrNull()?.message ?: "Errore")
+                    if (result.isSuccess) {
+                        state.copy(isLoading = false, isSaved = true)
+                    } else {
+                        state.copy(isLoading = false, error = result.exceptionOrNull()?.message ?: "Errore")
+                    }
                 }
             }
         }
 
         private fun loadTherapies(personId: String) {
             therapiesJob?.cancel()
-            therapiesJob = viewModelScope.launch {
-                observeTherapies(personId)
-                    .catch { e ->
-                        Log.e("QuickLogViewModel", "loadTherapies($personId) error", e)
-                        _state.update { it.copy(error = e.message) }
-                    }
-                    .collect { list ->
-                        _state.update { it.copy(therapies = list.filter { t -> t.isActive }) }
-                    }
-            }
+            therapiesJob =
+                viewModelScope.launch {
+                    observeTherapies(personId)
+                        .catch { e ->
+                            Log.e("QuickLogViewModel", "loadTherapies($personId) error", e)
+                            _state.update { it.copy(error = e.message) }
+                        }
+                        .collect { list ->
+                            _state.update { it.copy(therapies = list.filter { t -> t.isActive }) }
+                        }
+                }
         }
 
         fun logMeal(
