@@ -89,13 +89,18 @@ jobs:
             git log --pretty=format:"- %s" -20 > /tmp/release-notes.txt
           fi
 
+      - name: Compute version
+        run: |
+          echo "VERSION_NAME=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+          echo "VERSION_CODE=$(git rev-list --count HEAD)" >> $GITHUB_ENV
+
       - name: Build release APK
         env:
           KEYSTORE_FILE: /tmp/release.keystore
           KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
           KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
           KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease -PversionName=${{ env.VERSION_NAME }} -PversionCode=${{ env.VERSION_CODE }}
 
       - name: Write service account
         env:
