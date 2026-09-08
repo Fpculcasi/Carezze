@@ -390,14 +390,16 @@ private fun ActivityLog.emoji(): String =
 @Preview(showBackground = true)
 @Composable
 private fun DashboardContentPreview() {
-    val persons = listOf(
-        Person("p1", "Francesco", "Io", "uid1", emptyMap()),
-        Person("p2", "Jessica", "Amore", "uid1", emptyMap()),
-        Person("p3", "Christian", "Chri", "uid1", emptyMap()),
-        Person("p4", "Federico", "Fede", "uid1", emptyMap()),
-        Person("p5", "Vittoria", "Vicky", "uid1", emptyMap()),
-        Person("p6", "Antonina", "Nonna Nina", "uid1", emptyMap()),
-        Person("p7", "Antonio", "Nonno Totò", "uid1", emptyMap()))
+    val persons =
+        listOf(
+            Person("p1", "Francesco", "Io", "uid1", emptyMap()),
+            Person("p2", "Jessica", "Amore", "uid1", emptyMap()),
+            Person("p3", "Christian", "Chri", "uid1", emptyMap()),
+            Person("p4", "Federico", "Fede", "uid1", emptyMap()),
+            Person("p5", "Vittoria", "Vicky", "uid1", emptyMap()),
+            Person("p6", "Antonina", "Nonna Nina", "uid1", emptyMap()),
+            Person("p7", "Antonio", "Nonno Totò", "uid1", emptyMap()),
+        )
     val log = ActivityLog.Diaper("l1", "p5", Instant.now(), "uid1", DiaperType.WET, null)
     CarezzeTheme {
         DashboardContent(

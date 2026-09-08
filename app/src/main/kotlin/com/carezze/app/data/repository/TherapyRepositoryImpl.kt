@@ -1,5 +1,6 @@
 package com.fpculcasi.carezze.data.repository
 
+import android.util.Log
 import com.fpculcasi.carezze.domain.model.Medication
 import com.fpculcasi.carezze.domain.model.MemberRole
 import com.fpculcasi.carezze.domain.model.Therapy
@@ -9,7 +10,6 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import android.util.Log
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

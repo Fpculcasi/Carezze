@@ -83,10 +83,11 @@ fun TherapyLogScreen(
     ) { padding ->
         if (sortedLogs.isEmpty()) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(16.dp),
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
@@ -97,19 +98,21 @@ fun TherapyLogScreen(
             }
         } else {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(horizontal = 16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 item { Spacer(Modifier.height(8.dp)) }
                 items(sortedLogs, key = { it.id }) { log ->
                     MedicationLogCard(
                         log = log,
-                        medicationName = therapy?.medications
-                            ?.firstOrNull { it.id == log.medicationId }
-                            ?.name ?: "Farmaco sconosciuto",
+                        medicationName =
+                            therapy?.medications
+                                ?.firstOrNull { it.id == log.medicationId }
+                                ?.name ?: "Farmaco sconosciuto",
                     )
                 }
                 item { Spacer(Modifier.height(8.dp)) }
@@ -137,9 +140,10 @@ private fun MedicationLogCard(
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(ZoneId.systemDefault())
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -164,11 +168,12 @@ private fun MedicationLogCard(
 
 @Composable
 private fun StatusBadge(status: MedicationStatus) {
-    val (label, color) = when (status) {
-        MedicationStatus.TAKEN -> "Presa" to MaterialTheme.colorScheme.primary
-        MedicationStatus.SKIPPED -> "Saltata" to MaterialTheme.colorScheme.error
-        MedicationStatus.PENDING -> "In attesa" to MaterialTheme.colorScheme.onSurfaceVariant
-    }
+    val (label, color) =
+        when (status) {
+            MedicationStatus.TAKEN -> "Presa" to MaterialTheme.colorScheme.primary
+            MedicationStatus.SKIPPED -> "Saltata" to MaterialTheme.colorScheme.error
+            MedicationStatus.PENDING -> "In attesa" to MaterialTheme.colorScheme.onSurfaceVariant
+        }
     Text(label, style = MaterialTheme.typography.labelMedium, color = color)
 }
 
@@ -202,9 +207,10 @@ private fun AddManualLogDialog(
                         readOnly = true,
                         label = { Text("Farmaco") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(dropdownExpanded) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                     )
                     ExposedDropdownMenu(
                         expanded = dropdownExpanded,
@@ -258,9 +264,10 @@ private fun AddManualLogDialog(
             TextButton(
                 onClick = {
                     if (date != null && hour != null && minute != null) {
-                        val instant = date.atTime(hour, minute)
-                            .atZone(ZoneId.systemDefault())
-                            .toInstant()
+                        val instant =
+                            date.atTime(hour, minute)
+                                .atZone(ZoneId.systemDefault())
+                                .toInstant()
                         onConfirm(selectedMedication, instant)
                     }
                 },

@@ -1,5 +1,6 @@
 package com.fpculcasi.carezze.ui.therapy
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fpculcasi.carezze.domain.model.Medication
@@ -18,7 +19,6 @@ import com.fpculcasi.carezze.domain.usecase.therapy.ScheduleCalculator
 import com.fpculcasi.carezze.domain.usecase.therapy.TerminateTherapyUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.UpdateTherapyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -217,22 +217,24 @@ class TherapyViewModel
             viewModelScope.launch {
                 val therapy = getTherapyUseCase(personId, therapyId).getOrNull() ?: return@launch
                 editingTherapy = therapy
-                _form.value = AddTherapyFormState(
-                    step = 1,
-                    therapyName = therapy.name,
-                    startDate = therapy.startDate,
-                    isFixed = therapy.duration is TherapyDuration.Fixed,
-                    fixedDays = (therapy.duration as? TherapyDuration.Fixed)?.days?.toString() ?: "7",
-                    medications = therapy.medications.map { med ->
-                        MedicationFormState(
-                            id = med.id,
-                            name = med.name,
-                            dosage = med.dosage.toString(),
-                            dosageUnit = med.dosageUnit,
-                            frequencyHours = med.frequencyHours,
-                        )
-                    }.ifEmpty { listOf(MedicationFormState()) },
-                )
+                _form.value =
+                    AddTherapyFormState(
+                        step = 1,
+                        therapyName = therapy.name,
+                        startDate = therapy.startDate,
+                        isFixed = therapy.duration is TherapyDuration.Fixed,
+                        fixedDays = (therapy.duration as? TherapyDuration.Fixed)?.days?.toString() ?: "7",
+                        medications =
+                            therapy.medications.map { med ->
+                                MedicationFormState(
+                                    id = med.id,
+                                    name = med.name,
+                                    dosage = med.dosage.toString(),
+                                    dosageUnit = med.dosageUnit,
+                                    frequencyHours = med.frequencyHours,
+                                )
+                            }.ifEmpty { listOf(MedicationFormState()) },
+                    )
             }
         }
 

@@ -209,7 +209,11 @@ private fun TherapyStepContent(
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             Column(modifier = Modifier.padding(12.dp)) {
-                                Text(therapy.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                                Text(
+                                    therapy.name,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.Medium,
+                                )
                                 Text(
                                     "${therapy.medications.size} farmaco/i",
                                     style = MaterialTheme.typography.bodySmall,
@@ -228,7 +232,11 @@ private fun TherapyStepContent(
                 ) {
                     Text("← ${therapy?.name ?: "Terapia"}")
                 }
-                Text("Seleziona farmaco", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(
+                    "Seleziona farmaco",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
                 therapy?.medications?.forEach { med ->
                     ElevatedCard(
                         onClick = { onSelectMedication(med.id) },
@@ -548,28 +556,30 @@ private fun FilterToggle(
 
 // region Previews
 
-private val previewMedication = Medication(
-    id = "m1",
-    name = "Paracetamolo",
-    dosage = 5.0,
-    dosageUnit = "ml",
-    frequencyHours = 8,
-    scheduledTimes = emptyList(),
-    startDate = LocalDate.now(),
-    notes = null,
-)
+private val previewMedication =
+    Medication(
+        id = "m1",
+        name = "Paracetamolo",
+        dosage = 5.0,
+        dosageUnit = "ml",
+        frequencyHours = 8,
+        scheduledTimes = emptyList(),
+        startDate = LocalDate.now(),
+        notes = null,
+    )
 
-private val previewTherapy = Therapy(
-    id = "t1",
-    personId = "p1",
-    name = "Febbre",
-    createdBy = "u1",
-    startDate = LocalDate.now(),
-    duration = TherapyDuration.Indefinite,
-    isActive = true,
-    members = emptyMap(),
-    medications = listOf(previewMedication),
-)
+private val previewTherapy =
+    Therapy(
+        id = "t1",
+        personId = "p1",
+        name = "Febbre",
+        createdBy = "u1",
+        startDate = LocalDate.now(),
+        duration = TherapyDuration.Indefinite,
+        isActive = true,
+        members = emptyMap(),
+        medications = listOf(previewMedication),
+    )
 
 @Preview(showBackground = true, name = "Selezione tipo")
 @Composable
@@ -629,10 +639,11 @@ private fun PreviewTherapyMedicationPicker() {
     CarezzeTheme {
         Column(Modifier.padding(16.dp)) {
             TherapyStepContent(
-                state = QuickLogUiState(
-                    therapies = listOf(previewTherapy),
-                    selectedTherapyId = "t1",
-                ),
+                state =
+                    QuickLogUiState(
+                        therapies = listOf(previewTherapy),
+                        selectedTherapyId = "t1",
+                    ),
                 personId = "p1",
                 onSelectTherapy = {},
                 onClearTherapy = {},
@@ -653,11 +664,12 @@ private fun PreviewTherapyConfirmDose() {
     CarezzeTheme {
         Column(Modifier.padding(16.dp)) {
             TherapyStepContent(
-                state = QuickLogUiState(
-                    therapies = listOf(previewTherapy),
-                    selectedTherapyId = "t1",
-                    selectedMedicationId = "m1",
-                ),
+                state =
+                    QuickLogUiState(
+                        therapies = listOf(previewTherapy),
+                        selectedTherapyId = "t1",
+                        selectedMedicationId = "m1",
+                    ),
                 personId = "p1",
                 onSelectTherapy = {},
                 onClearTherapy = {},

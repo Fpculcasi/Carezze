@@ -1,12 +1,12 @@
 package com.fpculcasi.carezze.data.repository
 
+import android.util.Log
 import com.fpculcasi.carezze.domain.model.MedicationLog
 import com.fpculcasi.carezze.domain.model.MedicationStatus
 import com.fpculcasi.carezze.domain.repository.MedicationLogRepository
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import android.util.Log
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

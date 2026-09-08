@@ -145,7 +145,11 @@ fun TherapyDetailScreen(
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
             title = { Text("Elimina terapia") },
-            text = { Text("Eliminare la terapia rimuoverà anche tutti i log associati. Questa azione è irreversibile.") },
+            text = {
+                Text(
+                    "Eliminare la terapia rimuoverà anche tutti i log associati. Questa azione è irreversibile.",
+                )
+            },
             confirmButton = {
                 TextButton(
                     onClick = {

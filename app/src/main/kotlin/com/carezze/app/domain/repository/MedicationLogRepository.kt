@@ -10,6 +10,7 @@ interface MedicationLogRepository {
         therapyId: String,
     ): Flow<List<MedicationLog>>
 
+    @Suppress("LongParameterList")
     suspend fun logMedication(
         personId: String,
         therapyId: String,

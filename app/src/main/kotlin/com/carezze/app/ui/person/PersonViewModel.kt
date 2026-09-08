@@ -1,5 +1,6 @@
 package com.fpculcasi.carezze.ui.person
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fpculcasi.carezze.domain.model.Person
@@ -9,7 +10,6 @@ import com.fpculcasi.carezze.domain.usecase.person.DeletePersonUseCase
 import com.fpculcasi.carezze.domain.usecase.person.ObservePersonsUseCase
 import com.fpculcasi.carezze.domain.usecase.person.UpdatePersonUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -32,7 +32,14 @@ class PersonViewModel
 
         val persons: StateFlow<List<Person>> =
             userId
-                ?.let { uid -> observePersons(uid).catch { e -> Log.e("PersonViewModel", "observePersons error", e); emit(emptyList()) } }
+                ?.let {
+                        uid ->
+                    observePersons(uid).catch {
+                            e ->
+                        Log.e("PersonViewModel", "observePersons error", e)
+                        emit(emptyList())
+                    }
+                }
                 ?.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
                 ?: MutableStateFlow(emptyList())
 

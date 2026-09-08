@@ -126,7 +126,7 @@ Progress shown as bar, calendar, and remaining dose counter.
 ---
 
 ## Milestone 4.5 — Gestione Terapie: Edit / Termina / Elimina + Log Somministrazioni
-**Goal**: Utente può modificare tutti i campi di una terapia, terminarla (soft-stop con storico conservato), eliminarla (hard delete con cascade), e visualizzare/aggiungere manualmente dosi al di fuori del Quick Log | **Status**: todo
+**Goal**: Utente può modificare tutti i campi di una terapia, terminarla (soft-stop con storico conservato), eliminarla (hard delete con cascade), e visualizzare/aggiungere manualmente dosi al di fuori del Quick Log | **Status**: done
 
 | Task | Descrizione | Status |
 |---|---|---|
@@ -137,7 +137,7 @@ Progress shown as bar, calendar, and remaining dose counter.
 | 4.5.5 | UI: `TherapyLogScreen` — lista cronologica dosi prese (da `MedicationLog`) + FAB aggiunta manuale con DateTimePicker e selezione farmaco | done |
 | 4.5.6 | Firestore Security Rules: permesso `delete` su `therapies/{id}` + `medicationLogs` cascade | done |
 | 4.5.7 | UI: QuickLogSheet — tile "Farmaci", flusso terapia→farmaco→azione (segna presa / vai storico), nessuna terapia→naviga a AddTherapy | done |
-| 4.5.8 | Test unitari: Use Cases `updateTherapy`, `terminateTherapy`, `deleteTherapy`, `addManualMedicationLog` + `QuickLogViewModel` metodi terapia (`selectType(THERAPY)`, `logMedication`, `loadTherapies` con fakes) | todo |
+| 4.5.8 | Test unitari: Use Cases `updateTherapy`, `terminateTherapy`, `deleteTherapy`, `addManualMedicationLog` + `QuickLogViewModel` metodi terapia (`selectType(THERAPY)`, `logMedication`, `loadTherapies` con fakes) | done |
 
 **Scelte architetturali:**
 - Termina = soft-stop: `endDate = today`, `status = COMPLETED`; terapia rimane visibile in lista con badge "Conclusa"; log esistenti conservati

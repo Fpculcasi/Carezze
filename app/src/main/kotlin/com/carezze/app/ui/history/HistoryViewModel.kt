@@ -56,12 +56,18 @@ class HistoryViewModel
 
         private val activityEvents: Flow<List<HistoryEvent>> =
             observeActivityLogs(personId, from, to)
-                .catch { e -> Log.e("HistoryViewModel", "activityLogs($personId) error", e); emit(emptyList()) }
+                .catch { e ->
+                    Log.e("HistoryViewModel", "activityLogs($personId) error", e)
+                    emit(emptyList())
+                }
                 .map { logs -> logs.map { HistoryEvent.Activity(it) } }
 
         private val medicationEvents: Flow<List<HistoryEvent>> =
             observeTherapies(personId)
-                .catch { e -> Log.e("HistoryViewModel", "therapies($personId) error", e); emit(emptyList()) }
+                .catch { e ->
+                    Log.e("HistoryViewModel", "therapies($personId) error", e)
+                    emit(emptyList())
+                }
                 .flatMapLatest { therapies ->
                     if (therapies.isEmpty()) {
                         flowOf(emptyList())
