@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.fpculcasi.carezze.domain.model.ActivityLog
+import com.fpculcasi.carezze.domain.model.MedicationStatus
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
@@ -61,13 +62,13 @@ fun HistoryCalendarScreen(
     onNavigateBack: () -> Unit,
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
-    val logs by viewModel.logs.collectAsState()
+    val events by viewModel.events.collectAsState()
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
     var selectedDay by remember { mutableStateOf<LocalDate?>(null) }
 
     val logsByDate =
-        logs.groupBy { log ->
-            log.timestamp.atZone(ZoneId.systemDefault()).toLocalDate()
+        events.groupBy { event ->
+            event.timestamp.atZone(ZoneId.systemDefault()).toLocalDate()
         }
 
     Scaffold(
@@ -164,7 +165,7 @@ private fun DayOfWeekHeader() {
 @Composable
 private fun CalendarGrid(
     month: YearMonth,
-    logsByDate: Map<LocalDate, List<ActivityLog>>,
+    logsByDate: Map<LocalDate, List<HistoryEvent>>,
     selectedDay: LocalDate?,
     onDayClick: (LocalDate) -> Unit,
 ) {
@@ -239,7 +240,7 @@ private fun CalendarGrid(
 @Composable
 private fun DayDetail(
     day: LocalDate,
-    logs: List<ActivityLog>,
+    logs: List<HistoryEvent>,
 ) {
     val dateFormatter = DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.ITALIAN)
     Card(
@@ -259,11 +260,11 @@ private fun DayDetail(
             if (logs.isEmpty()) {
                 Text("Nessun evento", color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
-                logs.sortedByDescending { it.timestamp }.forEach { log ->
+                logs.sortedByDescending { it.timestamp }.forEach { event ->
                     ListItem(
-                        headlineContent = { Text(log.label()) },
-                        supportingContent = { Text(timeFormatter.format(log.timestamp)) },
-                        leadingContent = { Text(log.emoji(), style = MaterialTheme.typography.titleMedium) },
+                        headlineContent = { Text(event.calendarLabel()) },
+                        supportingContent = { Text(timeFormatter.format(event.timestamp)) },
+                        leadingContent = { Text(event.calendarEmoji(), style = MaterialTheme.typography.titleMedium) },
                     )
                 }
             }
@@ -271,24 +272,37 @@ private fun DayDetail(
     }
 }
 
-private fun ActivityLog.label(): String =
+private fun HistoryEvent.calendarLabel(): String =
     when (this) {
-        is ActivityLog.Meal -> "Pasto"
-        is ActivityLog.Diaper -> "Pannolino"
-        is ActivityLog.SleepStart -> "Inizio sonno"
-        is ActivityLog.SleepEnd -> "Fine sonno"
-        is ActivityLog.Temperature -> "Temperatura · $temperature°${unit.name}"
-        is ActivityLog.Weight -> "Peso · $weight ${weightUnit.name.lowercase()}"
-        is ActivityLog.Hygiene -> "Igiene"
+        is HistoryEvent.Activity ->
+            when (val l = log) {
+                is ActivityLog.Meal -> "Pasto"
+                is ActivityLog.Diaper -> "Pannolino"
+                is ActivityLog.SleepStart -> "Inizio sonno"
+                is ActivityLog.SleepEnd -> "Fine sonno"
+                is ActivityLog.Temperature -> "Temperatura · ${l.temperature}°${l.unit.name}"
+                is ActivityLog.Weight -> "Peso · ${l.weight} ${l.weightUnit.name.lowercase()}"
+                is ActivityLog.Hygiene -> "Igiene"
+            }
+        is HistoryEvent.Medication -> "$medicationName · $dosage"
     }
 
-private fun ActivityLog.emoji(): String =
+private fun HistoryEvent.calendarEmoji(): String =
     when (this) {
-        is ActivityLog.Meal -> "🍼"
-        is ActivityLog.Diaper -> "👶"
-        is ActivityLog.SleepStart -> "🌙"
-        is ActivityLog.SleepEnd -> "☀️"
-        is ActivityLog.Temperature -> "🌡️"
-        is ActivityLog.Weight -> "⚖️"
-        is ActivityLog.Hygiene -> "🛁"
+        is HistoryEvent.Activity ->
+            when (log) {
+                is ActivityLog.Meal -> "🍼"
+                is ActivityLog.Diaper -> "👶"
+                is ActivityLog.SleepStart -> "🌙"
+                is ActivityLog.SleepEnd -> "☀️"
+                is ActivityLog.Temperature -> "🌡️"
+                is ActivityLog.Weight -> "⚖️"
+                is ActivityLog.Hygiene -> "🛁"
+            }
+        is HistoryEvent.Medication ->
+            when (log.status) {
+                MedicationStatus.TAKEN -> "💊"
+                MedicationStatus.SKIPPED -> "⏭️"
+                MedicationStatus.PENDING -> "⏳"
+            }
     }

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.fpculcasi.carezze.domain.model.ActivityLog
 import com.fpculcasi.carezze.domain.model.DiaperType
+import com.fpculcasi.carezze.domain.model.MedicationStatus
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -46,7 +47,7 @@ fun HistoryListScreen(
     onNavigateToCalendar: () -> Unit = {},
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
-    val logs by viewModel.logs.collectAsState()
+    val events by viewModel.events.collectAsState()
 
     Scaffold(
         topBar = {
@@ -65,7 +66,7 @@ fun HistoryListScreen(
             )
         },
     ) { padding ->
-        if (logs.isEmpty()) {
+        if (events.isEmpty()) {
             Box(
                 Modifier
                     .fillMaxSize()
@@ -75,7 +76,7 @@ fun HistoryListScreen(
                 Text("Nessun evento negli ultimi 30 giorni", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         } else {
-            GroupedFeed(logs = logs, contentPadding = padding)
+            GroupedFeed(events = events, contentPadding = padding)
         }
     }
 }
@@ -83,16 +84,16 @@ fun HistoryListScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun GroupedFeed(
-    logs: List<ActivityLog>,
+    events: List<HistoryEvent>,
     contentPadding: PaddingValues,
 ) {
     val grouped =
-        logs.groupBy { log ->
-            log.timestamp.atZone(ZoneId.systemDefault()).toLocalDate()
+        events.groupBy { event ->
+            event.timestamp.atZone(ZoneId.systemDefault()).toLocalDate()
         }.entries.sortedByDescending { it.key }
 
     LazyColumn(contentPadding = contentPadding) {
-        grouped.forEach { (date, dayLogs) ->
+        grouped.forEach { (date, dayEvents) ->
             stickyHeader(key = date.toString()) {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -108,12 +109,12 @@ private fun GroupedFeed(
                     )
                 }
             }
-            items(dayLogs, key = { it.id }) { log ->
+            items(dayEvents, key = { it.itemKey() }) { event ->
                 Column {
                     ListItem(
-                        headlineContent = { Text(log.label()) },
-                        supportingContent = { Text(timeFormatter.format(log.timestamp)) },
-                        leadingContent = { Text(log.emoji(), style = MaterialTheme.typography.headlineSmall) },
+                        headlineContent = { Text(event.label()) },
+                        supportingContent = { Text(timeFormatter.format(event.timestamp)) },
+                        leadingContent = { Text(event.emoji(), style = MaterialTheme.typography.headlineSmall) },
                     )
                     HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                 }
@@ -122,7 +123,38 @@ private fun GroupedFeed(
     }
 }
 
-private fun ActivityLog.label(): String =
+private fun HistoryEvent.itemKey(): String =
+    when (this) {
+        is HistoryEvent.Activity -> "activity-${log.id}"
+        is HistoryEvent.Medication -> "medication-${log.id}"
+    }
+
+private fun HistoryEvent.label(): String =
+    when (this) {
+        is HistoryEvent.Activity -> log.activityLabel()
+        is HistoryEvent.Medication -> {
+            val statusLabel =
+                when (log.status) {
+                    MedicationStatus.TAKEN -> "Somministrato"
+                    MedicationStatus.SKIPPED -> "Saltato"
+                    MedicationStatus.PENDING -> "In attesa"
+                }
+            "$medicationName · $dosage · $statusLabel"
+        }
+    }
+
+private fun HistoryEvent.emoji(): String =
+    when (this) {
+        is HistoryEvent.Activity -> log.activityEmoji()
+        is HistoryEvent.Medication ->
+            when (log.status) {
+                MedicationStatus.TAKEN -> "💊"
+                MedicationStatus.SKIPPED -> "⏭️"
+                MedicationStatus.PENDING -> "⏳"
+            }
+    }
+
+private fun ActivityLog.activityLabel(): String =
     when (this) {
         is ActivityLog.Meal -> mealLabel()
         is ActivityLog.Diaper ->
@@ -148,7 +180,7 @@ private fun ActivityLog.Meal.mealLabel(): String =
         if (amount != null && amountUnit != null) append(" · $amount ${amountUnit.name.lowercase()}")
     }
 
-private fun ActivityLog.emoji(): String =
+private fun ActivityLog.activityEmoji(): String =
     when (this) {
         is ActivityLog.Meal -> "🍼"
         is ActivityLog.Diaper -> "👶"

@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
@@ -38,12 +39,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.fpculcasi.carezze.domain.model.DiaperType
 import com.fpculcasi.carezze.domain.model.MealType
 import com.fpculcasi.carezze.domain.model.MealUnit
+import com.fpculcasi.carezze.domain.model.Medication
 import com.fpculcasi.carezze.domain.model.TemperatureUnit
+import com.fpculcasi.carezze.domain.model.Therapy
+import com.fpculcasi.carezze.domain.model.TherapyDuration
+import com.fpculcasi.carezze.domain.model.WeightUnit
+import com.fpculcasi.carezze.ui.theme.CarezzeTheme
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,7 +105,17 @@ fun QuickLogSheet(
                     TherapyStepContent(
                         state = state,
                         personId = personId,
-                        viewModel = viewModel,
+                        onSelectTherapy = viewModel::selectTherapy,
+                        onClearTherapy = viewModel::clearTherapy,
+                        onSelectMedication = viewModel::selectMedication,
+                        onClearMedication = viewModel::clearMedication,
+                        onLogMedication = {
+                            viewModel.logMedication(
+                                personId,
+                                state.selectedTherapyId!!,
+                                state.selectedMedicationId!!,
+                            )
+                        },
                         onBack = viewModel::clearType,
                         onNavigateToAddTherapy = onNavigateToAddTherapy,
                         onNavigateToTherapyLog = onNavigateToTherapyLog,
@@ -158,7 +176,11 @@ private fun TypeSelectionGrid(onSelectType: (ActivityLogType) -> Unit) {
 private fun TherapyStepContent(
     state: QuickLogUiState,
     personId: String,
-    viewModel: QuickLogViewModel,
+    onSelectTherapy: (String) -> Unit,
+    onClearTherapy: () -> Unit,
+    onSelectMedication: (String) -> Unit,
+    onClearMedication: () -> Unit,
+    onLogMedication: () -> Unit,
     onBack: () -> Unit,
     onNavigateToAddTherapy: (String) -> Unit,
     onNavigateToTherapyLog: (String, String) -> Unit,
@@ -183,7 +205,7 @@ private fun TherapyStepContent(
                 } else {
                     state.therapies.forEach { therapy ->
                         ElevatedCard(
-                            onClick = { viewModel.selectTherapy(therapy.id) },
+                            onClick = { onSelectTherapy(therapy.id) },
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             Column(modifier = Modifier.padding(12.dp)) {
@@ -201,7 +223,7 @@ private fun TherapyStepContent(
             state.selectedMedicationId == null -> {
                 val therapy = state.therapies.find { it.id == state.selectedTherapyId }
                 TextButton(
-                    onClick = viewModel::clearTherapy,
+                    onClick = onClearTherapy,
                     modifier = Modifier.align(Alignment.Start),
                 ) {
                     Text("← ${therapy?.name ?: "Terapia"}")
@@ -209,7 +231,7 @@ private fun TherapyStepContent(
                 Text("Seleziona farmaco", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 therapy?.medications?.forEach { med ->
                     ElevatedCard(
-                        onClick = { viewModel.selectMedication(med.id) },
+                        onClick = { onSelectMedication(med.id) },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
@@ -227,7 +249,7 @@ private fun TherapyStepContent(
                 val therapy = state.therapies.find { it.id == state.selectedTherapyId }
                 val med = therapy?.medications?.find { it.id == state.selectedMedicationId }
                 TextButton(
-                    onClick = viewModel::clearMedication,
+                    onClick = onClearMedication,
                     modifier = Modifier.align(Alignment.Start),
                 ) {
                     Text("← ${med?.name ?: "Farmaco"}")
@@ -244,9 +266,7 @@ private fun TherapyStepContent(
                 )
                 Spacer(Modifier.height(4.dp))
                 Button(
-                    onClick = {
-                        viewModel.logMedication(personId, state.selectedTherapyId!!, state.selectedMedicationId!!)
-                    },
+                    onClick = onLogMedication,
                     enabled = !state.isLoading,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -264,9 +284,7 @@ private fun TherapyStepContent(
                     Text("Segna presa")
                 }
                 TextButton(
-                    onClick = {
-                        onNavigateToTherapyLog(personId, state.selectedTherapyId!!)
-                    },
+                    onClick = { onNavigateToTherapyLog(personId, state.selectedTherapyId!!) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text("Vai allo storico →")
@@ -285,12 +303,20 @@ private fun TypeForm(
     viewModel: QuickLogViewModel,
     onBack: () -> Unit,
 ) {
-    var notes by remember { mutableStateOf("") }
-
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         when (type) {
-            ActivityLogType.MEAL -> MealForm(personId = personId, isLoading = isLoading, viewModel = viewModel)
-            ActivityLogType.DIAPER -> DiaperForm(personId = personId, isLoading = isLoading, viewModel = viewModel)
+            ActivityLogType.MEAL ->
+                MealForm(
+                    isLoading = isLoading,
+                    onSave = { amount, unit, mealType, notes ->
+                        viewModel.logMeal(personId, amount, unit, mealType, notes)
+                    },
+                )
+            ActivityLogType.DIAPER ->
+                DiaperForm(
+                    isLoading = isLoading,
+                    onSave = { diaperType, notes -> viewModel.logDiaper(personId, diaperType, notes) },
+                )
             ActivityLogType.SLEEP_START ->
                 QuickSaveForm(
                     label = "Inizio sonno registrato",
@@ -304,17 +330,20 @@ private fun TypeForm(
                     onSave = { viewModel.logSleep(personId, isStart = false) },
                 )
             ActivityLogType.TEMPERATURE ->
-                TemperatureForm(personId = personId, isLoading = isLoading, viewModel = viewModel)
-            ActivityLogType.WEIGHT -> WeightForm(personId = personId, isLoading = isLoading, viewModel = viewModel)
-            ActivityLogType.HYGIENE -> {
-                OutlinedTextField(
-                    value = notes,
-                    onValueChange = { notes = it },
-                    label = { Text("Note (opzionale)") },
-                    modifier = Modifier.fillMaxWidth(),
+                TemperatureForm(
+                    isLoading = isLoading,
+                    onSave = { temp, unit -> viewModel.logTemperature(personId, temp, unit, null, null) },
                 )
-                SaveButton(isLoading = isLoading, onSave = { viewModel.logHygiene(personId, notes) })
-            }
+            ActivityLogType.WEIGHT ->
+                WeightForm(
+                    isLoading = isLoading,
+                    onSave = { weight -> viewModel.logWeight(personId, weight, WeightUnit.KG, null) },
+                )
+            ActivityLogType.HYGIENE ->
+                HygieneForm(
+                    isLoading = isLoading,
+                    onSave = { notes -> viewModel.logHygiene(personId, notes) },
+                )
             ActivityLogType.THERAPY -> {}
         }
         ElevatedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("← Indietro") }
@@ -323,9 +352,8 @@ private fun TypeForm(
 
 @Composable
 private fun MealForm(
-    personId: String,
     isLoading: Boolean,
-    viewModel: QuickLogViewModel,
+    onSave: (Double?, MealUnit, MealType, String?) -> Unit,
 ) {
     var amount by remember { mutableStateOf("") }
     var selectedUnit by remember { mutableStateOf(MealUnit.ML) }
@@ -363,16 +391,15 @@ private fun MealForm(
             }
         }
         SaveButton(isLoading = isLoading, onSave = {
-            viewModel.logMeal(personId, amount.toDoubleOrNull(), selectedUnit, selectedType, null)
+            onSave(amount.toDoubleOrNull(), selectedUnit, selectedType, null)
         })
     }
 }
 
 @Composable
 private fun DiaperForm(
-    personId: String,
     isLoading: Boolean,
-    viewModel: QuickLogViewModel,
+    onSave: (DiaperType, String?) -> Unit,
 ) {
     var selected by remember { mutableStateOf(DiaperType.WET) }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -392,15 +419,14 @@ private fun DiaperForm(
                 )
             }
         }
-        SaveButton(isLoading = isLoading, onSave = { viewModel.logDiaper(personId, selected, null) })
+        SaveButton(isLoading = isLoading, onSave = { onSave(selected, null) })
     }
 }
 
 @Composable
 private fun TemperatureForm(
-    personId: String,
     isLoading: Boolean,
-    viewModel: QuickLogViewModel,
+    onSave: (Double, TemperatureUnit) -> Unit,
 ) {
     var temp by remember { mutableStateOf("") }
     var unit by remember { mutableStateOf(TemperatureUnit.C) }
@@ -418,16 +444,15 @@ private fun TemperatureForm(
             }
         }
         SaveButton(isLoading = isLoading, onSave = {
-            temp.toDoubleOrNull()?.let { viewModel.logTemperature(personId, it, unit, null, null) }
+            temp.toDoubleOrNull()?.let { onSave(it, unit) }
         })
     }
 }
 
 @Composable
 private fun WeightForm(
-    personId: String,
     isLoading: Boolean,
-    viewModel: QuickLogViewModel,
+    onSave: (Double) -> Unit,
 ) {
     var weight by remember { mutableStateOf("") }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -439,10 +464,25 @@ private fun WeightForm(
             modifier = Modifier.fillMaxWidth(),
         )
         SaveButton(isLoading = isLoading, onSave = {
-            weight.toDoubleOrNull()?.let {
-                viewModel.logWeight(personId, it, com.fpculcasi.carezze.domain.model.WeightUnit.KG, null)
-            }
+            weight.toDoubleOrNull()?.let { onSave(it) }
         })
+    }
+}
+
+@Composable
+private fun HygieneForm(
+    isLoading: Boolean,
+    onSave: (String?) -> Unit,
+) {
+    var notes by remember { mutableStateOf("") }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        OutlinedTextField(
+            value = notes,
+            onValueChange = { notes = it },
+            label = { Text("Note (opzionale)") },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        SaveButton(isLoading = isLoading, onSave = { onSave(notes.ifBlank { null }) })
     }
 }
 
@@ -495,13 +535,222 @@ private fun FilterToggle(
         modifier = modifier,
         colors =
             if (selected) {
-                androidx.compose.material3.ButtonDefaults.elevatedButtonColors(
+                ButtonDefaults.elevatedButtonColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                 )
             } else {
-                androidx.compose.material3.ButtonDefaults.elevatedButtonColors()
+                ButtonDefaults.elevatedButtonColors()
             },
     ) {
         Text(label, style = MaterialTheme.typography.labelSmall)
     }
 }
+
+// region Previews
+
+private val previewMedication = Medication(
+    id = "m1",
+    name = "Paracetamolo",
+    dosage = 5.0,
+    dosageUnit = "ml",
+    frequencyHours = 8,
+    scheduledTimes = emptyList(),
+    startDate = LocalDate.now(),
+    notes = null,
+)
+
+private val previewTherapy = Therapy(
+    id = "t1",
+    personId = "p1",
+    name = "Febbre",
+    createdBy = "u1",
+    startDate = LocalDate.now(),
+    duration = TherapyDuration.Indefinite,
+    isActive = true,
+    members = emptyMap(),
+    medications = listOf(previewMedication),
+)
+
+@Preview(showBackground = true, name = "Selezione tipo")
+@Composable
+private fun PreviewTypeSelectionGrid() {
+    CarezzeTheme {
+        Column(Modifier.padding(16.dp)) {
+            TypeSelectionGrid(onSelectType = {})
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Terapie — nessuna attiva")
+@Composable
+private fun PreviewTherapyEmpty() {
+    CarezzeTheme {
+        Column(Modifier.padding(16.dp)) {
+            TherapyStepContent(
+                state = QuickLogUiState(therapies = emptyList()),
+                personId = "p1",
+                onSelectTherapy = {},
+                onClearTherapy = {},
+                onSelectMedication = {},
+                onClearMedication = {},
+                onLogMedication = {},
+                onBack = {},
+                onNavigateToAddTherapy = {},
+                onNavigateToTherapyLog = { _, _ -> },
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Terapie — lista")
+@Composable
+private fun PreviewTherapyList() {
+    CarezzeTheme {
+        Column(Modifier.padding(16.dp)) {
+            TherapyStepContent(
+                state = QuickLogUiState(therapies = listOf(previewTherapy)),
+                personId = "p1",
+                onSelectTherapy = {},
+                onClearTherapy = {},
+                onSelectMedication = {},
+                onClearMedication = {},
+                onLogMedication = {},
+                onBack = {},
+                onNavigateToAddTherapy = {},
+                onNavigateToTherapyLog = { _, _ -> },
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Terapie — selezione farmaco")
+@Composable
+private fun PreviewTherapyMedicationPicker() {
+    CarezzeTheme {
+        Column(Modifier.padding(16.dp)) {
+            TherapyStepContent(
+                state = QuickLogUiState(
+                    therapies = listOf(previewTherapy),
+                    selectedTherapyId = "t1",
+                ),
+                personId = "p1",
+                onSelectTherapy = {},
+                onClearTherapy = {},
+                onSelectMedication = {},
+                onClearMedication = {},
+                onLogMedication = {},
+                onBack = {},
+                onNavigateToAddTherapy = {},
+                onNavigateToTherapyLog = { _, _ -> },
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Terapie — conferma dose")
+@Composable
+private fun PreviewTherapyConfirmDose() {
+    CarezzeTheme {
+        Column(Modifier.padding(16.dp)) {
+            TherapyStepContent(
+                state = QuickLogUiState(
+                    therapies = listOf(previewTherapy),
+                    selectedTherapyId = "t1",
+                    selectedMedicationId = "m1",
+                ),
+                personId = "p1",
+                onSelectTherapy = {},
+                onClearTherapy = {},
+                onSelectMedication = {},
+                onClearMedication = {},
+                onLogMedication = {},
+                onBack = {},
+                onNavigateToAddTherapy = {},
+                onNavigateToTherapyLog = { _, _ -> },
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Form pasto")
+@Composable
+private fun PreviewMealForm() {
+    CarezzeTheme {
+        Column(Modifier.padding(16.dp)) {
+            MealForm(isLoading = false, onSave = { _, _, _, _ -> })
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Form pannolino")
+@Composable
+private fun PreviewDiaperForm() {
+    CarezzeTheme {
+        Column(Modifier.padding(16.dp)) {
+            DiaperForm(isLoading = false, onSave = { _, _ -> })
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Form sonno")
+@Composable
+private fun PreviewSleepForm() {
+    CarezzeTheme {
+        Column(Modifier.padding(16.dp)) {
+            QuickSaveForm(label = "Inizio sonno registrato", isLoading = false, onSave = {})
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Form temperatura")
+@Composable
+private fun PreviewTemperatureForm() {
+    CarezzeTheme {
+        Column(Modifier.padding(16.dp)) {
+            TemperatureForm(isLoading = false, onSave = { _, _ -> })
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Form peso")
+@Composable
+private fun PreviewWeightForm() {
+    CarezzeTheme {
+        Column(Modifier.padding(16.dp)) {
+            WeightForm(isLoading = false, onSave = {})
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Form igiene")
+@Composable
+private fun PreviewHygieneForm() {
+    CarezzeTheme {
+        Column(Modifier.padding(16.dp)) {
+            HygieneForm(isLoading = false, onSave = {})
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Pulsante salva")
+@Composable
+private fun PreviewSaveButton() {
+    CarezzeTheme {
+        Column(Modifier.padding(16.dp)) {
+            SaveButton(isLoading = false, onSave = {})
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "FilterToggle selezionato")
+@Composable
+private fun PreviewFilterToggleSelected() {
+    CarezzeTheme {
+        Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterToggle(label = "Seno", selected = true, onClick = {})
+            FilterToggle(label = "Formula", selected = false, onClick = {})
+        }
+    }
+}
+
+// endregion
