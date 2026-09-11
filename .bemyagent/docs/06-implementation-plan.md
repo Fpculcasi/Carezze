@@ -177,8 +177,8 @@ card and feed view. History shows 30 days in list or calendar mode.
 |---|---|---|
 | 5.5.1 | Bottom navigation shell 4 tab (Home, Persone, Profilo, Impostazioni) + inner NavHost | done |
 | 5.5.2 | Quick Log per-persona: azione "+" nella card, sheet vincolato alla persona, header con nome (R2) | done |
-| 5.5.3 | Evento "Farmaco" nel Quick Log: dosi schedulate terapie attive → conferma TAKEN (R3) | todo |
-| 5.5.4 | Tab Profilo/Account: vedi/modifica profilo se loggato, CTA login se anonimo (R4) | todo |
+| 5.5.3 | Evento "Farmaco" nel Quick Log: dosi schedulate terapie attive → conferma TAKEN (R3) | done |
+| 5.5.4 | Tab Profilo/Account: vedi/modifica profilo se loggato, CTA login se anonimo (R4) | done |
 | 5.5.5 | Navigazione: no back su tab radice; PersonDetail unica pagina persona, EditPersonScreen assorbita (R5) | todo |
 | 5.5.6 | Distinzione persone: colore locale per-utente e/o icona fascia d'età (R6) | todo |
 | 5.5.7 | Filtro Home: card singola su selezione + search bar nome/nickname (R7) | todo |
