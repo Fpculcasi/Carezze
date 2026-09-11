@@ -116,6 +116,9 @@ fun QuickLogSheet(
                                 state.selectedMedicationId!!,
                             )
                         },
+                        onConfirmScheduledDose = { dose -> viewModel.confirmScheduledDose(personId, dose) },
+                        onEnterManualDoseFlow = viewModel::enterManualDoseFlow,
+                        onExitManualDoseFlow = viewModel::exitManualDoseFlow,
                         onBack = viewModel::clearType,
                         onNavigateToAddTherapy = onNavigateToAddTherapy,
                         onNavigateToTherapyLog = onNavigateToTherapyLog,
@@ -181,45 +184,144 @@ private fun TherapyStepContent(
     onSelectMedication: (String) -> Unit,
     onClearMedication: () -> Unit,
     onLogMedication: () -> Unit,
+    onConfirmScheduledDose: (ScheduledDose) -> Unit,
+    onEnterManualDoseFlow: () -> Unit,
+    onExitManualDoseFlow: () -> Unit,
     onBack: () -> Unit,
     onNavigateToAddTherapy: (String) -> Unit,
     onNavigateToTherapyLog: (String, String) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (state.showManualDoseFlow) {
+            ManualDoseFlowContent(
+                state = state,
+                personId = personId,
+                onSelectTherapy = onSelectTherapy,
+                onClearTherapy = onClearTherapy,
+                onSelectMedication = onSelectMedication,
+                onClearMedication = onClearMedication,
+                onLogMedication = onLogMedication,
+                onExitManualDoseFlow = onExitManualDoseFlow,
+                onNavigateToTherapyLog = onNavigateToTherapyLog,
+            )
+        } else {
+            ScheduledDosesContent(
+                state = state,
+                personId = personId,
+                onConfirmScheduledDose = onConfirmScheduledDose,
+                onEnterManualDoseFlow = onEnterManualDoseFlow,
+                onNavigateToAddTherapy = onNavigateToAddTherapy,
+            )
+        }
+        ElevatedButton(
+            onClick = onBack,
+            modifier = Modifier.fillMaxWidth(),
+        ) { Text("← Indietro") }
+    }
+}
+
+@Composable
+private fun ScheduledDosesContent(
+    state: QuickLogUiState,
+    personId: String,
+    onConfirmScheduledDose: (ScheduledDose) -> Unit,
+    onEnterManualDoseFlow: () -> Unit,
+    onNavigateToAddTherapy: (String) -> Unit,
+) {
+    Text(
+        "Dosi di oggi",
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.SemiBold,
+    )
+    when {
+        state.therapies.isEmpty() -> {
+            Text(
+                "Nessuna terapia attiva",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(4.dp))
+            Button(
+                onClick = { onNavigateToAddTherapy(personId) },
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text("Aggiungi terapia") }
+        }
+        state.scheduledDoses.isEmpty() -> {
+            Text(
+                "Nessuna dose pianificata per oggi",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(4.dp))
+            TextButton(
+                onClick = onEnterManualDoseFlow,
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text("+ Aggiungi dose extra") }
+        }
+        else -> {
+            state.scheduledDoses.groupBy { it.therapyId }.forEach { (_, doses) ->
+                Text(
+                    doses.first().therapyName,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                doses.forEach { dose ->
+                    DoseRow(
+                        dose = dose,
+                        isLoading = state.isLoading,
+                        onConfirm = { onConfirmScheduledDose(dose) },
+                    )
+                }
+            }
+            Spacer(Modifier.height(4.dp))
+            TextButton(
+                onClick = onEnterManualDoseFlow,
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text("+ Aggiungi dose extra") }
+        }
+    }
+}
+
+@Composable
+private fun ManualDoseFlowContent(
+    state: QuickLogUiState,
+    personId: String,
+    onSelectTherapy: (String) -> Unit,
+    onClearTherapy: () -> Unit,
+    onSelectMedication: (String) -> Unit,
+    onClearMedication: () -> Unit,
+    onLogMedication: () -> Unit,
+    onExitManualDoseFlow: () -> Unit,
+    onNavigateToTherapyLog: (String, String) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        TextButton(
+            onClick = onExitManualDoseFlow,
+            modifier = Modifier.align(Alignment.Start),
+        ) { Text("← Dosi di oggi") }
         when {
             state.selectedTherapyId == null -> {
-                Text("Terapie attive", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                if (state.therapies.isEmpty()) {
-                    Text(
-                        "Nessuna terapia attiva",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Button(
-                        onClick = { onNavigateToAddTherapy(personId) },
+                Text(
+                    "Seleziona terapia",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                state.therapies.forEach { therapy ->
+                    ElevatedCard(
+                        onClick = { onSelectTherapy(therapy.id) },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text("Aggiungi terapia")
-                    }
-                } else {
-                    state.therapies.forEach { therapy ->
-                        ElevatedCard(
-                            onClick = { onSelectTherapy(therapy.id) },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
-                                Text(
-                                    therapy.name,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = FontWeight.Medium,
-                                )
-                                Text(
-                                    "${therapy.medications.size} farmaco/i",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                therapy.name,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Medium,
+                            )
+                            Text(
+                                "${therapy.medications.size} farmaco/i",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                     }
                 }
@@ -229,9 +331,7 @@ private fun TherapyStepContent(
                 TextButton(
                     onClick = onClearTherapy,
                     modifier = Modifier.align(Alignment.Start),
-                ) {
-                    Text("← ${therapy?.name ?: "Terapia"}")
-                }
+                ) { Text("← ${therapy?.name ?: "Terapia"}") }
                 Text(
                     "Seleziona farmaco",
                     style = MaterialTheme.typography.titleMedium,
@@ -243,7 +343,11 @@ private fun TherapyStepContent(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
-                            Text(med.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                            Text(
+                                med.name,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Medium,
+                            )
                             Text(
                                 "${med.dosage} ${med.dosageUnit}",
                                 style = MaterialTheme.typography.bodySmall,
@@ -259,9 +363,7 @@ private fun TherapyStepContent(
                 TextButton(
                     onClick = onClearMedication,
                     modifier = Modifier.align(Alignment.Start),
-                ) {
-                    Text("← ${med?.name ?: "Farmaco"}")
-                }
+                ) { Text("← ${med?.name ?: "Farmaco"}") }
                 Text(
                     med?.name ?: "",
                     style = MaterialTheme.typography.titleMedium,
@@ -294,12 +396,49 @@ private fun TherapyStepContent(
                 TextButton(
                     onClick = { onNavigateToTherapyLog(personId, state.selectedTherapyId!!) },
                     modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("Vai allo storico →")
+                ) { Text("Vai allo storico →") }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DoseRow(
+    dose: ScheduledDose,
+    isLoading: Boolean,
+    onConfirm: () -> Unit,
+) {
+    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    dose.medicationName,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                )
+                Text(
+                    dose.timeLabel,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Button(onClick = onConfirm, enabled = !isLoading) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+                } else {
+                    Icon(Icons.Default.Check, contentDescription = null)
+                    Spacer(Modifier.width(4.dp))
+                    Text("Segna")
                 }
             }
         }
-        ElevatedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("← Indietro") }
     }
 }
 
@@ -604,6 +743,9 @@ private fun PreviewTherapyEmpty() {
                 onSelectMedication = {},
                 onClearMedication = {},
                 onLogMedication = {},
+                onConfirmScheduledDose = {},
+                onEnterManualDoseFlow = {},
+                onExitManualDoseFlow = {},
                 onBack = {},
                 onNavigateToAddTherapy = {},
                 onNavigateToTherapyLog = { _, _ -> },
@@ -612,19 +754,31 @@ private fun PreviewTherapyEmpty() {
     }
 }
 
-@Preview(showBackground = true, name = "Terapie — lista")
+@Preview(showBackground = true, name = "Terapie — dosi schedulate")
 @Composable
-private fun PreviewTherapyList() {
+private fun PreviewTherapyScheduledDoses() {
+    val dose =
+        ScheduledDose(
+            therapyId = "t1",
+            therapyName = "Febbre",
+            medicationId = "m1",
+            medicationName = "Paracetamolo",
+            timeLabel = "08:00",
+            scheduledTime = java.time.Instant.now(),
+        )
     CarezzeTheme {
         Column(Modifier.padding(16.dp)) {
             TherapyStepContent(
-                state = QuickLogUiState(therapies = listOf(previewTherapy)),
+                state = QuickLogUiState(therapies = listOf(previewTherapy), scheduledDoses = listOf(dose)),
                 personId = "p1",
                 onSelectTherapy = {},
                 onClearTherapy = {},
                 onSelectMedication = {},
                 onClearMedication = {},
                 onLogMedication = {},
+                onConfirmScheduledDose = {},
+                onEnterManualDoseFlow = {},
+                onExitManualDoseFlow = {},
                 onBack = {},
                 onNavigateToAddTherapy = {},
                 onNavigateToTherapyLog = { _, _ -> },
@@ -633,15 +787,16 @@ private fun PreviewTherapyList() {
     }
 }
 
-@Preview(showBackground = true, name = "Terapie — selezione farmaco")
+@Preview(showBackground = true, name = "Terapie — flusso manuale selezione farmaco")
 @Composable
-private fun PreviewTherapyMedicationPicker() {
+private fun PreviewTherapyManualMedicationPicker() {
     CarezzeTheme {
         Column(Modifier.padding(16.dp)) {
             TherapyStepContent(
                 state =
                     QuickLogUiState(
                         therapies = listOf(previewTherapy),
+                        showManualDoseFlow = true,
                         selectedTherapyId = "t1",
                     ),
                 personId = "p1",
@@ -650,6 +805,9 @@ private fun PreviewTherapyMedicationPicker() {
                 onSelectMedication = {},
                 onClearMedication = {},
                 onLogMedication = {},
+                onConfirmScheduledDose = {},
+                onEnterManualDoseFlow = {},
+                onExitManualDoseFlow = {},
                 onBack = {},
                 onNavigateToAddTherapy = {},
                 onNavigateToTherapyLog = { _, _ -> },
@@ -658,15 +816,16 @@ private fun PreviewTherapyMedicationPicker() {
     }
 }
 
-@Preview(showBackground = true, name = "Terapie — conferma dose")
+@Preview(showBackground = true, name = "Terapie — flusso manuale conferma dose")
 @Composable
-private fun PreviewTherapyConfirmDose() {
+private fun PreviewTherapyManualConfirmDose() {
     CarezzeTheme {
         Column(Modifier.padding(16.dp)) {
             TherapyStepContent(
                 state =
                     QuickLogUiState(
                         therapies = listOf(previewTherapy),
+                        showManualDoseFlow = true,
                         selectedTherapyId = "t1",
                         selectedMedicationId = "m1",
                     ),
@@ -676,6 +835,9 @@ private fun PreviewTherapyConfirmDose() {
                 onSelectMedication = {},
                 onClearMedication = {},
                 onLogMedication = {},
+                onConfirmScheduledDose = {},
+                onEnterManualDoseFlow = {},
+                onExitManualDoseFlow = {},
                 onBack = {},
                 onNavigateToAddTherapy = {},
                 onNavigateToTherapyLog = { _, _ -> },
