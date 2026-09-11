@@ -8,12 +8,14 @@ import com.fpculcasi.carezze.domain.model.DiaperType
 import com.fpculcasi.carezze.domain.model.MealType
 import com.fpculcasi.carezze.domain.model.MealUnit
 import com.fpculcasi.carezze.domain.model.MeasurementMethod
+import com.fpculcasi.carezze.domain.model.MedicationStatus
 import com.fpculcasi.carezze.domain.model.TemperatureUnit
 import com.fpculcasi.carezze.domain.model.Therapy
 import com.fpculcasi.carezze.domain.model.WeightUnit
 import com.fpculcasi.carezze.domain.repository.AuthRepository
 import com.fpculcasi.carezze.domain.usecase.activity.LogActivityUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.AddManualMedicationLogUseCase
+import com.fpculcasi.carezze.domain.usecase.therapy.LogMedicationUseCase
 import com.fpculcasi.carezze.domain.usecase.therapy.ObserveTherapiesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -24,10 +26,21 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.UUID
 import javax.inject.Inject
 
 enum class ActivityLogType { MEAL, DIAPER, SLEEP_START, SLEEP_END, TEMPERATURE, WEIGHT, HYGIENE, THERAPY }
+
+data class ScheduledDose(
+    val therapyId: String,
+    val therapyName: String,
+    val medicationId: String,
+    val medicationName: String,
+    val timeLabel: String,
+    val scheduledTime: Instant,
+)
 
 data class QuickLogUiState(
     val selectedType: ActivityLogType? = null,
@@ -35,6 +48,8 @@ data class QuickLogUiState(
     val isSaved: Boolean = false,
     val error: String? = null,
     val therapies: List<Therapy> = emptyList(),
+    val scheduledDoses: List<ScheduledDose> = emptyList(),
+    val showManualDoseFlow: Boolean = false,
     val selectedTherapyId: String? = null,
     val selectedMedicationId: String? = null,
 )
@@ -47,6 +62,7 @@ class QuickLogViewModel
         private val authRepository: AuthRepository,
         private val observeTherapies: ObserveTherapiesUseCase,
         private val addManualMedicationLog: AddManualMedicationLogUseCase,
+        private val logMedicationUseCase: LogMedicationUseCase,
     ) : ViewModel() {
         private val _state = MutableStateFlow(QuickLogUiState())
         val state: StateFlow<QuickLogUiState> = _state.asStateFlow()
@@ -71,10 +87,20 @@ class QuickLogViewModel
                     error = null,
                     isSaved = false,
                     therapies = emptyList(),
+                    scheduledDoses = emptyList(),
+                    showManualDoseFlow = false,
                     selectedTherapyId = null,
                     selectedMedicationId = null,
                 )
             }
+        }
+
+        fun enterManualDoseFlow() {
+            _state.update { it.copy(showManualDoseFlow = true) }
+        }
+
+        fun exitManualDoseFlow() {
+            _state.update { it.copy(showManualDoseFlow = false, selectedTherapyId = null, selectedMedicationId = null) }
         }
 
         fun selectTherapy(therapyId: String) {
@@ -112,6 +138,32 @@ class QuickLogViewModel
             }
         }
 
+        fun confirmScheduledDose(
+            personId: String,
+            dose: ScheduledDose,
+        ) {
+            val uid = authRepository.currentUser?.id ?: return
+            viewModelScope.launch {
+                _state.update { it.copy(isLoading = true, error = null) }
+                val result =
+                    logMedicationUseCase(
+                        personId = personId,
+                        therapyId = dose.therapyId,
+                        medicationId = dose.medicationId,
+                        scheduledTime = dose.scheduledTime,
+                        status = MedicationStatus.TAKEN,
+                        userId = uid,
+                    )
+                _state.update { state ->
+                    if (result.isSuccess) {
+                        state.copy(isLoading = false, isSaved = true)
+                    } else {
+                        state.copy(isLoading = false, error = result.exceptionOrNull()?.message ?: "Errore")
+                    }
+                }
+            }
+        }
+
         private fun loadTherapies(personId: String) {
             therapiesJob?.cancel()
             therapiesJob =
@@ -122,9 +174,30 @@ class QuickLogViewModel
                             _state.update { it.copy(error = e.message) }
                         }
                         .collect { list ->
-                            _state.update { it.copy(therapies = list.filter { t -> t.isActive }) }
+                            val active = list.filter { t -> t.isActive }
+                            _state.update { it.copy(therapies = active, scheduledDoses = buildScheduledDoses(active)) }
                         }
                 }
+        }
+
+        private fun buildScheduledDoses(therapies: List<Therapy>): List<ScheduledDose> {
+            val today = LocalDate.now()
+            val zone = ZoneId.systemDefault()
+            return therapies.flatMap { therapy ->
+                therapy.medications.flatMap { med ->
+                    med.scheduledTimes.map { timeLabel ->
+                        val hour = timeLabel.substringBefore(":").toIntOrNull() ?: 0
+                        ScheduledDose(
+                            therapyId = therapy.id,
+                            therapyName = therapy.name,
+                            medicationId = med.id,
+                            medicationName = med.name,
+                            timeLabel = timeLabel,
+                            scheduledTime = today.atTime(hour, 0).atZone(zone).toInstant(),
+                        )
+                    }
+                }
+            }
         }
 
         fun logMeal(
