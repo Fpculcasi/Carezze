@@ -12,9 +12,12 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -23,6 +26,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.fpculcasi.carezze.ui.auth.AuthUiState
+import com.fpculcasi.carezze.ui.auth.AuthViewModel
 import com.fpculcasi.carezze.ui.auth.LoginScreen
 import com.fpculcasi.carezze.ui.auth.RegisterScreen
 import com.fpculcasi.carezze.ui.auth.WelcomeScreen
@@ -32,6 +37,7 @@ import com.fpculcasi.carezze.ui.history.HistoryListScreen
 import com.fpculcasi.carezze.ui.person.EditPersonScreen
 import com.fpculcasi.carezze.ui.person.PersonDetailScreen
 import com.fpculcasi.carezze.ui.person.PersonListScreen
+import com.fpculcasi.carezze.ui.profile.ProfileScreen
 import com.fpculcasi.carezze.ui.settings.SettingsScreen
 import com.fpculcasi.carezze.ui.therapy.AddTherapyScreen
 import com.fpculcasi.carezze.ui.therapy.EditTherapyScreen
@@ -120,6 +126,17 @@ val bottomNavItems =
 @Composable
 fun AppNavigation() {
     val rootNavController = rememberNavController()
+    val authViewModel: AuthViewModel = hiltViewModel()
+    val authState by authViewModel.authState.collectAsStateWithLifecycle()
+
+    // Auto-navigate to Welcome whenever the user signs out
+    LaunchedEffect(authState) {
+        if (authState is AuthUiState.SignedOut) {
+            rootNavController.navigate(Welcome) {
+                popUpTo(rootNavController.graph.id) { inclusive = true }
+            }
+        }
+    }
 
     NavHost(
         navController = rootNavController,
@@ -179,7 +196,10 @@ fun AppNavigation() {
 
         // -- Main shell (post-auth) --
         composable<Main> {
-            MainScreen()
+            MainScreen(
+                onNavigateToLogin = { rootNavController.navigate(Login) },
+                onNavigateToRegister = { rootNavController.navigate(Register) },
+            )
         }
     }
 }
@@ -199,7 +219,10 @@ fun AppNavigation() {
  * automatically when the user navigates to detail screens.
  */
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    onNavigateToLogin: () -> Unit = {},
+    onNavigateToRegister: () -> Unit = {},
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -270,8 +293,10 @@ fun MainScreen() {
             }
 
             composable<Profile> {
-                // Placeholder: la schermata Profilo/Account arriva con il rework UX (vedi 06-implementation-plan)
-                Text("Profilo")
+                ProfileScreen(
+                    onNavigateToLogin = onNavigateToLogin,
+                    onNavigateToRegister = onNavigateToRegister,
+                )
             }
 
             composable<Settings> {

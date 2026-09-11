@@ -1,0 +1,10 @@
+# EXECUTE — 5.5.4 Tab Profilo/Account
+
+## Log
+
+2026-09-11 | domain/usecase/auth/SignOutUseCase.kt — creato wrapper suspend su AuthRepository.signOut() | DONE
+2026-09-11 | ui/profile/ProfileViewModel.kt — creato HiltViewModel: authState (via ObserveAuthStateUseCase map), userState (via ObserveUserUseCase), updateDisplayName (SyncUserUseCase), signOut (SignOutUseCase) | DONE
+2026-09-11 | ui/profile/ProfileScreen.kt — creato composable: AnonymousProfileContent (CTA Registrati + Accedi) + AuthenticatedProfileContent (avatar, displayName edit, email, provider, Disconnetti) | DONE
+2026-09-11 | ui/navigation/AppNavigation.kt — aggiunto LaunchedEffect(authState) in AppNavigation() per auto-nav a Welcome su SignedOut; MainScreen(onNavigateToLogin, onNavigateToRegister) con default {}; composable<Profile> → ProfileScreen wired | DONE
+2026-09-11 | ktlintFormat — fix import ordering AppNavigation.kt + ProfileScreen.kt + line wrap line 169 ProfileScreen | DONE
+2026-09-11 | Build verify: compileDebugKotlin ✅ | ktlintCheck ✅ | detekt ✅ | testDebugUnitTest ✅ — BUILD SUCCESSFUL | PASS
