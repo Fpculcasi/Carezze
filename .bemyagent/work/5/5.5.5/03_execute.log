@@ -1,0 +1,10 @@
+# EXECUTE — 5.5.5
+
+2026-09-11T00:00Z | Write PersonListScreen.kt — rimuovi ArrowBack/onNavigateBack; FAB apre dialog create; onCreatePerson lambda | DONE
+2026-09-11T00:00Z | Write PersonDetailScreen.kt — rimuovi onNavigateToEdit; aggiungi onUpdatePerson; Edit icon apre dialog inline | DONE
+2026-09-11T00:00Z | Write SettingsScreen.kt — rimuovi onNavigateBack/navigationIcon/Icon/IconButton/ArrowBack | DONE
+2026-09-11T00:00Z | Edit AppNavigation.kt — rimuovi import EditPersonScreen, route EditPerson, composable<EditPerson>; aggiorna PersonList/PersonDetail/Settings | DONE
+2026-09-11T00:00Z | rm EditPersonScreen.kt | DONE
+2026-09-11T00:00Z | grep EditPerson → 0 hit; grep ArrowBack in PersonListScreen → 0 hit | PASS
+2026-09-11T00:00Z | ./gradlew :app:compileDebugKotlin → BUILD SUCCESSFUL in 35s | PASS
+next: write 04_verify.md → commit
