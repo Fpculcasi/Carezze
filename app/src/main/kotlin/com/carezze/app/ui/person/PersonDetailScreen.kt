@@ -1,7 +1,10 @@
 package com.fpculcasi.carezze.ui.person
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -33,7 +38,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,6 +49,8 @@ import com.fpculcasi.carezze.domain.model.Person
 import com.fpculcasi.carezze.domain.model.Therapy
 import com.fpculcasi.carezze.domain.model.TherapyDuration
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
+import com.fpculcasi.carezze.ui.theme.PersonColorPalette
+import com.fpculcasi.carezze.ui.theme.personColor
 import com.fpculcasi.carezze.ui.therapy.TherapyViewModel
 import java.time.LocalDate
 
@@ -57,15 +66,18 @@ fun PersonDetailScreen(
     val persons by viewModel.persons.collectAsState()
     val person = persons.firstOrNull { it.id == personId }
     val therapies by therapyViewModel.therapiesFor(personId).collectAsState()
+    val currentColorIndex by viewModel.personColorFlow(personId).collectAsState(initial = 0)
 
     PersonDetailContent(
         person = person,
         personId = personId,
         therapies = therapies,
+        currentColorIndex = currentColorIndex,
         onNavigateBack = onNavigateBack,
         onUpdatePerson = { name, nick ->
             person?.let { viewModel.updatePerson(it.copy(name = name, nickname = nick)) }
         },
+        onSetPersonColor = { index -> viewModel.setPersonColor(personId, index) },
         onNavigateToAddTherapy = onNavigateToAddTherapy,
         onNavigateToTherapy = onNavigateToTherapy,
     )
@@ -77,8 +89,10 @@ internal fun PersonDetailContent(
     person: Person?,
     personId: String,
     therapies: List<Therapy>,
+    currentColorIndex: Int,
     onNavigateBack: () -> Unit,
     onUpdatePerson: (name: String, nickname: String?) -> Unit,
+    onSetPersonColor: (Int) -> Unit,
     onNavigateToAddTherapy: (String) -> Unit,
     onNavigateToTherapy: (personId: String, therapyId: String) -> Unit,
 ) {
@@ -120,12 +134,19 @@ internal fun PersonDetailContent(
                     .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
+            item {
+                ColorPickerRow(
+                    currentColorIndex = currentColorIndex,
+                    onSelectColor = onSetPersonColor,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
             if (therapies.isEmpty()) {
                 item {
                     Text(
                         "Nessuna terapia",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 16.dp),
+                        modifier = Modifier.padding(top = 8.dp),
                     )
                 }
             } else {
@@ -186,6 +207,52 @@ internal fun PersonDetailContent(
 }
 
 @Composable
+private fun ColorPickerRow(
+    currentColorIndex: Int,
+    onSelectColor: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        Text(
+            "Colore",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            PersonColorPalette.forEachIndexed { index, color ->
+                ColorSwatch(
+                    color = color,
+                    selected = index == currentColorIndex,
+                    onClick = { onSelectColor(index) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ColorSwatch(
+    color: Color,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .size(32.dp)
+            .background(color, CircleShape)
+            .then(
+                if (selected) {
+                    Modifier.border(3.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
+                } else {
+                    Modifier
+                },
+            )
+            .clickable(onClick = onClick),
+    )
+}
+
+@Composable
 private fun TherapyListItem(
     therapy: Therapy,
     onClick: () -> Unit,
@@ -238,8 +305,10 @@ private fun PersonDetailContentPreview() {
                         isActive = true, members = emptyMap(), medications = emptyList(),
                     ),
                 ),
+            currentColorIndex = 2,
             onNavigateBack = {},
             onUpdatePerson = { _, _ -> },
+            onSetPersonColor = {},
             onNavigateToAddTherapy = {},
             onNavigateToTherapy = { _, _ -> },
         )

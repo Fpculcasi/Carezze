@@ -7,13 +7,19 @@ import com.fpculcasi.carezze.domain.model.Person
 import com.fpculcasi.carezze.domain.repository.AuthRepository
 import com.fpculcasi.carezze.domain.usecase.person.CreatePersonUseCase
 import com.fpculcasi.carezze.domain.usecase.person.DeletePersonUseCase
+import com.fpculcasi.carezze.domain.usecase.person.ObservePersonColorUseCase
 import com.fpculcasi.carezze.domain.usecase.person.ObservePersonsUseCase
+import com.fpculcasi.carezze.domain.usecase.person.SetPersonColorUseCase
 import com.fpculcasi.carezze.domain.usecase.person.UpdatePersonUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,22 +32,33 @@ class PersonViewModel
         private val createPerson: CreatePersonUseCase,
         private val updatePersonUseCase: UpdatePersonUseCase,
         private val deletePersonUseCase: DeletePersonUseCase,
+        private val observePersonColorUseCase: ObservePersonColorUseCase,
+        private val setPersonColorUseCase: SetPersonColorUseCase,
         private val authRepository: AuthRepository,
     ) : ViewModel() {
         private val userId: String? get() = authRepository.currentUser?.id
 
         val persons: StateFlow<List<Person>> =
             userId
-                ?.let {
-                        uid ->
-                    observePersons(uid).catch {
-                            e ->
+                ?.let { uid ->
+                    observePersons(uid).catch { e ->
                         Log.e("PersonViewModel", "observePersons error", e)
                         emit(emptyList())
                     }
                 }
                 ?.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
                 ?: MutableStateFlow(emptyList())
+
+        val personColors: StateFlow<Map<String, Int>> =
+            persons
+                .flatMapLatest { personList ->
+                    if (personList.isEmpty()) return@flatMapLatest flowOf(emptyMap())
+                    val flows = personList.map { p -> observePersonColorUseCase(p.id).map { idx -> p.id to idx } }
+                    combine(flows) { pairs -> pairs.associate { it } }
+                }
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
+
+        fun personColorFlow(personId: String) = observePersonColorUseCase(personId)
 
         fun createPerson(
             name: String,
@@ -59,5 +76,9 @@ class PersonViewModel
 
         fun deletePerson(personId: String) {
             viewModelScope.launch { deletePersonUseCase(personId) }
+        }
+
+        fun setPersonColor(personId: String, colorIndex: Int) {
+            viewModelScope.launch { setPersonColorUseCase(personId, colorIndex) }
         }
     }

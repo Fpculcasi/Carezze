@@ -1,5 +1,6 @@
 package com.fpculcasi.carezze.ui.person
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,8 +9,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -39,6 +42,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.fpculcasi.carezze.domain.model.MemberRole
 import com.fpculcasi.carezze.domain.model.Person
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
+import com.fpculcasi.carezze.ui.theme.personColor
 
 @Composable
 fun PersonListScreen(
@@ -46,8 +50,10 @@ fun PersonListScreen(
     viewModel: PersonViewModel = hiltViewModel(),
 ) {
     val persons by viewModel.persons.collectAsState()
+    val personColors by viewModel.personColors.collectAsState()
     PersonListContent(
         persons = persons,
+        personColors = personColors,
         onNavigateToPerson = onNavigateToPerson,
         onCreatePerson = { name, nick -> viewModel.createPerson(name, nick) },
         onDeletePerson = viewModel::deletePerson,
@@ -58,6 +64,7 @@ fun PersonListScreen(
 @Composable
 internal fun PersonListContent(
     persons: List<Person>,
+    personColors: Map<String, Int>,
     onNavigateToPerson: (String) -> Unit,
     onCreatePerson: (String, String?) -> Unit,
     onDeletePerson: (String) -> Unit,
@@ -89,6 +96,7 @@ internal fun PersonListContent(
                 items(persons, key = { it.id }) { person ->
                     PersonItem(
                         person = person,
+                        colorIndex = personColors[person.id] ?: 0,
                         onClick = { onNavigateToPerson(person.id) },
                         onDelete = { personToDelete = person },
                     )
@@ -166,6 +174,7 @@ internal fun PersonListContent(
 @Composable
 private fun PersonItem(
     person: Person,
+    colorIndex: Int,
     onClick: () -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -179,6 +188,13 @@ private fun PersonItem(
         ListItem(
             headlineContent = { Text(person.name) },
             supportingContent = person.nickname?.let { { Text(it) } },
+            leadingContent = {
+                Box(
+                    modifier = Modifier
+                        .size(16.dp)
+                        .background(personColor(colorIndex), CircleShape),
+                )
+            },
             trailingContent = {
                 IconButton(onClick = onDelete) {
                     Icon(Icons.Default.Delete, contentDescription = "Elimina")
@@ -200,6 +216,7 @@ private fun PersonListContentPreview() {
     CarezzeTheme {
         PersonListContent(
             persons = previewPersons,
+            personColors = mapOf("1" to 0, "2" to 4),
             onNavigateToPerson = {},
             onCreatePerson = { _, _ -> },
             onDeletePerson = {},
@@ -213,6 +230,7 @@ private fun PersonListContentEmptyPreview() {
     CarezzeTheme {
         PersonListContent(
             persons = emptyList(),
+            personColors = emptyMap(),
             onNavigateToPerson = {},
             onCreatePerson = { _, _ -> },
             onDeletePerson = {},

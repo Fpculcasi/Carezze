@@ -1,5 +1,6 @@
 package com.fpculcasi.carezze.ui.dashboard
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
@@ -41,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,6 +52,7 @@ import com.fpculcasi.carezze.domain.model.ActivityLog
 import com.fpculcasi.carezze.domain.model.DiaperType
 import com.fpculcasi.carezze.domain.model.Person
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
+import com.fpculcasi.carezze.ui.theme.personColor
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -69,6 +73,7 @@ fun DashboardScreen(
     val recentLogs by viewModel.recentLogs.collectAsState()
     val selectedPersonId by viewModel.selectedPersonId.collectAsState()
     val viewMode by viewModel.viewMode.collectAsState()
+    val personColors by viewModel.personColors.collectAsState()
     var quickLogPersonId by remember { mutableStateOf<String?>(null) }
 
     DashboardContent(
@@ -76,6 +81,7 @@ fun DashboardScreen(
         recentLogs = recentLogs,
         selectedPersonId = selectedPersonId,
         viewMode = viewMode,
+        personColors = personColors,
         onSelectPerson = viewModel::selectPerson,
         onToggleViewMode = viewModel::toggleViewMode,
         onNavigateToSettings = onNavigateToSettings,
@@ -109,6 +115,7 @@ internal fun DashboardContent(
     recentLogs: List<ActivityLog>,
     selectedPersonId: String?,
     viewMode: DashboardViewMode,
+    personColors: Map<String, Int>,
     onSelectPerson: (String?) -> Unit,
     onToggleViewMode: () -> Unit,
     onNavigateToSettings: () -> Unit,
@@ -146,6 +153,7 @@ internal fun DashboardContent(
             PersonFilterRow(
                 persons = persons,
                 selectedPersonId = selectedPersonId,
+                personColors = personColors,
                 onSelectPerson = onSelectPerson,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
@@ -154,6 +162,7 @@ internal fun DashboardContent(
                 CardView(
                     persons = persons,
                     recentLogs = recentLogs,
+                    personColors = personColors,
                     onNavigateToHistory = onNavigateToHistory,
                     onNavigateToPersons = onNavigateToPersons,
                     onOpenQuickLog = onOpenQuickLog,
@@ -162,6 +171,7 @@ internal fun DashboardContent(
                 FeedView(
                     logs = recentLogs,
                     persons = persons,
+                    personColors = personColors,
                 )
             }
         }
@@ -173,6 +183,7 @@ internal fun DashboardContent(
 private fun PersonFilterRow(
     persons: List<Person>,
     selectedPersonId: String?,
+    personColors: Map<String, Int>,
     onSelectPerson: (String?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -189,10 +200,18 @@ private fun PersonFilterRow(
             )
         }
         items(persons) { person ->
+            val colorIndex = personColors[person.id] ?: 0
             FilterChip(
                 selected = selectedPersonId == person.id,
                 onClick = { onSelectPerson(person.id) },
                 label = { Text(person.nickname ?: person.name) },
+                leadingIcon = {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .background(personColor(colorIndex), CircleShape),
+                    )
+                },
             )
         }
     }
@@ -202,6 +221,7 @@ private fun PersonFilterRow(
 private fun CardView(
     persons: List<Person>,
     recentLogs: List<ActivityLog>,
+    personColors: Map<String, Int>,
     onNavigateToHistory: (personId: String) -> Unit,
     onNavigateToPersons: () -> Unit,
     onOpenQuickLog: (personId: String) -> Unit,
@@ -234,6 +254,7 @@ private fun CardView(
                 PersonCard(
                     person = person,
                     recentLogCount = logCount,
+                    colorIndex = personColors[person.id] ?: 0,
                     onNavigateToHistory = { onNavigateToHistory(person.id) },
                     onOpenQuickLog = { onOpenQuickLog(person.id) },
                 )
@@ -246,6 +267,7 @@ private fun CardView(
 private fun PersonCard(
     person: Person,
     recentLogCount: Int,
+    colorIndex: Int,
     onNavigateToHistory: () -> Unit,
     onOpenQuickLog: () -> Unit,
 ) {
@@ -268,12 +290,19 @@ private fun PersonCard(
                     }
                 },
             ) {
-                Icon(
-                    Icons.Default.Person,
-                    contentDescription = null,
-                    modifier = Modifier.size(40.dp),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(personColor(colorIndex), CircleShape),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        Icons.Default.Person,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.White,
+                    )
+                }
             }
             Spacer(Modifier.size(16.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -306,6 +335,7 @@ private fun PersonCard(
 private fun FeedView(
     logs: List<ActivityLog>,
     persons: List<Person>,
+    personColors: Map<String, Int>,
 ) {
     if (logs.isEmpty()) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -324,6 +354,7 @@ private fun FeedView(
                 ActivityLogFeedItem(
                     log = log,
                     personName = personMap[log.personId]?.nickname ?: personMap[log.personId]?.name,
+                    personColorIndex = personColors[log.personId] ?: 0,
                 )
             }
         }
@@ -334,12 +365,24 @@ private fun FeedView(
 private fun ActivityLogFeedItem(
     log: ActivityLog,
     personName: String?,
+    personColorIndex: Int,
 ) {
     ListItem(
         headlineContent = { Text(log.label()) },
         supportingContent = {
-            val personPart = if (personName != null) "$personName · " else ""
-            Text("$personPart${timeFormatter.format(log.timestamp)} ${dateFormatter.format(log.timestamp)}")
+            if (personName != null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .background(personColor(personColorIndex), CircleShape),
+                    )
+                    Spacer(Modifier.size(4.dp))
+                    Text("$personName · ${timeFormatter.format(log.timestamp)} ${dateFormatter.format(log.timestamp)}")
+                }
+            } else {
+                Text("${timeFormatter.format(log.timestamp)} ${dateFormatter.format(log.timestamp)}")
+            }
         },
         leadingContent = {
             Text(
@@ -407,6 +450,7 @@ private fun DashboardContentPreview() {
             recentLogs = listOf(log),
             selectedPersonId = null,
             viewMode = DashboardViewMode.CARD,
+            personColors = mapOf("p1" to 0, "p2" to 2, "p3" to 4, "p5" to 3),
             onSelectPerson = {},
             onToggleViewMode = {},
             onNavigateToSettings = {},

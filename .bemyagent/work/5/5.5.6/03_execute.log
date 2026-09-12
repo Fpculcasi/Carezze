@@ -1,0 +1,62 @@
+# EXECUTE — 5.5.6
+
+## 2026-09-12
+
+### 1. libs.versions.toml — aggiunta versione datastore
+`datastore = "1.1.1"` in [versions]; `androidx-datastore-preferences` in [libraries]
+→ next: aggiungere implementazione in build.gradle.kts
+
+### 2. app/build.gradle.kts — aggiunta dipendenza DataStore
+`implementation(libs.androidx.datastore.preferences)`
+→ next: creare PersonColorStore
+
+### 3. data/local/PersonColorStore.kt — CREATO
+DataStore<Preferences> via `preferencesDataStore` top-level property; `observeColorIndex(personId): Flow<Int>`; `setColorIndex(personId, index): suspend`
+→ next: creare use cases
+
+### 4. domain/usecase/person/ObservePersonColorUseCase.kt — CREATO
+`operator fun invoke(personId: String): Flow<Int>` → delega a `PersonColorStore`
+→ next: SetPersonColorUseCase
+
+### 5. domain/usecase/person/SetPersonColorUseCase.kt — CREATO
+`suspend operator fun invoke(personId, colorIndex)` → `PersonColorStore.setColorIndex`
+→ next: palette
+
+### 6. ui/theme/PersonColors.kt — CREATO
+`PersonColorPalette: List<Color>` (8 colori); `personColor(index): Color`
+→ next: PersonViewModel
+
+### 7. ui/person/PersonViewModel.kt — MODIFICATO
+Injected `ObservePersonColorUseCase`, `SetPersonColorUseCase`; aggiunto `personColors: StateFlow<Map<String,Int>>` via `flatMapLatest + combine`; `personColorFlow(personId)`; `setPersonColor(personId, index)`
+→ next: DashboardViewModel
+
+### 8. ui/dashboard/DashboardViewModel.kt — MODIFICATO
+Injected `ObservePersonColorUseCase`; `personColors: StateFlow<Map<String,Int>>` con stesso pattern di PersonViewModel
+→ next: DashboardScreen
+
+### 9. ui/dashboard/DashboardScreen.kt — MODIFICATO
+- `DashboardContent` riceve `personColors: Map<String,Int>`
+- `PersonFilterRow`: dot 8dp colorato come `leadingIcon` su ogni `FilterChip`
+- `PersonCard`: cerchio colorato 40dp con icona Person bianca al posto di tint primario
+- `FeedView` + `ActivityLogFeedItem`: dot 8dp colorato + nome in `supportingContent`
+- Preview aggiornata con `personColors` campione
+→ next: PersonDetailScreen
+
+### 10. ui/person/PersonDetailScreen.kt — MODIFICATO
+- Nuovo `ColorPickerRow` composable: label "Colore" + 8 `ColorSwatch` (cerchi 32dp)
+- Swatch selezionato ha bordo `3.dp` colore `onSurface`
+- `PersonDetailScreen` raccoglie `personColorFlow(personId).collectAsState(initial=0)`
+- `PersonDetailContent` riceve `currentColorIndex` + `onSetPersonColor`
+- Preview aggiornata
+→ next: PersonListScreen
+
+### 11. ui/person/PersonListScreen.kt — MODIFICATO
+- `PersonListScreen` raccoglie `personColors` da `PersonViewModel`
+- `PersonListContent` + `PersonItem` ricevono `personColors`/`colorIndex`
+- `PersonItem.leadingContent`: Box 16dp con `personColor(colorIndex)` e `CircleShape`
+- Preview aggiornata
+→ next: 03-code-map.md
+
+### 12. docs/03-code-map.md — AGGIORNATO
+Aggiunti `ObservePersonColorUseCase`, `SetPersonColorUseCase`, sezione "Dati Locali (DataStore)", sezione "Palette Persone"
+→ task completato
