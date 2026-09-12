@@ -129,9 +129,4 @@
 
 ## Known Issues
 
-- **QuickLogSheet senza selezione persona**: il sheet riceve `selectedPersonId ?: persons.first()` — con filtro "Tutti" l'evento viene attribuito silenziosamente alla prima persona. Manca un picker esplicito. (UX rework in pianificazione)
-- **QuickLog senza evento "farmaco"**: `ActivityLogType` non include l'assunzione farmaco; le dosi si confermano solo da TherapyDetail. (UX rework in pianificazione)
-- **Titolo QuickLogSheet temporaneo**: mostra il `personId` grezzo ("Registra evento per $personId") — placeholder in attesa del rework.
-- **Tab radice con freccia back**: `PersonListScreen` e `SettingsScreen` espongono ancora `onNavigateBack` pur essendo destinazioni radice della bottom bar.
-- **Preview duplicate in DashboardScreen**: `DashboardContentPreview2` e `DashboardContentPreviewQuickLog` sono identiche — residuo di sperimentazione, da ripulire nel rework.
-- **Tab Profilo placeholder**: `composable<Profile>` renderizza solo `Text("Profilo")`.
+_(tutte le issue aperte di M5.5 chiuse in 5.5.1–5.5.8: QuickLog per-persona, evento farmaco, titolo sheet, back su tab radice, preview duplicate, tab Profilo — vedere work/5.5/)_

@@ -41,5 +41,5 @@
 - [ ] Creazione/modifica/cancellazione persona avvengono senza passare per una terza schermata dedicata.
 - [ ] Ogni persona ha colore (locale) e/o icona distintiva visibile in card, chip e feed.
 - [ ] Filtro su persona singola → in vista card resta solo la sua card; ricerca per nome/nick funzionante.
-- [ ] Preview duplicate rimosse (`DashboardContentPreview2`, `DashboardContentPreviewQuickLog`); titolo temporaneo "Registra evento per $personId" sostituito.
-- [ ] Test unit per i nuovi use case / ViewModel; `detekt`, `ktlintCheck`, `testDebugUnitTest` verdi.
+- [x] Preview duplicate rimosse (`DashboardContentPreview2`, `DashboardContentPreviewQuickLog`); titolo temporaneo "Registra evento per $personId" sostituito. _(fatto in 5.5.2; verificato in repo: DashboardScreen.kt non contiene più le preview; QuickLogSheet.kt:88 usa `$personName`)_
+- [x] Test unit per i nuovi use case / ViewModel; `detekt`, `ktlintCheck`, `testDebugUnitTest` verdi. _(DashboardViewModelTest 8 test + ProfileViewModelTest 3 test aggiunti in 5.5.8; testDebugUnitTest BUILD SUCCESSFUL)_

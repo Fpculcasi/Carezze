@@ -171,7 +171,7 @@ card and feed view. History shows 30 days in list or calendar mode.
 ---
 
 ## Milestone 5.5 — UX Rework: Dashboard, Navigazione, Persone
-**Goal**: Quick Log per-persona (incluso farmaco), pagina Account, navigazione coerente, persone distinguibili | **Status**: in-progress | **Spec**: [ux-rework](specs/ux-rework.md) — ⚠️ open questions OQ1–OQ5 da chiudere prima di 5.5.2+
+**Goal**: Quick Log per-persona (incluso farmaco), pagina Account, navigazione coerente, persone distinguibili | **Status**: done | **Spec**: [ux-rework](specs/ux-rework.md)
 
 | Task | Descrizione | Status |
 |---|---|---|
@@ -182,7 +182,7 @@ card and feed view. History shows 30 days in list or calendar mode.
 | 5.5.5 | Navigazione: no back su tab radice; PersonDetail unica pagina persona, EditPersonScreen assorbita (R5) | done |
 | 5.5.6 | Distinzione persone: colore locale per-utente e/o icona fascia d'età (R6) | done |
 | 5.5.7 | Filtro Home: card singola su selezione + search bar nome/nickname (R7) | done |
-| 5.5.8 | Pulizia: preview duplicate Dashboard, titolo QuickLogSheet con nome, test unit nuovi ViewModel | todo |
+| 5.5.8 | Pulizia: preview duplicate Dashboard, titolo QuickLogSheet con nome, test unit nuovi ViewModel | done |
 
 ---
 
