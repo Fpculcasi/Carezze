@@ -2,13 +2,15 @@ package com.fpculcasi.carezze.ui.person
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
@@ -18,6 +20,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -39,17 +42,14 @@ import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 
 @Composable
 fun PersonListScreen(
-    onNavigateBack: () -> Unit,
-    onNavigateToAdd: () -> Unit,
     onNavigateToPerson: (String) -> Unit,
     viewModel: PersonViewModel = hiltViewModel(),
 ) {
     val persons by viewModel.persons.collectAsState()
     PersonListContent(
         persons = persons,
-        onNavigateBack = onNavigateBack,
-        onNavigateToAdd = onNavigateToAdd,
         onNavigateToPerson = onNavigateToPerson,
+        onCreatePerson = { name, nick -> viewModel.createPerson(name, nick) },
         onDeletePerson = viewModel::deletePerson,
     )
 }
@@ -58,26 +58,21 @@ fun PersonListScreen(
 @Composable
 internal fun PersonListContent(
     persons: List<Person>,
-    onNavigateBack: () -> Unit,
-    onNavigateToAdd: () -> Unit,
     onNavigateToPerson: (String) -> Unit,
+    onCreatePerson: (String, String?) -> Unit,
     onDeletePerson: (String) -> Unit,
 ) {
     var personToDelete by remember { mutableStateOf<Person?>(null) }
+    var showCreateDialog by remember { mutableStateOf(false) }
+    var newName by remember { mutableStateOf("") }
+    var newNickname by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Persone") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
-                    }
-                },
-            )
+            TopAppBar(title = { Text("Persone") })
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onNavigateToAdd) {
+            FloatingActionButton(onClick = { showCreateDialog = true }) {
                 Icon(Icons.Default.Add, contentDescription = "Aggiungi Persona")
             }
         },
@@ -100,6 +95,54 @@ internal fun PersonListContent(
                 }
             }
         }
+    }
+
+    if (showCreateDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showCreateDialog = false
+                newName = ""
+                newNickname = ""
+            },
+            title = { Text("Nuova Persona") },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = newName,
+                        onValueChange = { newName = it },
+                        label = { Text("Nome *") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = newNickname,
+                        onValueChange = { newNickname = it },
+                        label = { Text("Soprannome") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onCreatePerson(newName.trim(), newNickname.trim().takeIf { it.isNotBlank() })
+                        showCreateDialog = false
+                        newName = ""
+                        newNickname = ""
+                    },
+                    enabled = newName.isNotBlank(),
+                ) { Text("Crea") }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showCreateDialog = false
+                    newName = ""
+                    newNickname = ""
+                }) { Text("Annulla") }
+            },
+        )
     }
 
     personToDelete?.let { person ->
@@ -157,9 +200,8 @@ private fun PersonListContentPreview() {
     CarezzeTheme {
         PersonListContent(
             persons = previewPersons,
-            onNavigateBack = {},
-            onNavigateToAdd = {},
             onNavigateToPerson = {},
+            onCreatePerson = { _, _ -> },
             onDeletePerson = {},
         )
     }
@@ -171,9 +213,8 @@ private fun PersonListContentEmptyPreview() {
     CarezzeTheme {
         PersonListContent(
             persons = emptyList(),
-            onNavigateBack = {},
-            onNavigateToAdd = {},
             onNavigateToPerson = {},
+            onCreatePerson = { _, _ -> },
             onDeletePerson = {},
         )
     }

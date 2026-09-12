@@ -4,8 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,18 +15,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,7 +49,6 @@ import java.time.LocalDate
 fun PersonDetailScreen(
     personId: String,
     onNavigateBack: () -> Unit,
-    onNavigateToEdit: (String) -> Unit,
     onNavigateToAddTherapy: (String) -> Unit,
     onNavigateToTherapy: (personId: String, therapyId: String) -> Unit,
     viewModel: PersonViewModel = hiltViewModel(),
@@ -56,7 +63,9 @@ fun PersonDetailScreen(
         personId = personId,
         therapies = therapies,
         onNavigateBack = onNavigateBack,
-        onNavigateToEdit = onNavigateToEdit,
+        onUpdatePerson = { name, nick ->
+            person?.let { viewModel.updatePerson(it.copy(name = name, nickname = nick)) }
+        },
         onNavigateToAddTherapy = onNavigateToAddTherapy,
         onNavigateToTherapy = onNavigateToTherapy,
     )
@@ -69,10 +78,14 @@ internal fun PersonDetailContent(
     personId: String,
     therapies: List<Therapy>,
     onNavigateBack: () -> Unit,
-    onNavigateToEdit: (String) -> Unit,
+    onUpdatePerson: (name: String, nickname: String?) -> Unit,
     onNavigateToAddTherapy: (String) -> Unit,
     onNavigateToTherapy: (personId: String, therapyId: String) -> Unit,
 ) {
+    var showEditDialog by remember { mutableStateOf(false) }
+    var editName by remember { mutableStateOf("") }
+    var editNickname by remember { mutableStateOf("") }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -83,7 +96,11 @@ internal fun PersonDetailContent(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { onNavigateToEdit(personId) }) {
+                    IconButton(onClick = {
+                        editName = person?.name ?: ""
+                        editNickname = person?.nickname ?: ""
+                        showEditDialog = true
+                    }) {
                         Icon(Icons.Default.Edit, contentDescription = "Modifica")
                     }
                 },
@@ -127,6 +144,44 @@ internal fun PersonDetailContent(
                 }
             }
         }
+    }
+
+    if (showEditDialog) {
+        AlertDialog(
+            onDismissRequest = { showEditDialog = false },
+            title = { Text("Modifica Persona") },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = editName,
+                        onValueChange = { editName = it },
+                        label = { Text("Nome *") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = editNickname,
+                        onValueChange = { editNickname = it },
+                        label = { Text("Soprannome") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onUpdatePerson(editName.trim(), editNickname.trim().takeIf { it.isNotBlank() })
+                        showEditDialog = false
+                    },
+                    enabled = editName.isNotBlank(),
+                ) { Text("Salva") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEditDialog = false }) { Text("Annulla") }
+            },
+        )
     }
 }
 
@@ -184,7 +239,7 @@ private fun PersonDetailContentPreview() {
                     ),
                 ),
             onNavigateBack = {},
-            onNavigateToEdit = {},
+            onUpdatePerson = { _, _ -> },
             onNavigateToAddTherapy = {},
             onNavigateToTherapy = { _, _ -> },
         )

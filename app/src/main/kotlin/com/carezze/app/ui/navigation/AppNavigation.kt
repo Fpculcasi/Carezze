@@ -34,7 +34,6 @@ import com.fpculcasi.carezze.ui.auth.WelcomeScreen
 import com.fpculcasi.carezze.ui.dashboard.DashboardScreen
 import com.fpculcasi.carezze.ui.history.HistoryCalendarScreen
 import com.fpculcasi.carezze.ui.history.HistoryListScreen
-import com.fpculcasi.carezze.ui.person.EditPersonScreen
 import com.fpculcasi.carezze.ui.person.PersonDetailScreen
 import com.fpculcasi.carezze.ui.person.PersonListScreen
 import com.fpculcasi.carezze.ui.profile.ProfileScreen
@@ -70,8 +69,6 @@ import kotlinx.serialization.Serializable
 
 // -- Detail screen routes (inner NavHost, bottom bar hidden) --
 @Serializable data class PersonDetail(val personId: String)
-
-@Serializable data class EditPerson(val personId: String? = null)
 
 @Serializable data class AddTherapy(val personId: String)
 
@@ -284,8 +281,6 @@ fun MainScreen(
 
             composable<PersonList> {
                 PersonListScreen(
-                    onNavigateBack = { navController.popBackStack() },
-                    onNavigateToAdd = { navController.navigate(EditPerson()) },
                     onNavigateToPerson = { id ->
                         navController.navigate(PersonDetail(id))
                     },
@@ -300,9 +295,7 @@ fun MainScreen(
             }
 
             composable<Settings> {
-                SettingsScreen(
-                    onNavigateBack = { navController.popBackStack() },
-                )
+                SettingsScreen()
             }
 
             // ────────────────────────────────────────────
@@ -314,23 +307,12 @@ fun MainScreen(
                 PersonDetailScreen(
                     personId = route.personId,
                     onNavigateBack = { navController.popBackStack() },
-                    onNavigateToEdit = { id ->
-                        navController.navigate(EditPerson(id))
-                    },
                     onNavigateToAddTherapy = { pid ->
                         navController.navigate(AddTherapy(pid))
                     },
                     onNavigateToTherapy = { pid, tid ->
                         navController.navigate(TherapyDetail(pid, tid))
                     },
-                )
-            }
-
-            composable<EditPerson> { backStackEntry ->
-                val route = backStackEntry.toRoute<EditPerson>()
-                EditPersonScreen(
-                    personId = route.personId,
-                    onNavigateBack = { navController.popBackStack() },
                 )
             }
 
