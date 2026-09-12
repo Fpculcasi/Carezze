@@ -71,8 +71,20 @@
 | `RedeemInvitationUseCase` | `code` | Aggiunge utente come Membro |
 | `RevokeAccessUseCase` | `targetId, userId` | Rimuove Membro + cancella suoi dati |
 | `ObservePersonsUseCase` | `userId` | `Flow<List<Person>>` real-time |
+| `ObservePersonColorUseCase` | `personId` | `Flow<Int>` indice colore locale (DataStore) |
+| `SetPersonColorUseCase` | `personId, colorIndex: Int` | salva indice in `PersonColorStore` |
 | `ObserveActivityLogsUseCase` | `personId, DateRange` | `Flow<List<ActivityLog>>` |
 | `ObservePendingDosesUseCase` | `userId` | `Flow<List<PendingDose>>` per widget |
+
+## Dati Locali (DataStore)
+
+| Store | File | Chiavi | Nota |
+|---|---|---|---|
+| `PersonColorStore` | `data/local/PersonColorStore.kt` | `color_<personId>` → `Int` (0-7) | preferenza locale, mai su Firestore |
+
+## Palette Persone
+
+`ui/theme/PersonColors.kt` — 8 colori (`PersonColorPalette: List<Color>`), helper `personColor(index)`. Colore visibile in: card Dashboard, FilterChip, feed attività, lista Persone. Picker in PersonDetail (8 swatches circolari).
 
 ## Data Schemas — Firestore
 
