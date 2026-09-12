@@ -265,7 +265,6 @@ fun MainScreen(
 
             composable<Dashboard> {
                 DashboardScreen(
-                    onNavigateToSettings = { navController.navigate(Settings) },
                     onNavigateToPersons = { navController.navigate(PersonList) },
                     onNavigateToHistory = { personId ->
                         navController.navigate(HistoryList(personId))

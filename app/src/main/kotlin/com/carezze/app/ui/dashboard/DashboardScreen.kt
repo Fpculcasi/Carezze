@@ -16,11 +16,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
@@ -32,8 +34,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -62,7 +66,6 @@ private val dateFormatter = DateTimeFormatter.ofPattern("d MMM").withZone(ZoneId
 
 @Composable
 fun DashboardScreen(
-    onNavigateToSettings: () -> Unit = {},
     onNavigateToPersons: () -> Unit = {},
     onNavigateToHistory: (personId: String) -> Unit = {},
     onNavigateToAddTherapy: (personId: String) -> Unit = {},
@@ -70,21 +73,25 @@ fun DashboardScreen(
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
     val persons by viewModel.persons.collectAsState()
+    val filteredPersons by viewModel.filteredPersons.collectAsState()
     val recentLogs by viewModel.recentLogs.collectAsState()
     val selectedPersonId by viewModel.selectedPersonId.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
     val viewMode by viewModel.viewMode.collectAsState()
     val personColors by viewModel.personColors.collectAsState()
     var quickLogPersonId by remember { mutableStateOf<String?>(null) }
 
     DashboardContent(
         persons = persons,
+        filteredPersons = filteredPersons,
         recentLogs = recentLogs,
         selectedPersonId = selectedPersonId,
+        searchQuery = searchQuery,
         viewMode = viewMode,
         personColors = personColors,
         onSelectPerson = viewModel::selectPerson,
+        onSearchQueryChange = viewModel::setSearchQuery,
         onToggleViewMode = viewModel::toggleViewMode,
-        onNavigateToSettings = onNavigateToSettings,
         onNavigateToPersons = onNavigateToPersons,
         onNavigateToHistory = onNavigateToHistory,
         onOpenQuickLog = { personId -> quickLogPersonId = personId },
@@ -112,13 +119,15 @@ fun DashboardScreen(
 @Composable
 internal fun DashboardContent(
     persons: List<Person>,
+    filteredPersons: List<Person>,
     recentLogs: List<ActivityLog>,
     selectedPersonId: String?,
+    searchQuery: String,
     viewMode: DashboardViewMode,
     personColors: Map<String, Int>,
     onSelectPerson: (String?) -> Unit,
+    onSearchQueryChange: (String) -> Unit,
     onToggleViewMode: () -> Unit,
-    onNavigateToSettings: () -> Unit,
     onNavigateToPersons: () -> Unit,
     onNavigateToHistory: (personId: String) -> Unit,
     onOpenQuickLog: (personId: String) -> Unit,
@@ -133,12 +142,6 @@ internal fun DashboardContent(
                             if (viewMode == DashboardViewMode.CARD) Icons.Default.DateRange else Icons.Default.Person,
                             contentDescription = if (viewMode == DashboardViewMode.CARD) "Vista feed" else "Vista card",
                         )
-                    }
-                    IconButton(onClick = onNavigateToPersons) {
-                        Icon(Icons.Default.Person, contentDescription = "Gestisci persone")
-                    }
-                    IconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = "Impostazioni")
                     }
                 },
             )
@@ -157,10 +160,18 @@ internal fun DashboardContent(
                 onSelectPerson = onSelectPerson,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
-            Spacer(Modifier.height(8.dp))
+            PersonSearchBar(
+                query = searchQuery,
+                onQueryChange = onSearchQueryChange,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+            )
+            Spacer(Modifier.height(4.dp))
             if (viewMode == DashboardViewMode.CARD) {
                 CardView(
-                    persons = persons,
+                    persons = filteredPersons,
+                    allPersonsCount = persons.size,
                     recentLogs = recentLogs,
                     personColors = personColors,
                     onNavigateToHistory = onNavigateToHistory,
@@ -170,7 +181,7 @@ internal fun DashboardContent(
             } else {
                 FeedView(
                     logs = recentLogs,
-                    persons = persons,
+                    persons = filteredPersons,
                     personColors = personColors,
                 )
             }
@@ -217,47 +228,91 @@ private fun PersonFilterRow(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PersonSearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        modifier = modifier,
+        placeholder = { Text("Cerca per nome…", style = MaterialTheme.typography.bodyMedium) },
+        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(Icons.Default.Close, contentDescription = "Cancella ricerca")
+                }
+            }
+        },
+        singleLine = true,
+        shape = RoundedCornerShape(50),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+        ),
+    )
+}
+
 @Composable
 private fun CardView(
     persons: List<Person>,
+    allPersonsCount: Int,
     recentLogs: List<ActivityLog>,
     personColors: Map<String, Int>,
     onNavigateToHistory: (personId: String) -> Unit,
     onNavigateToPersons: () -> Unit,
     onOpenQuickLog: (personId: String) -> Unit,
 ) {
-    if (persons.isEmpty()) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Nessuna persona ancora", style = MaterialTheme.typography.bodyLarge)
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    "Aggiungi una persona per iniziare",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(Modifier.height(16.dp))
-                Button(onClick = onNavigateToPersons) {
-                    Icon(Icons.Default.Person, contentDescription = null)
-                    Spacer(Modifier.size(8.dp))
-                    Text("Gestisci persone")
+    when {
+        allPersonsCount == 0 -> {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Nessuna persona ancora", style = MaterialTheme.typography.bodyLarge)
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Aggiungi una persona per iniziare",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Button(onClick = onNavigateToPersons) {
+                        Icon(Icons.Default.Person, contentDescription = null)
+                        Spacer(Modifier.size(8.dp))
+                        Text("Gestisci persone")
+                    }
                 }
             }
         }
-    } else {
-        LazyColumn(
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            items(persons) { person ->
-                val logCount = recentLogs.count { it.personId == person.id }
-                PersonCard(
-                    person = person,
-                    recentLogCount = logCount,
-                    colorIndex = personColors[person.id] ?: 0,
-                    onNavigateToHistory = { onNavigateToHistory(person.id) },
-                    onOpenQuickLog = { onOpenQuickLog(person.id) },
+        persons.isEmpty() -> {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    "Nessun risultato",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+            }
+        }
+        else -> {
+            LazyColumn(
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                items(persons) { person ->
+                    val logCount = recentLogs.count { it.personId == person.id }
+                    PersonCard(
+                        person = person,
+                        recentLogCount = logCount,
+                        colorIndex = personColors[person.id] ?: 0,
+                        onNavigateToHistory = { onNavigateToHistory(person.id) },
+                        onOpenQuickLog = { onOpenQuickLog(person.id) },
+                    )
+                }
             }
         }
     }
@@ -447,13 +502,15 @@ private fun DashboardContentPreview() {
     CarezzeTheme {
         DashboardContent(
             persons = persons,
+            filteredPersons = persons,
             recentLogs = listOf(log),
             selectedPersonId = null,
+            searchQuery = "",
             viewMode = DashboardViewMode.CARD,
             personColors = mapOf("p1" to 0, "p2" to 2, "p3" to 4, "p5" to 3),
             onSelectPerson = {},
+            onSearchQueryChange = {},
             onToggleViewMode = {},
-            onNavigateToSettings = {},
             onNavigateToPersons = {},
             onNavigateToHistory = {},
             onOpenQuickLog = { _ -> },

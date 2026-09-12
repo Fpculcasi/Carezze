@@ -181,7 +181,7 @@ card and feed view. History shows 30 days in list or calendar mode.
 | 5.5.4 | Tab Profilo/Account: vedi/modifica profilo se loggato, CTA login se anonimo (R4) | done |
 | 5.5.5 | Navigazione: no back su tab radice; PersonDetail unica pagina persona, EditPersonScreen assorbita (R5) | done |
 | 5.5.6 | Distinzione persone: colore locale per-utente e/o icona fascia d'età (R6) | done |
-| 5.5.7 | Filtro Home: card singola su selezione + search bar nome/nickname (R7) | todo |
+| 5.5.7 | Filtro Home: card singola su selezione + search bar nome/nickname (R7) | done |
 | 5.5.8 | Pulizia: preview duplicate Dashboard, titolo QuickLogSheet con nome, test unit nuovi ViewModel | todo |
 
 ---
