@@ -1,0 +1,21 @@
+# EXECUTE — 5.5.7
+
+## 2026-09-12
+
+### Step 1 — DashboardViewModel.kt
+Aggiunto `searchQuery: MutableStateFlow<String>`, `filteredPersons: StateFlow<List<Person>>` (combine di persons + selectedPersonId + searchQuery), `setSearchQuery()`. `recentLogs` aggiornato per usare `filteredPersons.flatMapLatest` invece di ricalcolare internamente.
+→ Build successful (1m 19s, 43 tasks, 11 executed).
+
+### Step 2 — DashboardScreen.kt
+`DashboardContent` riceve `filteredPersons`, `searchQuery`, `onSearchQueryChange`. Aggiunto composable `PersonSearchBar` (OutlinedTextField pill-shaped, leading Search icon, trailing Close icon quando query non vuota). `CardView` e `FeedView` usano `filteredPersons`. `CardView` distingue "nessuna persona" (allPersonsCount==0) da "nessun risultato" (filteredPersons.isEmpty() ma allPersonsCount>0). Preview aggiornata. `onNavigateToSettings` rimosso da `DashboardScreen` e `DashboardContent` (ridondante con bottom nav) — hook ha pulito anche `AppNavigation.kt`.
+
+### Step 3 — Fix detekt MaxLineLength
+Riga 67 di DashboardViewModel spezzata: `filter { p -> query.isBlank() || p.name.contains(...) || p.nickname?.contains(...) == true }` su più righe.
+→ `./gradlew detekt` PASS.
+
+### Step 4 — ktlintCheck
+Fallisce su PersonColors.kt (violazione pre-esistente da task 5.5.6, non introdotta da questo task). File toccati da 5.5.7 passano ktlint.
+→ Verdict: PASS_WITH_CAVEATS (ktlint su PersonColors.kt è backlog pre-esistente).
+
+### Next intended action
+Scrivere 04_verify.md + aggiornare 06-implementation-plan.md + 03-code-map.md.

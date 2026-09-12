@@ -2,7 +2,7 @@
 
 ## Hot Paths / Performance Critical
 
-- `DashboardViewModel.observePersonsWithRecentActivity()` — snapshot listener aggregato, carico all'avvio
+- `DashboardViewModel` — `filteredPersons: StateFlow` (combine di persons + selectedPersonId + searchQuery); `recentLogs` usa `filteredPersons.flatMapLatest`
 - `ActivityLogRepositoryImpl.streamLogs(personId, from, to)` — query Firestore con range timestamp, indice composito richiesto
 - `MedicationLogRepositoryImpl.streamPendingDoses(therapyId)` — polling per countdown widget
 - `GlanceWidget.update()` — deve completare in < 500ms (limit Android widget framework)

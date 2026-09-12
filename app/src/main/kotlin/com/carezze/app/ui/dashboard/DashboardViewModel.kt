@@ -48,7 +48,7 @@ class DashboardViewModel
                 ?: MutableStateFlow(emptyList())
 
         val selectedPersonId = MutableStateFlow<String?>(null)
-
+        val searchQuery = MutableStateFlow("")
         val viewMode = MutableStateFlow(DashboardViewMode.CARD)
 
         val personColors: StateFlow<Map<String, Int>> =
@@ -60,10 +60,19 @@ class DashboardViewModel
                 }
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
 
+        val filteredPersons: StateFlow<List<Person>> =
+            combine(persons, selectedPersonId, searchQuery) { personList, selectedId, query ->
+                personList
+                    .filter { selectedId == null || it.id == selectedId }
+                    .filter { p ->
+                        query.isBlank() ||
+                            p.name.contains(query, ignoreCase = true) ||
+                            p.nickname?.contains(query, ignoreCase = true) == true
+                    }
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
         val recentLogs: StateFlow<List<ActivityLog>> =
-            combine(persons, selectedPersonId) { personList, selectedId ->
-                if (selectedId == null) personList else personList.filter { it.id == selectedId }
-            }.flatMapLatest { relevant ->
+            filteredPersons.flatMapLatest { relevant ->
                 if (relevant.isEmpty()) return@flatMapLatest flowOf(emptyList())
                 val from = Instant.now().minus(7, ChronoUnit.DAYS)
                 val to = Instant.now()
@@ -80,6 +89,10 @@ class DashboardViewModel
 
         fun selectPerson(id: String?) {
             selectedPersonId.value = id
+        }
+
+        fun setSearchQuery(query: String) {
+            searchQuery.value = query
         }
 
         fun toggleViewMode() {
