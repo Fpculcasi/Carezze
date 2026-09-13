@@ -38,7 +38,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,7 +49,6 @@ import com.fpculcasi.carezze.domain.model.Therapy
 import com.fpculcasi.carezze.domain.model.TherapyDuration
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 import com.fpculcasi.carezze.ui.theme.PersonColorPalette
-import com.fpculcasi.carezze.ui.theme.personColor
 import com.fpculcasi.carezze.ui.therapy.TherapyViewModel
 import java.time.LocalDate
 
@@ -238,17 +236,18 @@ private fun ColorSwatch(
     onClick: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .size(32.dp)
-            .background(color, CircleShape)
-            .then(
-                if (selected) {
-                    Modifier.border(3.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
-                } else {
-                    Modifier
-                },
-            )
-            .clickable(onClick = onClick),
+        modifier =
+            Modifier
+                .size(32.dp)
+                .background(color, CircleShape)
+                .then(
+                    if (selected) {
+                        Modifier.border(3.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
+                    } else {
+                        Modifier
+                    },
+                )
+                .clickable(onClick = onClick),
     )
 }
 

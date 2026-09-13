@@ -190,8 +190,8 @@ class TherapyViewModel
                     userId = uid,
                 )
                 resetForm()
-                onDone()
             }
+            onDone()
         }
 
         fun deleteTherapy(

@@ -1,5 +1,6 @@
 package com.fpculcasi.carezze.ui.therapy
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -46,6 +48,11 @@ fun AddTherapyScreen(
     viewModel: TherapyViewModel = hiltViewModel(),
 ) {
     val form by viewModel.form.collectAsState()
+    val context = LocalContext.current
+    val onSaved: () -> Unit = {
+        Toast.makeText(context, "Terapia salvata", Toast.LENGTH_SHORT).show()
+        onNavigateBack()
+    }
 
     Scaffold(
         topBar = {
@@ -81,7 +88,7 @@ fun AddTherapyScreen(
 
             when (form.step) {
                 1 -> StepOneContent(form, viewModel)
-                2 -> StepTwoContent(form, viewModel, personId, onNavigateBack)
+                2 -> StepTwoContent(form, viewModel, personId, onSaved)
             }
         }
     }

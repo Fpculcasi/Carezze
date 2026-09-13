@@ -125,17 +125,8 @@ class QuickLogViewModel
             medicationId: String,
         ) {
             val uid = authRepository.currentUser?.id ?: return
-            viewModelScope.launch {
-                _state.update { it.copy(isLoading = true, error = null) }
-                val result = addManualMedicationLog(personId, therapyId, medicationId, Instant.now(), uid)
-                _state.update { state ->
-                    if (result.isSuccess) {
-                        state.copy(isLoading = false, isSaved = true)
-                    } else {
-                        state.copy(isLoading = false, error = result.exceptionOrNull()?.message ?: "Errore")
-                    }
-                }
-            }
+            viewModelScope.launch { addManualMedicationLog(personId, therapyId, medicationId, Instant.now(), uid) }
+            _state.update { it.copy(isSaved = true) }
         }
 
         fun confirmScheduledDose(
@@ -144,24 +135,16 @@ class QuickLogViewModel
         ) {
             val uid = authRepository.currentUser?.id ?: return
             viewModelScope.launch {
-                _state.update { it.copy(isLoading = true, error = null) }
-                val result =
-                    logMedicationUseCase(
-                        personId = personId,
-                        therapyId = dose.therapyId,
-                        medicationId = dose.medicationId,
-                        scheduledTime = dose.scheduledTime,
-                        status = MedicationStatus.TAKEN,
-                        userId = uid,
-                    )
-                _state.update { state ->
-                    if (result.isSuccess) {
-                        state.copy(isLoading = false, isSaved = true)
-                    } else {
-                        state.copy(isLoading = false, error = result.exceptionOrNull()?.message ?: "Errore")
-                    }
-                }
+                logMedicationUseCase(
+                    personId = personId,
+                    therapyId = dose.therapyId,
+                    medicationId = dose.medicationId,
+                    scheduledTime = dose.scheduledTime,
+                    status = MedicationStatus.TAKEN,
+                    userId = uid,
+                )
             }
+            _state.update { it.copy(isSaved = true) }
         }
 
         private fun loadTherapies(personId: String) {
@@ -316,16 +299,7 @@ class QuickLogViewModel
             personId: String,
             log: ActivityLog,
         ) {
-            viewModelScope.launch {
-                _state.update { it.copy(isLoading = true, error = null) }
-                val result = logActivity(personId, log)
-                _state.update { state ->
-                    if (result.isSuccess) {
-                        state.copy(isLoading = false, isSaved = true)
-                    } else {
-                        state.copy(isLoading = false, error = result.exceptionOrNull()?.message ?: "Errore")
-                    }
-                }
-            }
+            viewModelScope.launch { logActivity(personId, log) }
+            _state.update { it.copy(isSaved = true) }
         }
     }

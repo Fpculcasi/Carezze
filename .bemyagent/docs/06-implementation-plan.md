@@ -187,16 +187,16 @@ card and feed view. History shows 30 days in list or calendar mode.
 ---
 
 ## Milestone 5.6 — Salvataggio Non Bloccante + Pending Indicator
-**Goal**: Tutte le operazioni di salvataggio (activity log, creazione terapia, log terapia) sono fire-and-forget: l'UI si chiude immediatamente con un toast, lo stato di sincronizzazione è visibile nell'app, gli errori sono gestiti con retry silenzioso | **Status**: todo
+**Goal**: Tutte le operazioni di salvataggio (activity log, creazione terapia, log terapia) sono fire-and-forget: l'UI si chiude immediatamente con un toast, lo stato di sincronizzazione è visibile nell'app, gli errori sono gestiti con retry silenzioso | **Status**: done
 
 | Task | Descrizione | Status |
 |---|---|---|
-| 5.6.1 | Infrastruttura: `SyncStatus` enum (SYNCED, PENDING, ERROR) + colonna `syncStatus` nelle Room entities `ActivityLog`, `Therapy`, `MedicationLog` | todo |
-| 5.6.2 | Repository pattern: scrittura Room-first → Firestore in coroutine background; in caso di errore: 3 retry esponenziali silenziosi → imposta `syncStatus = ERROR` | todo |
-| 5.6.3 | UI: indicatore pending — icona/badge discreta sull'elemento in lista quando `syncStatus != SYNCED` (es. orologio o dot colorato) | todo |
-| 5.6.4 | Activity Log non bloccante: Quick Log Bottom Sheet si chiude al tap "Salva" + toast "Registrato"; log appare in lista immediatamente con stato PENDING | todo |
-| 5.6.5 | Creazione terapia non bloccante: ultimo step wizard chiude la schermata immediatamente + toast "Terapia salvata"; terapia appare in lista con stato PENDING | todo |
-| 5.6.6 | Log terapia non bloccante: `TherapyLogScreen` aggiunta manuale chiude dialog immediatamente + toast + entry in lista con PENDING | todo |
+| 5.6.1 | Infrastruttura: `SyncStatus` enum (SYNCED, PENDING, ERROR) + colonna `syncStatus` nelle Room entities `ActivityLog`, `Therapy`, `MedicationLog` | done |
+| 5.6.2 | Repository pattern: scrittura Room-first → Firestore in coroutine background; in caso di errore: 3 retry esponenziali silenziosi → imposta `syncStatus = ERROR` | done |
+| 5.6.3 | UI: indicatore pending — dot 8dp (tertiary=PENDING, error=ERROR) in HistoryListScreen e TherapyLogScreen | done |
+| 5.6.4 | Activity Log non bloccante: Quick Log Bottom Sheet si chiude al tap "Salva" + toast "Registrato"; log appare in lista immediatamente con stato PENDING | done |
+| 5.6.5 | Creazione terapia non bloccante: ultimo step wizard chiude la schermata immediatamente + toast "Terapia salvata"; terapia appare in lista con stato PENDING | done |
+| 5.6.6 | Log terapia non bloccante: `TherapyLogScreen` aggiunta manuale chiude dialog immediatamente + toast "Dose registrata" + entry in lista con PENDING | done |
 
 **Scelte architetturali:**
 - Room è la source of truth locale; Firestore è il target di sync

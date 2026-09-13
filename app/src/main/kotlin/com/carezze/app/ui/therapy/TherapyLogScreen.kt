@@ -1,6 +1,9 @@
 package com.fpculcasi.carezze.ui.therapy
 
+import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -37,12 +42,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.fpculcasi.carezze.domain.model.Medication
 import com.fpculcasi.carezze.domain.model.MedicationLog
 import com.fpculcasi.carezze.domain.model.MedicationStatus
+import com.fpculcasi.carezze.domain.model.SyncStatus
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -63,6 +70,7 @@ fun TherapyLogScreen(
     val sortedLogs = logs.sortedByDescending { it.scheduledTime }
 
     var showAddDialog by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -126,6 +134,7 @@ fun TherapyLogScreen(
             onDismiss = { showAddDialog = false },
             onConfirm = { medicationId, takenAt ->
                 viewModel.addManualLog(personId, therapyId, medicationId, takenAt)
+                Toast.makeText(context, "Dose registrata", Toast.LENGTH_SHORT).show()
                 showAddDialog = false
             },
         )
@@ -161,9 +170,31 @@ private fun MedicationLogCard(
                     )
                 }
             }
-            StatusBadge(log.status)
+            Column(
+                horizontalAlignment = androidx.compose.ui.Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                StatusBadge(log.status)
+                SyncDot(log.syncStatus)
+            }
         }
     }
+}
+
+@Composable
+private fun SyncDot(syncStatus: SyncStatus) {
+    val color =
+        when (syncStatus) {
+            SyncStatus.PENDING -> MaterialTheme.colorScheme.tertiary
+            SyncStatus.ERROR -> MaterialTheme.colorScheme.error
+            SyncStatus.SYNCED -> return
+        }
+    Box(
+        modifier =
+            Modifier
+                .size(8.dp)
+                .background(color, CircleShape),
+    )
 }
 
 @Composable

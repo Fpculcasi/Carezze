@@ -32,9 +32,7 @@ import com.fpculcasi.carezze.domain.model.TemperatureUnit
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 
 @Composable
-fun SettingsScreen(
-    viewModel: SettingsViewModel = hiltViewModel(),
-) {
+fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
     val user by viewModel.settingsState.collectAsStateWithLifecycle()
 
     SettingsContent(

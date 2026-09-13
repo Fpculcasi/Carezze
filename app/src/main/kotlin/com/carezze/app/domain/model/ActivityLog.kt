@@ -7,6 +7,7 @@ sealed class ActivityLog {
     abstract val personId: String
     abstract val timestamp: Instant
     abstract val loggedBy: String
+    abstract val syncStatus: SyncStatus
 
     data class Meal(
         override val id: String,
@@ -17,6 +18,7 @@ sealed class ActivityLog {
         val amountUnit: MealUnit?,
         val mealType: MealType?,
         val notes: String?,
+        override val syncStatus: SyncStatus = SyncStatus.SYNCED,
     ) : ActivityLog()
 
     data class Diaper(
@@ -26,6 +28,7 @@ sealed class ActivityLog {
         override val loggedBy: String,
         val diaperType: DiaperType,
         val notes: String?,
+        override val syncStatus: SyncStatus = SyncStatus.SYNCED,
     ) : ActivityLog()
 
     data class SleepStart(
@@ -33,6 +36,7 @@ sealed class ActivityLog {
         override val personId: String,
         override val timestamp: Instant,
         override val loggedBy: String,
+        override val syncStatus: SyncStatus = SyncStatus.SYNCED,
     ) : ActivityLog()
 
     data class SleepEnd(
@@ -40,6 +44,7 @@ sealed class ActivityLog {
         override val personId: String,
         override val timestamp: Instant,
         override val loggedBy: String,
+        override val syncStatus: SyncStatus = SyncStatus.SYNCED,
     ) : ActivityLog()
 
     data class Temperature(
@@ -51,6 +56,7 @@ sealed class ActivityLog {
         val unit: TemperatureUnit,
         val method: MeasurementMethod?,
         val notes: String?,
+        override val syncStatus: SyncStatus = SyncStatus.SYNCED,
     ) : ActivityLog()
 
     data class Weight(
@@ -63,6 +69,7 @@ sealed class ActivityLog {
         val height: Double?,
         val heightUnit: HeightUnit?,
         val notes: String?,
+        override val syncStatus: SyncStatus = SyncStatus.SYNCED,
     ) : ActivityLog()
 
     data class Hygiene(
@@ -71,6 +78,7 @@ sealed class ActivityLog {
         override val timestamp: Instant,
         override val loggedBy: String,
         val notes: String?,
+        override val syncStatus: SyncStatus = SyncStatus.SYNCED,
     ) : ActivityLog()
 }
 

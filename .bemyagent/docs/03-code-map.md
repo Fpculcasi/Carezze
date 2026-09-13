@@ -82,6 +82,30 @@
 |---|---|---|---|
 | `PersonColorStore` | `data/local/PersonColorStore.kt` | `color_<personId>` → `Int` (0-7) | preferenza locale, mai su Firestore |
 
+## Dati Locali (Room) — aggiunto in M5.6
+
+`CarezzeDatabase` (versione 1) — `data/local/db/CarezzeDatabase.kt` — 3 tabelle; DI in `di/RoomModule.kt`
+
+| Entity | Tabella | Colonne chiave | syncStatus |
+|---|---|---|---|
+| `ActivityLogEntity` | `activity_logs` | id, personId, type, timestampEpochSecond, loggedBy, dataJson | `String` (PENDING/SYNCED/ERROR) |
+| `TherapyEntity` | `therapies` | id, personId, name, durationJson, medicationsJson, membersJson, isActive | `String` |
+| `MedicationLogEntity` | `medication_logs` | id, therapyId, personId, medicationId, scheduledTimeEpochSecond, status | `String` |
+
+| DAO | File | Operazioni |
+|---|---|---|
+| `ActivityLogDao` | `data/local/db/dao/` | `upsert`, `observe(personId, from, to): Flow`, `updateSyncStatus` |
+| `TherapyDao` | `data/local/db/dao/` | `upsert`, `observe(personId): Flow`, `updateSyncStatus` |
+| `MedicationLogDao` | `data/local/db/dao/` | `upsert`, `observe(personId, therapyId): Flow`, `updateSyncStatus` |
+
+**Pattern Repository (M5.6):** `logActivity`/`createTherapy`/`logMedication` sono Room-first (Room PENDING → return) + `launch { syncToFirestore(...) }` con 4 tentativi backoff 1s/2s/4s. `observe*` usa `channelFlow { Firestore listener → upsert Room SYNCED; Room flow → emit }`.
+
+**SyncStatus** — `domain/model/SyncStatus.kt` — enum SYNCED/PENDING/ERROR. Aggiunto come campo abstract su `ActivityLog` e come campo (default SYNCED) su `Therapy` e `MedicationLog`.
+
+**UI SyncDot** — dot 8dp (tertiary=PENDING, error=ERROR, invisible=SYNCED) in `HistoryListScreen` (trailingContent) e `TherapyLogScreen` (MedicationLogCard).
+
+**Fire-and-forget:** `QuickLogViewModel.save()` + `logMedication()` + `confirmScheduledDose()` → `isSaved=true` immediato + Toast "Registrato". `TherapyViewModel.submitTherapy()` → `onDone()` immediato + Toast "Terapia salvata". `TherapyLogScreen.AddManualLogDialog` → Toast "Dose registrata".
+
 ## Palette Persone
 
 `ui/theme/PersonColors.kt` — 8 colori (`PersonColorPalette: List<Color>`), helper `personColor(index)`. Colore visibile in: card Dashboard, FilterChip, feed attività, lista Persone. Picker in PersonDetail (8 swatches circolari).

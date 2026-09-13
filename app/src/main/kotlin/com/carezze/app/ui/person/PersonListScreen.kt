@@ -190,9 +190,10 @@ private fun PersonItem(
             supportingContent = person.nickname?.let { { Text(it) } },
             leadingContent = {
                 Box(
-                    modifier = Modifier
-                        .size(16.dp)
-                        .background(personColor(colorIndex), CircleShape),
+                    modifier =
+                        Modifier
+                            .size(16.dp)
+                            .background(personColor(colorIndex), CircleShape),
                 )
             },
             trailingContent = {

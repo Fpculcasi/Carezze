@@ -78,7 +78,10 @@ class PersonViewModel
             viewModelScope.launch { deletePersonUseCase(personId) }
         }
 
-        fun setPersonColor(personId: String, colorIndex: Int) {
+        fun setPersonColor(
+            personId: String,
+            colorIndex: Int,
+        ) {
             viewModelScope.launch { setPersonColorUseCase(personId, colorIndex) }
         }
     }

@@ -1,5 +1,6 @@
 package com.fpculcasi.carezze.ui.dashboard
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -65,11 +67,15 @@ fun QuickLogSheet(
 ) {
     val state by viewModel.state.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) { viewModel.clearType() }
 
     LaunchedEffect(state.isSaved) {
-        if (state.isSaved) onDismiss()
+        if (state.isSaved) {
+            Toast.makeText(context, "Registrato", Toast.LENGTH_SHORT).show()
+            onDismiss()
+        }
     }
 
     ModalBottomSheet(

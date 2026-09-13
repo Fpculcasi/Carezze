@@ -163,9 +163,10 @@ internal fun DashboardContent(
             PersonSearchBar(
                 query = searchQuery,
                 onQueryChange = onSearchQueryChange,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
             )
             Spacer(Modifier.height(4.dp))
             if (viewMode == DashboardViewMode.CARD) {
@@ -218,9 +219,10 @@ private fun PersonFilterRow(
                 label = { Text(person.nickname ?: person.name) },
                 leadingIcon = {
                     Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(personColor(colorIndex), CircleShape),
+                        modifier =
+                            Modifier
+                                .size(8.dp)
+                                .background(personColor(colorIndex), CircleShape),
                     )
                 },
             )
@@ -250,12 +252,13 @@ private fun PersonSearchBar(
         },
         singleLine = true,
         shape = RoundedCornerShape(50),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-        ),
+        colors =
+            TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+            ),
     )
 }
 
@@ -346,9 +349,10 @@ private fun PersonCard(
                 },
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(personColor(colorIndex), CircleShape),
+                    modifier =
+                        Modifier
+                            .size(40.dp)
+                            .background(personColor(colorIndex), CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -428,9 +432,10 @@ private fun ActivityLogFeedItem(
             if (personName != null) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(personColor(personColorIndex), CircleShape),
+                        modifier =
+                            Modifier
+                                .size(8.dp)
+                                .background(personColor(personColorIndex), CircleShape),
                     )
                     Spacer(Modifier.size(4.dp))
                     Text("$personName · ${timeFormatter.format(log.timestamp)} ${dateFormatter.format(log.timestamp)}")

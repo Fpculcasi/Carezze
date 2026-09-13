@@ -16,6 +16,7 @@ data class Therapy(
     val endDate: LocalDate? = null,
     val members: Map<String, MemberRole>,
     val medications: List<Medication>,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED,
 ) {
     val status: TherapyStatus get() = if (isActive) TherapyStatus.ACTIVE else TherapyStatus.COMPLETED
 }
@@ -46,6 +47,7 @@ data class MedicationLog(
     val status: MedicationStatus,
     val loggedBy: String?,
     val isManual: Boolean = false,
+    val syncStatus: SyncStatus = SyncStatus.SYNCED,
 )
 
 enum class MedicationStatus { TAKEN, SKIPPED, PENDING }
