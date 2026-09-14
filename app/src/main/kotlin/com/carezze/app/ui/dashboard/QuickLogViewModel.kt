@@ -125,8 +125,16 @@ class QuickLogViewModel
             medicationId: String,
         ) {
             val uid = authRepository.currentUser?.id ?: return
-            viewModelScope.launch { addManualMedicationLog(personId, therapyId, medicationId, Instant.now(), uid) }
-            _state.update { it.copy(isSaved = true) }
+            viewModelScope.launch {
+                val result = addManualMedicationLog(personId, therapyId, medicationId, Instant.now(), uid)
+                _state.update {
+                    if (result.isSuccess) {
+                        it.copy(isSaved = true)
+                    } else {
+                        it.copy(error = result.exceptionOrNull()?.message)
+                    }
+                }
+            }
         }
 
         fun confirmScheduledDose(
@@ -135,16 +143,23 @@ class QuickLogViewModel
         ) {
             val uid = authRepository.currentUser?.id ?: return
             viewModelScope.launch {
-                logMedicationUseCase(
-                    personId = personId,
-                    therapyId = dose.therapyId,
-                    medicationId = dose.medicationId,
-                    scheduledTime = dose.scheduledTime,
-                    status = MedicationStatus.TAKEN,
-                    userId = uid,
-                )
+                val result =
+                    logMedicationUseCase(
+                        personId = personId,
+                        therapyId = dose.therapyId,
+                        medicationId = dose.medicationId,
+                        scheduledTime = dose.scheduledTime,
+                        status = MedicationStatus.TAKEN,
+                        userId = uid,
+                    )
+                _state.update {
+                    if (result.isSuccess) {
+                        it.copy(isSaved = true)
+                    } else {
+                        it.copy(error = result.exceptionOrNull()?.message)
+                    }
+                }
             }
-            _state.update { it.copy(isSaved = true) }
         }
 
         private fun loadTherapies(personId: String) {
