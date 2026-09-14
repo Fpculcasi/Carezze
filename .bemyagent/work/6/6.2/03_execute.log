@@ -1,0 +1,8 @@
+# EXECUTE — 6.2
+
+## 2026-09-14T07:29Z | Creazione `InvitationRepositoryImpl.kt`
+`InvitationRepositoryImpl` creato con `redeemInvitation` (Firestore transaction) + `validateInvitation` companion function; altri metodi `TODO()`.
+`FirestoreModule.kt` aggiornato con binding `InvitationRepository → InvitationRepositoryImpl`.
+`InvitationRepositoryImplRedeemTest.kt` creato con 3 test sulla companion function.
+**Result:** `compileDebugKotlin → BUILD SUCCESSFUL`; test XML: tests=3, failures=0
+**Next intended action:** VERIFY → scrittura 04_verify.md
