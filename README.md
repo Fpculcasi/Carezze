@@ -10,7 +10,7 @@ A mobile app for tracking medical therapies and neonatal parameters. Built for f
 
 My daughter was born. A few weeks in, my partner and I kept asking each other the same question at 2am: *"Did you already give her the drops?"*
 
-Lot of sticky notes all around the kitchen, and a forgot shared Google Sheet. Just two exhausted parents with two phones and zero coordination.
+Lot of sticky notes all around the kitchen, and a forgotten shared Google Sheet. Just two exhausted parents with two phones and zero coordination.
 
 Carezze is the app I wished I had. It tracks therapies (medications, schedules, progress) and neonatal parameters (feeds, diapers, sleep, temperature) across everyone caring for the same person — in real time, privately, and **without requiring an account**.
 
@@ -22,7 +22,7 @@ Carezze is the app I wished I had. It tracks therapies (medications, schedules, 
 You can use Carezze entirely offline, without signing up. Your data stays on your device. If you later decide to share with family or sync across devices, you register — and your existing data migrates automatically.
 
 ### Privacy by design
-- Data stored in **Europe (Firebase `europe-west12 (Turin)`)** — GDPR compliant
+- Data stored in **Europe (Firebase `europe-west1`)** — GDPR compliant
 - Sharing requires an **explicit single-use invite** (8-char code, 24h expiry)
 - Revoking access **deletes** the other user's contributed data
 - No analytics, no ads, no third-party data sharing
@@ -34,14 +34,17 @@ Every architectural decision is visible in the code and documented in commit his
 
 ## Features
 
-- **Therapy management** — define multi-drug therapies with automatic dose scheduling; track progress as a bar, calendar, and remaining-dose counter
-- **Activity logging** — meals (ml / minutes / grams), diapers, sleep intervals, temperature, weight, hygiene — all in 1 tap
+**Implemented (v1.x)**
+- **Therapy management** — define multi-drug therapies with automatic dose scheduling; track progress as a bar, calendar, and remaining-dose counter; edit, terminate (soft), or delete (hard with cascade)
+- **Activity logging** — meals (ml / minutes / grams), diapers, sleep intervals, temperature, weight, hygiene — all in 1 tap via Quick Log
+- **Dashboard** — card view per person + chronological feed; filter by person, search by name
 - **Real-time family sync** — Firestore snapshot listeners propagate every update across all shared devices instantly
-- **Medication confirmation** — when one family member marks a dose as taken, the notification dismisses on everyone's phone
-- **Inactivity alerts** — configurable alerts per activity type (e.g. "no feed logged in 4 hours")
-- **Home screen widgets** — therapy countdown, diaper quick-log, meal quick-log — without opening the app
+- **Offline first** — Room as local source of truth; writes are fire-and-forget with a pending indicator and silent 3-attempt retry
 - **Granular sharing** — share an entire person profile *or* just a single therapy (e.g. share the antibiotic schedule with the pediatrician, not the diaper log)
-- **Offline first** — works without a connection; syncs automatically when back online
+
+**Coming soon**
+- **Push notifications** — medication reminders, inactivity alerts, family confirmation that dismisses on everyone's phone
+- **Home screen widgets** — therapy countdown, diaper quick-log, meal quick-log — without opening the app
 - **Multilingual** — Italian and English, switchable in-app
 
 ---
@@ -56,14 +59,15 @@ Every architectural decision is visible in the code and documented in commit his
 | Local storage | Room (SQLite) |
 | Remote database | Cloud Firestore (offline-first) |
 | Authentication | Firebase Auth (Email, Google, Anonymous) |
-| Push notifications | Firebase Cloud Messaging |
-| Server-side logic | Firebase Cloud Functions (Node.js) |
+| Push notifications | Firebase Cloud Messaging (planned — M7) |
 | Dependency injection | Hilt |
 | Background sync | WorkManager |
-| Home screen widgets | Jetpack Glance |
-| Testing | JUnit 5 + MockK + Turbine |
-| CI/CD | GitHub Actions |
+| Home screen widgets | Jetpack Glance (planned — M8) |
+| Testing | JUnit 5 + MockK |
+| CI/CD | GitHub Actions + Firebase App Distribution |
 | Code quality | Detekt + Ktlint |
+
+> No Cloud Functions — the app runs on Firebase Spark plan. Invite validation uses a client-side Firestore transaction; on-device scheduling uses WorkManager.
 
 ---
 
@@ -85,9 +89,6 @@ Every architectural decision is visible in the code and documented in commit his
    Firebase Auth        Cloud Firestore
    (anonymous ok)       (europe-west1)
                               │
-                    Firebase Cloud Functions
-                    (notifications, invite validation)
-                              │
                     Firebase Cloud Messaging
                     (push to all shared devices)
 ```
@@ -107,7 +108,7 @@ persons/{personId}
 invitations/{inviteId}
 ```
 
-Sharing is enforced by a `members` map on each `persons` and `therapies` document. Firestore Security Rules ensure users can only read and write documents they are explicitly listed in. Invite redemption is handled by a Cloud Function (HTTPS callable) to guarantee atomicity — no client-side bypass is possible.
+Sharing is enforced by a `members` map and a `memberIds` array on each `persons` and `therapies` document. Firestore Security Rules ensure users can only read and write documents they are explicitly listed in. Invite redemption is a client-side Firestore transaction — atomically validated and single-use.
 
 ---
 
@@ -117,9 +118,9 @@ Sharing is enforced by a `members` map on each `persons` and `therapies` documen
 
 ### Prerequisites
 
-- Android Studio Hedgehog or later
+- Android Studio Ladybug or later
 - JDK 17+
-- A Firebase project on the Blaze plan (required for Cloud Functions)
+- A Firebase project (Spark plan is sufficient — no Cloud Functions required)
 
 ### Setup
 
@@ -130,14 +131,6 @@ cd carezze
 # Copy the Firebase config (obtain from Firebase Console)
 cp google-services.json.template app/google-services.json
 # Fill in your Firebase project values
-
-# Install Firebase CLI (for Cloud Functions)
-npm install -g firebase-tools
-firebase login
-
-# Deploy Cloud Functions
-cd functions && npm install && cd ..
-firebase deploy --only functions
 ```
 
 ### Run
@@ -147,7 +140,7 @@ Open the project in Android Studio and run the `app` configuration on a device o
 ### Test
 
 ```bash
-./gradlew test              # Unit tests
+./gradlew test              # Unit tests (JVM, no emulator needed)
 ./gradlew connectedTest     # Instrumented tests (requires emulator)
 ```
 
@@ -159,15 +152,14 @@ Open the project in Android Studio and run the `app` configuration on a device o
 carezze/
 ├── app/
 │   └── src/
-│       ├── main/java/com/carezze/
-│       │   ├── data/         # Repository implementations, Firestore, Room, FCM
+│       ├── main/kotlin/com/fpculcasi/carezze/
+│       │   ├── data/         # Repository implementations, Firestore, Room
 │       │   ├── domain/       # Models, Use Cases, Repository interfaces
 │       │   ├── ui/           # Compose screens and ViewModels
-│       │   └── widget/       # Glance widgets
+│       │   └── widget/       # Glance widgets (planned)
 │       └── test/ + androidTest/
-├── functions/                # Firebase Cloud Functions
 ├── firestore.rules           # Firestore Security Rules
-└── .github/workflows/        # GitHub Actions CI
+└── .github/workflows/        # GitHub Actions CI + Firebase App Distribution
 ```
 
 ---
@@ -188,6 +180,29 @@ AI agents working on this project use worktrees with branch naming `bma/X.Y` (on
 
 ---
 
+## Roadmap
+
+**v1.0**
+- [x] Project design and architecture
+- [x] Android project setup + CI/CD (GitHub Actions, Firebase App Distribution)
+- [x] Authentication — anonymous (no account needed), email/password, Google Sign-In, seamless data migration
+- [x] Person management — CRUD, real-time sync, color coding per person
+- [x] Therapy management — multi-drug schedules, progress tracking, edit / terminate / delete, manual dose log
+- [x] Activity logging and dashboard — all event types, Quick Log, 30-day history (list + calendar), offline-first with pending indicator
+- [ ] Family sharing and invitations — QR + 8-char code, single-use with 24h expiry, member management, revocation with cascade *(in progress)*
+- [ ] Push notifications (FCM) — medication reminders, inactivity alerts, family dose confirmation
+- [ ] Home screen widgets (Glance) — therapy countdown, diaper, meal
+- [ ] Italian / English localization
+
+**Future**
+- iOS support
+- Data export (PDF / CSV)
+- Dark mode
+- Onboarding wizard
+- Additional languages
+
+---
+
 ## Development Blog
 
 This project is documented publicly as it's built:
@@ -199,28 +214,6 @@ This project is documented publicly as it's built:
 | [#3 — Core Features](https://medium.com) | Therapies, neonatal logging, TDD in practice | planned |
 | [#4 — Sharing & Security](https://medium.com) | Real-time sync, invite system, Firestore rules | planned |
 | [#5 — Launch & Retrospective](https://medium.com) | Widgets, AI-assisted development, lessons learned | planned |
-
----
-
-## Roadmap
-
-**v1.0**
-- [x] Project design and architecture
-- [ ] Android project setup + CI/CD
-- [ ] Authentication (anonymous, email, Google)
-- [ ] Person and therapy management
-- [ ] Activity logging and dashboard
-- [ ] Family sharing and invitations
-- [ ] Push notifications (FCM)
-- [ ] Home screen widgets (Glance)
-- [ ] Italian / English localization
-
-**Future**
-- iOS support
-- Data export (PDF / CSV)
-- Dark mode
-- Onboarding wizard
-- Additional languages
 
 ---
 
