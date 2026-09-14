@@ -16,7 +16,7 @@ class RevokeAccessUseCaseTest {
     fun `returns success when access revoked`() =
         runTest {
             coEvery {
-                invitationRepository.revokeAccess("pid-1", InvitationType.PERSON, "uid-2")
+                invitationRepository.revokeAccess("pid-1", InvitationType.PERSON, "uid-2", null)
             } returns Result.success(Unit)
 
             val result = useCase("pid-1", InvitationType.PERSON, "uid-2")
@@ -28,7 +28,7 @@ class RevokeAccessUseCaseTest {
     fun `returns failure when revocation fails`() =
         runTest {
             coEvery {
-                invitationRepository.revokeAccess("pid-1", InvitationType.PERSON, "uid-2")
+                invitationRepository.revokeAccess("pid-1", InvitationType.PERSON, "uid-2", null)
             } returns Result.failure(Exception("permission denied"))
 
             val result = useCase("pid-1", InvitationType.PERSON, "uid-2")

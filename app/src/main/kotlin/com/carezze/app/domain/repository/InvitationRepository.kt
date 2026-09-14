@@ -25,5 +25,6 @@ interface InvitationRepository {
         targetId: String,
         type: InvitationType,
         memberUserId: String,
+        personId: String? = null,
     ): Result<Unit>
 }

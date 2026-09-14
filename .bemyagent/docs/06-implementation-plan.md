@@ -228,8 +228,8 @@ card and feed view. History shows 30 days in list or calendar mode.
 | Task | Descrizione | Status |
 |---|---|---|
 | 6.1 | Domain: `Invitation` model + `InvitationRepository` + Use Cases | done |
-| 6.2 | Firestore transaction: `redeemInvitation` (atomica lato client, single-use + scadenza) | todo |
-| 6.3 | Client-side cascade: `onMemberRevoked` (transazione revoca + cancellazione dati membro) | todo |
+| 6.2 | Firestore transaction: `redeemInvitation` (atomica lato client, single-use + scadenza) | done |
+| 6.3 | Client-side cascade: `onMemberRevoked` (transazione revoca + cancellazione dati membro) | done |
 | 6.4 | Data: `InvitationRepositoryImpl` (generazione codice + QR bitmap) | todo |
 | 6.5 | UI: Genera Invito (QR + codice testo, condivisibile via Intent) | todo |
 | 6.6 | UI: Riscatta Invito (scanner QR camera + input manuale) | todo |

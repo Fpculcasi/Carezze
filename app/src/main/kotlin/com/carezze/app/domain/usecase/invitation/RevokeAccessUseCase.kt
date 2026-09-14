@@ -13,5 +13,6 @@ class RevokeAccessUseCase
             targetId: String,
             type: InvitationType,
             memberUserId: String,
-        ): Result<Unit> = invitationRepository.revokeAccess(targetId, type, memberUserId)
+            personId: String? = null,
+        ): Result<Unit> = invitationRepository.revokeAccess(targetId, type, memberUserId, personId)
     }
