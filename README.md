@@ -1,4 +1,7 @@
+![Carezze logo](carezze-logo.png "Carezze")
+
 # Carezze
+[![Firebase App Distribution](https://github.com/Fpculcasi/Carezze/actions/workflows/firebase-distribute.yml/badge.svg)](https://github.com/Fpculcasi/Carezze/actions/workflows/firebase-distribute.yml)
 
 > *Carezze* means *caresses* in Italian — gentle, caring touches. It also starts with **Care**.
 
@@ -34,7 +37,7 @@ Every architectural decision is visible in the code and documented in commit his
 
 ## Features
 
-**Implemented (v1.x)**
+**Implemented (v.x)**
 - **Therapy management** — define multi-drug therapies with automatic dose scheduling; track progress as a bar, calendar, and remaining-dose counter; edit, terminate (soft), or delete (hard with cascade)
 - **Activity logging** — meals (ml / minutes / grams), diapers, sleep intervals, temperature, weight, hygiene — all in 1 tap via Quick Log
 - **Dashboard** — card view per person + chronological feed; filter by person, search by name
@@ -209,11 +212,11 @@ This project is documented publicly as it's built:
 
 | Post | Topic | Status |
 |---|---|---|
-| [#1 — The Idea](https://medium.com) | Why Carezze exists, the Firestore schema, architecture decisions | planned |
-| [#2 — Foundations](https://medium.com) | Firebase, offline-first, anonymous auth | planned |
-| [#3 — Core Features](https://medium.com) | Therapies, neonatal logging, TDD in practice | planned |
-| [#4 — Sharing & Security](https://medium.com) | Real-time sync, invite system, Firestore rules | planned |
-| [#5 — Launch & Retrospective](https://medium.com) | Widgets, AI-assisted development, lessons learned | planned |
+| [#1 — The Idea](https://medium.com/@fpculcasi/i-had-a-daughter-i-built-an-app-f8bc76cf78ad) | Why Carezze exists, the Firestore schema, architecture decisions | published |
+| #2 — Foundations | Firebase, offline-first, anonymous auth | planned |
+| #3 — Core Features | Therapies, neonatal logging, TDD in practice | planned |
+| #4 — Sharing & Security | Real-time sync, invite system, Firestore rules | planned |
+| #5 — Launch & Retrospective | Widgets, AI-assisted development, lessons learned | planned |
 
 ---
 
