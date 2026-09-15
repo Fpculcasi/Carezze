@@ -20,6 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,6 +60,8 @@ fun PersonDetailScreen(
     onNavigateBack: () -> Unit,
     onNavigateToAddTherapy: (String) -> Unit,
     onNavigateToTherapy: (personId: String, therapyId: String) -> Unit,
+    onNavigateToSharePerson: (personId: String, personName: String) -> Unit = { _, _ -> },
+    onNavigateToMembers: (personId: String) -> Unit = {},
     viewModel: PersonViewModel = hiltViewModel(),
     therapyViewModel: TherapyViewModel = hiltViewModel(),
 ) {
@@ -78,6 +82,8 @@ fun PersonDetailScreen(
         onSetPersonColor = { index -> viewModel.setPersonColor(personId, index) },
         onNavigateToAddTherapy = onNavigateToAddTherapy,
         onNavigateToTherapy = onNavigateToTherapy,
+        onNavigateToSharePerson = { onNavigateToSharePerson(personId, person?.name ?: "") },
+        onNavigateToMembers = { onNavigateToMembers(personId) },
     )
 }
 
@@ -93,6 +99,8 @@ internal fun PersonDetailContent(
     onSetPersonColor: (Int) -> Unit,
     onNavigateToAddTherapy: (String) -> Unit,
     onNavigateToTherapy: (personId: String, therapyId: String) -> Unit,
+    onNavigateToSharePerson: () -> Unit = {},
+    onNavigateToMembers: () -> Unit = {},
 ) {
     var showEditDialog by remember { mutableStateOf(false) }
     var editName by remember { mutableStateOf("") }
@@ -108,6 +116,12 @@ internal fun PersonDetailContent(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onNavigateToSharePerson) {
+                        Icon(Icons.Default.Share, contentDescription = "Condividi")
+                    }
+                    IconButton(onClick = onNavigateToMembers) {
+                        Icon(Icons.Default.Group, contentDescription = "Membri")
+                    }
                     IconButton(onClick = {
                         editName = person?.name ?: ""
                         editNickname = person?.nickname ?: ""

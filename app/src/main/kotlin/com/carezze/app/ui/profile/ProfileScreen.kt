@@ -41,6 +41,7 @@ import com.fpculcasi.carezze.ui.auth.AuthUiState
 fun ProfileScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToRegister: () -> Unit,
+    onNavigateToRedeemInvitation: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val authState by viewModel.authState.collectAsStateWithLifecycle()
@@ -66,6 +67,7 @@ fun ProfileScreen(
                     isAnonymous = false,
                     onSaveDisplayName = viewModel::updateDisplayName,
                     onSignOut = viewModel::signOut,
+                    onNavigateToRedeemInvitation = onNavigateToRedeemInvitation,
                 )
             }
 
@@ -116,6 +118,7 @@ private fun AuthenticatedProfileContent(
     isAnonymous: Boolean,
     onSaveDisplayName: (String) -> Unit,
     onSignOut: () -> Unit,
+    onNavigateToRedeemInvitation: () -> Unit = {},
 ) {
     var nameInput by remember(displayName) { mutableStateOf(displayName) }
 
@@ -175,6 +178,16 @@ private fun AuthenticatedProfileContent(
                     "Google"
                 },
         )
+
+        Spacer(Modifier.height(16.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(16.dp))
+        OutlinedButton(
+            onClick = onNavigateToRedeemInvitation,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text("Riscatta Invito")
+        }
 
         Spacer(Modifier.weight(1f))
         TextButton(

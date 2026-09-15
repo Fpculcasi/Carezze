@@ -223,19 +223,19 @@ card and feed view. History shows 30 days in list or calendar mode.
 ---
 
 ## Milestone 6 — Condivisione & Inviti
-**Goal**: Utente può condividere Persona o Terapia tramite QR/codice, revocare accesso | **Status**: in-progress
+**Goal**: Utente può condividere Persona o Terapia tramite QR/codice, revocare accesso | **Status**: done
 
 | Task | Descrizione | Status |
 |---|---|---|
 | 6.1 | Domain: `Invitation` model + `InvitationRepository` + Use Cases | done |
 | 6.2 | Firestore transaction: `redeemInvitation` (atomica lato client, single-use + scadenza) | done |
 | 6.3 | Client-side cascade: `onMemberRevoked` (transazione revoca + cancellazione dati membro) | done |
-| 6.4 | Data: `InvitationRepositoryImpl` (generazione codice + QR bitmap) | todo |
-| 6.5 | UI: Genera Invito (QR + codice testo, condivisibile via Intent) | todo |
-| 6.6 | UI: Riscatta Invito (scanner QR camera + input manuale) | todo |
-| 6.7 | UI: Gestione Membri (lista + revoca con dialog conferma) | todo |
-| 6.8 | Firestore Security Rules aggiornate per sharing granulare | todo |
-| 6.9 | Test: Cloud Functions (emulatore Firebase) | todo |
+| 6.4 | Data: `InvitationRepositoryImpl` (generazione codice + QR bitmap) | done |
+| 6.5 | UI: Genera Invito (QR + codice testo, condivisibile via Intent) | done |
+| 6.6 | UI: Riscatta Invito (input manuale; QR scanner rinviato — richiede CameraX + ML Kit) | done |
+| 6.7 | UI: Gestione Membri (lista + revoca con dialog conferma) | done |
+| 6.8 | Firestore Security Rules aggiornate per sharing granulare | done |
+| 6.9 | Test: `generateCode` + `validateRevokeArgs` (re-scoped da Cloud Functions a unit test JVM) | done |
 
 **Git commit message (proposta):**
 ```

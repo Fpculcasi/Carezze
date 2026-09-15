@@ -1,0 +1,1 @@
+2026-09-15 | ADR inconsistency | Aggiornato adr-invite-flow.md da Option B (Cloud Function) a Option A (client-side transaction) per allineamento a D-08/D-15 | PASS | grep "Opzione A" adr-invite-flow.md → trovato

@@ -38,6 +38,9 @@ import com.fpculcasi.carezze.ui.person.PersonDetailScreen
 import com.fpculcasi.carezze.ui.person.PersonListScreen
 import com.fpculcasi.carezze.ui.profile.ProfileScreen
 import com.fpculcasi.carezze.ui.settings.SettingsScreen
+import com.fpculcasi.carezze.ui.invitation.GenerateInvitationScreen
+import com.fpculcasi.carezze.ui.invitation.MembersScreen
+import com.fpculcasi.carezze.ui.invitation.RedeemInvitationScreen
 import com.fpculcasi.carezze.ui.therapy.AddTherapyScreen
 import com.fpculcasi.carezze.ui.therapy.EditTherapyScreen
 import com.fpculcasi.carezze.ui.therapy.TherapyDetailScreen
@@ -81,6 +84,12 @@ import kotlinx.serialization.Serializable
 @Serializable data class HistoryList(val personId: String)
 
 @Serializable data class HistoryCalendar(val personId: String)
+
+@Serializable data class GenerateInvitation(val personId: String, val personName: String)
+
+@Serializable object RedeemInvitation
+
+@Serializable data class Members(val personId: String)
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Bottom navigation bar tab model
@@ -290,6 +299,7 @@ fun MainScreen(
                 ProfileScreen(
                     onNavigateToLogin = onNavigateToLogin,
                     onNavigateToRegister = onNavigateToRegister,
+                    onNavigateToRedeemInvitation = { navController.navigate(RedeemInvitation) },
                 )
             }
 
@@ -312,6 +322,28 @@ fun MainScreen(
                     onNavigateToTherapy = { pid, tid ->
                         navController.navigate(TherapyDetail(pid, tid))
                     },
+                    onNavigateToSharePerson = { pid, pname ->
+                        navController.navigate(GenerateInvitation(pid, pname))
+                    },
+                    onNavigateToMembers = { pid ->
+                        navController.navigate(Members(pid))
+                    },
+                )
+            }
+
+            composable<GenerateInvitation> {
+                GenerateInvitationScreen(onNavigateBack = { navController.popBackStack() })
+            }
+
+            composable<RedeemInvitation> {
+                RedeemInvitationScreen(onNavigateBack = { navController.popBackStack() })
+            }
+
+            composable<Members> { backStackEntry ->
+                val route = backStackEntry.toRoute<Members>()
+                MembersScreen(
+                    personId = route.personId,
+                    onNavigateBack = { navController.popBackStack() },
                 )
             }
 

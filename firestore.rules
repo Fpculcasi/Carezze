@@ -10,6 +10,16 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    function isPersonMember(personId) {
+      return request.auth.uid in
+        get(/databases/$(database)/documents/persons/$(personId)).data.memberIds;
+    }
+
+    function isTherapyMember(personId, therapyId) {
+      return request.auth.uid in
+        get(/databases/$(database)/documents/persons/$(personId)/therapies/$(therapyId)).data.memberIds;
+    }
+
     match /users/{userId} {
       allow read, write: if isOwner(userId);
     }
@@ -21,45 +31,68 @@ service cloud.firestore {
                        request.auth.uid == request.resource.data.createdBy &&
                        request.resource.data.members[request.auth.uid] == 'OWNER';
       allow update: if isAuthenticated() &&
-                       request.auth.uid in resource.data.members;
+                       request.auth.uid in resource.data.memberIds;
       allow delete: if isAuthenticated() &&
                        resource.data.members[request.auth.uid] == 'OWNER';
 
       match /therapies/{therapyId} {
-        // Person members can create/read/update therapies; therapy owners can delete
+        // Create: person member who will own the therapy
         allow create: if isAuthenticated() &&
-                         request.auth.uid in
-                           get(/databases/$(database)/documents/persons/$(personId)).data.memberIds &&
+                         isPersonMember(personId) &&
                          request.resource.data.members[request.auth.uid] == 'OWNER';
-        allow read: if isAuthenticated() &&
-                       request.auth.uid in
-                         get(/databases/$(database)/documents/persons/$(personId)).data.memberIds;
-        allow update: if isAuthenticated() &&
-                         request.auth.uid in
-                           get(/databases/$(database)/documents/persons/$(personId)).data.memberIds;
+
+        // Read/update: person member OR therapy-level member (M6 — therapy-level sharing)
+        allow read: if isAuthenticated() && (
+                       isPersonMember(personId) ||
+                       request.auth.uid in resource.data.memberIds
+                    );
+        allow update: if isAuthenticated() && (
+                         isPersonMember(personId) ||
+                         request.auth.uid in resource.data.memberIds
+                      );
         allow delete: if isAuthenticated() &&
                          resource.data.members[request.auth.uid] == 'OWNER';
 
         match /medicationLogs/{logId} {
-          allow read, create, update: if isAuthenticated() &&
-                                         request.auth.uid in
-                                           get(/databases/$(database)/documents/persons/$(personId)/therapies/$(therapyId)).data.memberIds;
+          // Read/create/update: person member OR therapy member (M6 — 2 get() per op, acceptable volume)
+          allow read, create, update: if isAuthenticated() && (
+                                         isPersonMember(personId) ||
+                                         isTherapyMember(personId, therapyId)
+                                      );
           allow delete: if isAuthenticated() &&
-                           get(/databases/$(database)/documents/persons/$(personId)/therapies/$(therapyId)).data.members[request.auth.uid] == 'OWNER';
+                           get(/databases/$(database)/documents/persons/$(personId)/therapies/$(therapyId))
+                             .data.members[request.auth.uid] == 'OWNER';
         }
       }
 
       match /activityLogs/{logId} {
-        allow read, write: if isAuthenticated() &&
-                              request.auth.uid in
-                                get(/databases/$(database)/documents/persons/$(personId)).data.memberIds;
+        allow read, write: if isAuthenticated() && isPersonMember(personId);
       }
     }
 
-    // Invitations — TODO(M6): restrict creation to person owner
+    // Invitations
     match /invitations/{invitationId} {
+      // Any authenticated user can read (needed to query by code for redemption)
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+
+      // Create: must be OWNER of the target person or therapy
+      allow create: if isAuthenticated() &&
+        request.resource.data.createdBy == request.auth.uid && (
+          (request.resource.data.type == 'PERSON' &&
+           get(/databases/$(database)/documents/persons/$(request.resource.data.targetId))
+             .data.members[request.auth.uid] == 'OWNER') ||
+          (request.resource.data.type == 'THERAPY' &&
+           get(/databases/$(database)/documents/persons/$(request.resource.data.personId)/therapies/$(request.resource.data.targetId))
+             .data.members[request.auth.uid] == 'OWNER')
+        );
+
+      // Update: any authenticated user can mark as used (redeemInvitation transaction)
+      allow update: if isAuthenticated() &&
+        resource.data.used == false &&
+        request.resource.data.used == true &&
+        request.resource.data.usedBy == request.auth.uid;
+
+      allow delete: if false;
     }
 
     match /{document=**} {

@@ -13,19 +13,22 @@ L'app permette di condividere Persone e Terapie con altri utenti tramite un codi
 | **C) Firestore Security Rules pure** (rules controllano l'invito al momento della write) | No Cloud Functions | Rules molto complesse, difficili da testare, rischio regressioni |
 
 ## Decision
-**Opzione B** — Cloud Function HTTPS callable `redeemInvitation`.
+**Opzione A** — Firestore transaction client-side (vedi D-08, D-15).
 
-La Function esegue una transaction Firestore che:
-1. Legge il documento `/invitations/{code}` 
-2. Verifica: non scaduto, non usato, codice corretto
-3. Aggiunge `userId` come `editor` nel documento `persons/{id}` o `therapies/{id}`
-4. Aggiorna `users/{userId}.personAccess` o `therapyAccess` (indice denormalizzato)
-5. Marca `invitations/{id}.used = true`
+~~Opzione B (Cloud Function) era il piano originale ma è stata scartata in D-15 (Firebase Spark plan + preferenza architetturale per zero server-side logic).~~
 
-Tutto atomicamente — se uno step fallisce, nessuna modifica viene applicata.
+La transaction `redeemInvitation` eseguita nel client:
+1. Legge il documento `/invitations/{code}` (query per codice, poi fetch)
+2. Verifica: `used=false` + `expiresAt > now()`
+3. Scrive in un'unica transaction Firestore:
+   - `invitations/{id}`: `used=true`, `usedBy`, `usedAt`
+   - `persons/{id}` o `therapies/{id}`: `memberIds` arrayUnion, `members.{uid}="EDITOR"`
+4. Le Security Rules bloccano write non autorizzate come secondo livello di difesa
+
+`revokeAccess` è analogamente client-side: transaction Firestore per rimuovere il membro + batch delete dei log.
 
 ## Consequences
-- **Positivo**: Nessuna race condition; sicurezza garantita server-side; facile da testare con Firebase Emulator
-- **Positivo**: La Function può aggiungere in futuro logica (es. notifica al creatore che qualcuno ha accettato)
-- **Negativo**: Richiede Firebase Blaze (pay-as-you-go); costo trascurabile per il volume atteso
-- **Negativo**: La Function deve essere deployata e monitorata; aggiunge dipendenza infrastrutturale
+- **Positivo**: Piano Firebase Spark (gratuito); zero cold start; funziona offline (la transaction viene re-tentata)
+- **Positivo**: Nessuna infrastruttura da deployare; architettura più portabile
+- **Negativo**: Race condition teorica se due client riscattano lo stesso codice nello stesso ms — Firestore transaction serializza le write, quindi la seconda fallisce con errore (comportamento corretto)
+- **Negativo**: La logica di validazione è nel client — le Security Rules devono essere rigorose per compensare

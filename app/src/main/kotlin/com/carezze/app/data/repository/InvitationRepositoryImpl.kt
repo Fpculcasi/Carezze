@@ -7,7 +7,9 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Transaction
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import java.time.Instant
 import javax.inject.Inject
@@ -21,7 +23,22 @@ class InvitationRepositoryImpl
     ) : InvitationRepository {
         private fun invitationsCollection() = firestore.collection("invitations")
 
-        override fun observeInvitations(userId: String): Flow<List<Invitation>> = TODO("Implemented in 6.4")
+        override fun observeInvitations(userId: String): Flow<List<Invitation>> =
+            callbackFlow {
+                val registration =
+                    invitationsCollection()
+                        .whereEqualTo("createdBy", userId)
+                        .addSnapshotListener { snapshot, error ->
+                            if (error != null) {
+                                close(error)
+                                return@addSnapshotListener
+                            }
+                            val invitations =
+                                snapshot?.documents?.mapNotNull { it.toInvitation() } ?: emptyList()
+                            trySend(invitations)
+                        }
+                awaitClose { registration.remove() }
+            }
 
         override suspend fun generateInvitation(
             type: InvitationType,
@@ -30,7 +47,44 @@ class InvitationRepositoryImpl
             userId: String,
             userName: String,
             targetName: String,
-        ): Result<Invitation> = TODO("Implemented in 6.4")
+        ): Result<Invitation> =
+            runCatching {
+                val code = generateCode()
+                val now = Instant.now()
+                val expiresAt = now.plusSeconds(24 * 3600)
+
+                val data =
+                    mutableMapOf(
+                        "type" to type.name,
+                        "targetId" to targetId,
+                        "targetName" to targetName,
+                        "createdBy" to userId,
+                        "createdByName" to userName,
+                        "code" to code,
+                        "expiresAt" to com.google.firebase.Timestamp(expiresAt.epochSecond, expiresAt.nano),
+                        "used" to false,
+                        "usedBy" to null,
+                        "usedAt" to null,
+                        "createdAt" to FieldValue.serverTimestamp(),
+                    )
+                if (personId != null) data["personId"] = personId
+
+                val docRef = invitationsCollection().add(data).await()
+                Invitation(
+                    id = docRef.id,
+                    type = type,
+                    targetId = targetId,
+                    personId = personId,
+                    targetName = targetName,
+                    createdBy = userId,
+                    createdByName = userName,
+                    code = code,
+                    expiresAt = expiresAt,
+                    used = false,
+                    usedBy = null,
+                    usedAt = null,
+                )
+            }
 
         override suspend fun redeemInvitation(
             code: String,
@@ -218,6 +272,11 @@ class InvitationRepositoryImpl
         }
 
         companion object {
+            private val CODE_CHARS = (('A'..'Z') + ('0'..'9')).toList()
+
+            internal fun generateCode(): String =
+                (1..8).map { CODE_CHARS.random() }.joinToString("")
+
             internal fun validateRevokeArgs(
                 type: InvitationType,
                 personId: String?,

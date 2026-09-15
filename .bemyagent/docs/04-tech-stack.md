@@ -10,7 +10,7 @@
 | **Credential Manager** | `1.3.0` | Google Sign-In moderno | `androidx.credentials` + `credentials-play-services-auth` + `googleid:1.1.1`; sostituisce il deprecato `GoogleSignInClient` |
 | **Cloud Firestore** | latest | Database real-time | Offline-first nativo, snapshot listeners, scalabilità orizzontale |
 | **Firebase Cloud Messaging** | latest | Push notifications | Integrato con Firebase, delivery garantito, supporto multi-device |
-| **Firebase Cloud Functions** | Node.js 20 | Logica server-side | Scheduling notifiche, validazione inviti atomica, no server da gestire |
+| **ZXing Core** | 3.5.3 | Generazione QR bitmap | Libreria pura Java, converte codice invito in `BitMatrix` → `Bitmap` |
 | **Hilt** | 2.x | Dependency Injection | Standard Android DI, integrato con Compose + ViewModel |
 | **Room** | 2.x | Cache locale SQLite | Offline-first: source of truth locale, query tipizzate, migration support |
 | **WorkManager** | 2.x | Sync in background | Sincronizzazione Room ↔ Firestore garantita anche dopo reboot |
@@ -44,16 +44,14 @@
 |---|---|---|
 | Firebase Auth | Autenticazione utenti | `google-services.json` |
 | Cloud Firestore | Database | Progetto: `carezze-5a3b0` (placeholder) |
-| Firebase Cloud Messaging | Notifiche push | Server key in Cloud Functions env |
-| Firebase Cloud Functions | Logica server | Deploy con `firebase deploy --only functions` |
+| Firebase Cloud Messaging | Notifiche push | Token salvati in `users/{id}.fcmTokens` |
 
 ## Infrastruttura
 
 | Risorsa | Dettaglio |
 |---|---|
-| Firebase Piano | Blaze (pay-as-you-go) — richiesto per Cloud Functions |
+| Firebase Piano | Spark (gratuito) — Zero Cloud Functions (vedi D-15) |
 | Regioni Firestore | `europe-west1` (GDPR compliance) |
-| Regioni Functions | `europe-west1` |
 | Android minSdk | 26 (Android 8.0) — copre > 95% dispositivi attivi |
 | Android targetSdk | 35 (Android 15) |
 | Android compileSdk | 35 |

@@ -23,7 +23,8 @@
 | **M4 total** | **17** | **0** | all therapy use cases + schedule logic |
 
 | M6 (sharing) — task 6.1 | 8 (Generate × 2, Redeem × 2, RevokeAccess × 2, ObserveInvitations × 2) | 0 | domain/usecase/invitation |
-| **M6 total (parziale)** | **8** | **0** | invitation use cases |
+| M6 (sharing) — task 6.9 | 6 (generateCode × 2, validateRevokeArgs × 3, repeated uniqueness × 1) | 0 | data/repository/InvitationRepositoryImpl |
+| **M6 total** | **14** | **0** | invitation use cases + repository helpers |
 
 > Aggiornare dopo ogni milestone. Target: ≥ 80% su domain + data layer.
 
@@ -47,8 +48,9 @@
 | Modifica Terapia | `ui/therapy/EditTherapyScreen.kt` ✅ | No | Wizard 2-step pre-popolato; salva via `UpdateTherapyUseCase` |
 | Storico Lista | `ui/history/HistoryListScreen.kt` | No | Feed cronologico filtrato |
 | Storico Calendario | `ui/history/HistoryCalendarScreen.kt` | No | Vista mensile + dettaglio giorno |
-| Genera Invito | `ui/invitation/GenerateInvitationScreen.kt` | Sì | QR + codice testo |
-| Riscatta Invito | `ui/invitation/RedeemInvitationScreen.kt` | No | Scanner QR o input manuale |
+| Genera Invito | `ui/invitation/GenerateInvitationScreen.kt` ✅ | Sì | QR bitmap + codice testo + "Condividi" Intent |
+| Riscatta Invito | `ui/invitation/RedeemInvitationScreen.kt` ✅ | No | Input manuale 8-char; QR scanner rinviato (M6 backlog) |
+| Gestione Membri | `ui/invitation/MembersScreen.kt` ✅ | Sì | Lista membri + "Revoca" per EDITOR con dialog conferma |
 | Impostazioni | `ui/settings/SettingsScreen.kt` ✅ | No | Lingua, unità temperatura, quiet hours (Account/notifiche: M7) |
 
 ## Use Cases (Domain)
@@ -75,6 +77,12 @@
 | `SetPersonColorUseCase` | `personId, colorIndex: Int` | salva indice in `PersonColorStore` |
 | `ObserveActivityLogsUseCase` | `personId, DateRange` | `Flow<List<ActivityLog>>` |
 | `ObservePendingDosesUseCase` | `userId` | `Flow<List<PendingDose>>` per widget |
+
+## Utility Data Layer
+
+| Classe | File | Funzione |
+|---|---|---|
+| `QrCodeGenerator` | `data/util/QrCodeGenerator.kt` | Converte stringa codice in `Bitmap` via ZXing `QRCodeWriter`; `@Singleton` Hilt; `fun generate(content, size=512): Bitmap` |
 
 ## Dati Locali (DataStore)
 

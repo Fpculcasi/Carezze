@@ -124,6 +124,7 @@ dependencies {
 
     // Coil
     implementation(libs.coil.compose)
+    implementation(libs.zxing.core)
 
     // Unit tests
     testImplementation(libs.junit5.api)
