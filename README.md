@@ -11,11 +11,13 @@ A mobile app for tracking medical therapies and neonatal parameters. Built for f
 
 ## Why This Exists
 
-My daughter was born. A few weeks in, my partner and I kept asking each other the same question at 2am: *"Did you already give her the drops?"*
+My daughter stopped breathing a few weeks after birth. We went to the emergency room in the middle of the night. She was admitted. The next morning, still in the hospital, doctors suggested a polysomnography to understand what had happened.
 
-Lot of sticky notes all around the kitchen, and a forgotten shared Google Sheet. Just two exhausted parents with two phones and zero coordination.
+While we waited, they asked us: when did she last eat? How long had she been sleeping? Had she had any other episodes?
 
-Carezze is the app I wished I had. It tracks therapies (medications, schedules, progress) and neonatal parameters (feeds, diapers, sleep, temperature) across everyone caring for the same person — in real time, privately, and **without requiring an account**.
+We had sticky notes in the kitchen and a Google Sheet we'd started and abandoned. We didn't have a clean log of the past 48 hours.
+
+Carezze is the app I wished I had that night. It tracks therapies (medications, schedules, progress) and neonatal parameters (feeds, diapers, sleep, temperature) across everyone caring for the same person — in real time, privately, and **without requiring an account**.
 
 ---
 
