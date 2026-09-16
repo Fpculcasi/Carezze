@@ -68,7 +68,7 @@ internal fun WelcomeContent(
     ) {
         Spacer(modifier = Modifier.weight(1f))
 
-        Image(painter = painterResource(R.mipmap.ic_launcher), contentDescription = "logo")
+        Image(painter = painterResource(R.mipmap.ic_launcher_foreground), contentDescription = "logo")
 
         Spacer(modifier = Modifier.height(8.dp))
 

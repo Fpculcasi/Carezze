@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
+import androidx.compose.ui.res.painterResource
+import com.fpculcasi.carezze.R
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,17 +27,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.fpculcasi.carezze.BuildConfig
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 
 @Composable
@@ -46,6 +49,7 @@ fun LoginScreen(
 ) {
     val authState by viewModel.authState.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
+    val passwordVisible by viewModel.passwordVisible.collectAsStateWithLifecycle()
 
     LaunchedEffect(authState) {
         when (authState) {
@@ -56,6 +60,8 @@ fun LoginScreen(
 
     LoginContent(
         errorMessage = errorMessage,
+        passwordVisible = passwordVisible,
+        onTogglePasswordVisible = viewModel::togglePasswordVisible,
         onLogin = viewModel::signIn,
         onClearError = viewModel::clearError,
         onNavigateToRegister = onNavigateToRegister,
@@ -68,12 +74,15 @@ fun LoginScreen(
 @Composable
 internal fun LoginContent(
     errorMessage: String?,
+    passwordVisible: Boolean,
+    onTogglePasswordVisible: () -> Unit,
     onLogin: (email: String, password: String) -> Unit,
     onClearError: () -> Unit,
     onNavigateToRegister: () -> Unit,
     onNavigateBack: () -> Unit,
     onGoogleSignIn: (String) -> Unit,
-) {
+
+    ) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
 
@@ -90,11 +99,10 @@ internal fun LoginContent(
         },
     ) { padding ->
         Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(horizontal = 24.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Spacer(modifier = Modifier.height(24.dp))
@@ -119,10 +127,17 @@ internal fun LoginContent(
                 },
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true,
-            )
+                trailingIcon = {
+                    val icon = if (passwordVisible) R.drawable.ic_visibility else R.drawable.ic_visibility_off
+                    val description = if (passwordVisible) "Hide password" else "Show password"
+
+                    IconButton(onClick = { onTogglePasswordVisible() }) {
+                        Icon(painter = painterResource(icon), contentDescription = description)
+                    }
+                })
 
             if (errorMessage != null) {
                 Text(
@@ -160,12 +175,13 @@ private fun LoginContentPreview() {
     CarezzeTheme {
         LoginContent(
             errorMessage = null,
+            passwordVisible = false,
+            onTogglePasswordVisible = {},
             onLogin = { _, _ -> },
             onClearError = {},
             onNavigateToRegister = {},
             onNavigateBack = {},
-            onGoogleSignIn = {},
-        )
+        ) {}
     }
 }
 
@@ -175,11 +191,12 @@ private fun LoginContentErrorPreview() {
     CarezzeTheme {
         LoginContent(
             errorMessage = "Email o password errati",
+            passwordVisible = false,
+            onTogglePasswordVisible = {},
             onLogin = { _, _ -> },
             onClearError = {},
             onNavigateToRegister = {},
             onNavigateBack = {},
-            onGoogleSignIn = {},
-        )
+        ) {}
     }
 }

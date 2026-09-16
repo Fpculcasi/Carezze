@@ -27,12 +27,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fpculcasi.carezze.R
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 
 @Composable
@@ -44,6 +47,8 @@ fun RegisterScreen(
 ) {
     val authState by viewModel.authState.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
+    val passwordVisible by viewModel.passwordVisible.collectAsStateWithLifecycle()
+    val confirmPasswordVisible by viewModel.confirmPasswordVisible.collectAsStateWithLifecycle()
 
     LaunchedEffect(authState) {
         when (authState) {
@@ -54,6 +59,10 @@ fun RegisterScreen(
 
     RegisterContent(
         errorMessage = errorMessage,
+        passwordVisible = passwordVisible,
+        onTogglePasswordVisible = viewModel::togglePasswordVisible,
+        confirmPasswordVisible = confirmPasswordVisible,
+        onToggleConfirmPasswordVisible = viewModel::toggleConfirmPasswordVisible,
         onRegister = viewModel::registerOrLink,
         onClearError = viewModel::clearError,
         onNavigateToLogin = onNavigateToLogin,
@@ -65,6 +74,10 @@ fun RegisterScreen(
 @Composable
 internal fun RegisterContent(
     errorMessage: String?,
+    passwordVisible: Boolean,
+    onTogglePasswordVisible: () -> Unit,
+    confirmPasswordVisible: Boolean,
+    onToggleConfirmPasswordVisible: () -> Unit,
     onRegister: (email: String, password: String) -> Unit,
     onClearError: () -> Unit,
     onNavigateToLogin: () -> Unit,
@@ -118,9 +131,17 @@ internal fun RegisterContent(
                 },
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true,
+                trailingIcon = {
+                    val icon = if (passwordVisible) R.drawable.ic_visibility else R.drawable.ic_visibility_off
+                    val description = if (passwordVisible) "Hide password" else "Show password"
+
+                    IconButton(onClick = { onTogglePasswordVisible() }) {
+                        Icon(painter = painterResource(icon), contentDescription = description)
+                    }
+                }
             )
 
             OutlinedTextField(
@@ -128,16 +149,24 @@ internal fun RegisterContent(
                 onValueChange = { confirmPassword = it },
                 label = { Text("Conferma password") },
                 modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                singleLine = true,
+                trailingIcon = {
+                    val icon = if (confirmPasswordVisible) R.drawable.ic_visibility else R.drawable.ic_visibility_off
+                    val description = if (confirmPasswordVisible) "Hide password" else "Show password"
+
+                    IconButton(onClick = { onToggleConfirmPasswordVisible() }) {
+                        Icon(painter = painterResource(icon), contentDescription = description)
+                    }
+                },
                 isError = passwordMismatch,
                 supportingText =
                     if (passwordMismatch) {
                         { Text("Le password non corrispondono") }
                     } else {
                         null
-                    },
-                singleLine = true,
+                    }
             )
 
             if (errorMessage != null) {
@@ -171,11 +200,14 @@ private fun RegisterContentPreview() {
     CarezzeTheme {
         RegisterContent(
             errorMessage = null,
+            passwordVisible = false,
+            onTogglePasswordVisible = {},
+            confirmPasswordVisible = false,
+            onToggleConfirmPasswordVisible = {},
             onRegister = { _, _ -> },
             onClearError = {},
             onNavigateToLogin = {},
-            onNavigateBack = {},
-        )
+        ) {}
     }
 }
 
@@ -185,10 +217,13 @@ private fun RegisterContentErrorPreview() {
     CarezzeTheme {
         RegisterContent(
             errorMessage = "Indirizzo email già in uso",
+            passwordVisible = true,
+            onTogglePasswordVisible = {},
+            confirmPasswordVisible = true,
+            onToggleConfirmPasswordVisible = {},
             onRegister = { _, _ -> },
             onClearError = {},
             onNavigateToLogin = {},
-            onNavigateBack = {},
-        )
+        ) {}
     }
 }

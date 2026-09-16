@@ -31,10 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fpculcasi.carezze.ui.auth.AuthUiState
+import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,7 +85,9 @@ private fun AnonymousProfileContent(
     onNavigateToRegister: () -> Unit,
 ) {
     Column(
-        modifier = modifier.fillMaxSize().padding(32.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(32.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -123,7 +127,9 @@ private fun AuthenticatedProfileContent(
     var nameInput by remember(displayName) { mutableStateOf(displayName) }
 
     Column(
-        modifier = modifier.fillMaxSize().padding(24.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(16.dp))
@@ -208,5 +214,43 @@ private fun ProfileInfoRow(
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(value, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, name = "Profilo — Ospite")
+@Composable
+private fun PreviewAnonymousProfile() {
+    CarezzeTheme {
+        Scaffold(
+            topBar = { TopAppBar(title = { Text("Profilo") }) },
+        ) { padding ->
+            AnonymousProfileContent(
+                modifier = Modifier.padding(padding),
+                onNavigateToLogin = {},
+                onNavigateToRegister = {},
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, name = "Profilo — Autenticato")
+@Composable
+private fun PreviewAuthenticatedProfile() {
+    CarezzeTheme {
+        Scaffold(
+            topBar = { TopAppBar(title = { Text("Profilo") }) },
+        ) { padding ->
+            AuthenticatedProfileContent(
+                modifier = Modifier.padding(padding),
+                displayName = "Mario Rossi",
+                email = "mario.rossi@example.com",
+                isAnonymous = false,
+                onSaveDisplayName = {},
+                onSignOut = {},
+                onNavigateToRedeemInvitation = {},
+            )
+        }
     }
 }
