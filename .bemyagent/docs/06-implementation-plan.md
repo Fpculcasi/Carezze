@@ -248,17 +248,17 @@ atomically. Revocation cascades to delete shared member's data.
 ---
 
 ## Milestone 7 — Notifiche FCM
-**Goal**: Notifiche push per terapie, inattività e conferma familiare | **Status**: next
+**Goal**: Notifiche push per terapie, inattività e conferma familiare | **Status**: done (7.6 deferred — no Cloud Functions)
 
 | Task | Descrizione | Status |
 |---|---|---|
-| 7.1 | FCM token management: salvataggio + refresh in `users/{id}.fcmTokens` | todo |
-| 7.2 | WorkManager: `MedicationReminderWorker` (periodic, dosi imminenti on-device) | todo |
-| 7.3 | WorkManager: `InactivityCheckWorker` (periodic 30min, soglia configurabile per tipo) | todo |
-| 7.4 | FCM Service Android: routing notifiche → deep link schermata corretta | todo |
-| 7.5 | Conferma familiare: tap "Preso" → update `MedicationLog` → dismiss notifica tutti | todo |
-| 7.6 | Rispetto quiet hours: Cloud Function legge `quietHoursStart/End` utente | todo |
-| 7.7 | Test: logica scheduling (unit) + FCM service (integration) | todo |
+| 7.1 | FCM token management: salvataggio + refresh in `users/{id}.fcmTokens` | done |
+| 7.2 | WorkManager: `MedicationReminderWorker` (periodic, dosi imminenti on-device) | done |
+| 7.3 | WorkManager: `InactivityCheckWorker` (periodic 30min, soglia configurabile per tipo) | done |
+| 7.4 | FCM Service Android: routing notifiche → deep link schermata corretta | done (navigazione profonda stub — TODO M9 polish) |
+| 7.5 | Conferma familiare: tap "Preso" → update `MedicationLog` → dismiss notifica tutti | done (dismiss locale; multi-device via FCM gestito da 7.6) |
+| 7.6 | Rispetto quiet hours: Cloud Function legge `quietHoursStart/End` utente | deferred (Firebase Functions non utilizzato — quiet hours rispettate solo lato Worker on-device in futuro) |
+| 7.7 | Test: logica scheduling (unit) + FCM service (integration) | done (8 unit test su computeDueDoses; FCM service integration test rinviato — richiede emulatore) |
 
 **Git commit message (proposta):**
 ```

@@ -23,6 +23,15 @@ interface ActivityLogDao {
         toEpoch: Long,
     ): Flow<List<ActivityLogEntity>>
 
+    @Query("SELECT DISTINCT personId FROM activity_logs WHERE timestampEpochSecond >= :since")
+    suspend fun getDistinctPersonIds(since: Long): List<String>
+
+    @Query(
+        "SELECT * FROM activity_logs WHERE personId = :personId AND type = :type " +
+            "ORDER BY timestampEpochSecond DESC LIMIT 1",
+    )
+    suspend fun getLastLogByType(personId: String, type: String): ActivityLogEntity?
+
     @Query("UPDATE activity_logs SET syncStatus = :status WHERE id = :id")
     suspend fun updateSyncStatus(
         id: String,

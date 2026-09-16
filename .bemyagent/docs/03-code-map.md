@@ -26,6 +26,9 @@
 | M6 (sharing) — task 6.9 | 6 (generateCode × 2, validateRevokeArgs × 3, repeated uniqueness × 1) | 0 | data/repository/InvitationRepositoryImpl |
 | **M6 total** | **14** | **0** | invitation use cases + repository helpers |
 
+| M7 (notifications) — task 7.7 | 8 (computeDueDoses × 8) | 0 | data/worker/MedicationReminderWorker |
+| **M7 total** | **8** | **0** | scheduling window logic |
+
 > Aggiornare dopo ogni milestone. Target: ≥ 80% su domain + data layer.
 
 ## Navigazione / Schermate
@@ -102,9 +105,25 @@
 
 | DAO | File | Operazioni |
 |---|---|---|
-| `ActivityLogDao` | `data/local/db/dao/` | `upsert`, `observe(personId, from, to): Flow`, `updateSyncStatus` |
-| `TherapyDao` | `data/local/db/dao/` | `upsert`, `observe(personId): Flow`, `updateSyncStatus` |
-| `MedicationLogDao` | `data/local/db/dao/` | `upsert`, `observe(personId, therapyId): Flow`, `updateSyncStatus` |
+| `ActivityLogDao` | `data/local/db/dao/` | `upsert`, `observe(personId, from, to): Flow`, `updateSyncStatus`, `getDistinctPersonIds(since)`, `getLastLogByType(personId, type)` |
+| `TherapyDao` | `data/local/db/dao/` | `upsert`, `observe(personId): Flow`, `updateSyncStatus`, `getActiveTherapies(): List<TherapyEntity>` |
+| `MedicationLogDao` | `data/local/db/dao/` | `upsert`, `observe(personId, therapyId): Flow`, `updateSyncStatus`, `getConfirmedLogsInWindow(therapyId, medicationId, from, to)` |
+
+## Notifiche & WorkManager (M7)
+
+| Classe | File | Funzione |
+|---|---|---|
+| `MedicationReminderWorker` | `data/worker/MedicationReminderWorker.kt` | `@HiltWorker` CoroutineWorker, 15 min periodic; legge terapie attive da Room, calcola dosi nella finestra [now, now+30min], posta notifiche locali. `companion.computeDueDoses(times, now, windowMinutes)` puro (testato) |
+| `InactivityCheckWorker` | `data/worker/InactivityCheckWorker.kt` | `@HiltWorker` CoroutineWorker, 30 min periodic; controlla ultime attività per tipo per persona, avvisa se delta > soglia (4h diaper/meal, 24h sleep, 48h temperatura, 7gg peso) |
+| `NotificationHelper` | `data/worker/NotificationHelper.kt` | `@Singleton`; canali `medication_reminder` + `inactivity_alert`; `postMedicationReminder(...)` con action "Preso" + PendingIntent broadcast; `postInactivityAlert(...)` |
+| `CarezzeMessagingService` | `data/service/CarezzeMessagingService.kt` | `@AndroidEntryPoint FirebaseMessagingService`; `onNewToken` → `updateFcmToken`; `onMessageReceived` → parse data map → NotificationHelper |
+| `NotificationActionReceiver` | `data/service/NotificationActionReceiver.kt` | `@AndroidEntryPoint BroadcastReceiver`; `ACTION_MEDICATION_TAKEN` → `LogMedicationUseCase(TAKEN)` via `goAsync()` → cancel notifica |
+
+**Intent extras (M7):** `EXTRA_ROUTE_TYPE`, `EXTRA_PERSON_ID`, `EXTRA_THERAPY_ID` (in `CarezzeMessagingService`); `EXTRA_MEDICATION_ID`, `EXTRA_SCHEDULED_TIME`, `EXTRA_NOTIF_ID` (in `NotificationActionReceiver`).
+
+**WorkManager config (M7):** `CarezzeApplication` implementa `Configuration.Provider` con `HiltWorkerFactory`; auto-init WorkManager disabilitato nel manifest; workers schedulati in `onCreate()` con `ExistingPeriodicWorkPolicy.KEEP`.
+
+**FCM token:** `UserRepository.updateFcmToken(uid, token)` → `FieldValue.arrayUnion(token)` su `users/{uid}.fcmTokens`.
 
 **Pattern Repository (M5.6):** `logActivity`/`createTherapy`/`logMedication` sono Room-first (Room PENDING → return) + `launch { syncToFirestore(...) }` con 4 tentativi backoff 1s/2s/4s. `observe*` usa `channelFlow { Firestore listener → upsert Room SYNCED; Room flow → emit }`.
 

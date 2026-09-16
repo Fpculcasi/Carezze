@@ -21,6 +21,19 @@ interface MedicationLogDao {
         therapyId: String,
     ): Flow<List<MedicationLogEntity>>
 
+    @Query(
+        "SELECT * FROM medication_logs WHERE therapyId = :therapyId " +
+            "AND medicationId = :medicationId " +
+            "AND scheduledTimeEpochSecond >= :from AND scheduledTimeEpochSecond < :to " +
+            "AND status IN ('TAKEN', 'SKIPPED')",
+    )
+    suspend fun getConfirmedLogsInWindow(
+        therapyId: String,
+        medicationId: String,
+        from: Long,
+        to: Long,
+    ): List<MedicationLogEntity>
+
     @Query("UPDATE medication_logs SET syncStatus = :status WHERE id = :id")
     suspend fun updateSyncStatus(
         id: String,

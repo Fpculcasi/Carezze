@@ -9,4 +9,6 @@ interface UserRepository {
     suspend fun getUser(userId: String): Result<User>
 
     fun observeUser(userId: String): Flow<User?>
+
+    suspend fun updateFcmToken(userId: String, token: String): Result<Unit>
 }

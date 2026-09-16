@@ -17,7 +17,7 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = (project.findProperty("versionCode") as String?)?.toInt() ?: 1
-        versionName = project.findProperty("versionName") as String? ?: "1.0"
+        versionName = project.findProperty("versionName") as String? ?: "1.4.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
@@ -94,6 +94,8 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
     // Room
     implementation(libs.androidx.room.runtime)

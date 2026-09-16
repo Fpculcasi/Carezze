@@ -1,0 +1,29 @@
+# EXECUTE — 7.1: FCM Token Management
+
+## Step 1 — Aggiunge `updateFcmToken` a `UserRepository`
+cmd: Edit `domain/repository/UserRepository.kt` → aggiungi firma `suspend fun updateFcmToken(...)`
+result: OK
+next: Implementare in UserRepositoryImpl
+
+## Step 2 — Implementa `updateFcmToken` in `UserRepositoryImpl`
+cmd: Edit `data/repository/UserRepositoryImpl.kt` → import `FieldValue` + implementazione con `arrayUnion`
+result: OK
+next: Aggiornare CarezzeMessagingService
+
+## Step 3 — Riscrive `CarezzeMessagingService`
+cmd: Write `data/service/CarezzeMessagingService.kt` → `@AndroidEntryPoint`, inject `UserRepository`+`FirebaseAuth`, `onNewToken` con coroutine scope
+result: OK
+next: Fix pre-existing build error in PersonDetailScreen
+
+## Step 4 — Fix pre-existing: `Icons.Default.Group` rimosso dal BOM
+cmd: Edit `PersonDetailScreen.kt` → rimuovi import `filled.Group`, sostituisci usage con `Icons.Default.Person`, aggiungi import `filled.Person`
+result: OK
+next: Build verification
+
+## Step 5 — Build + test
+cmd: `./gradlew assembleDebug` → BUILD SUCCESSFUL
+cmd: `./gradlew testDebugUnitTest` → BUILD SUCCESSFUL (34 tasks UP-TO-DATE)
+cmd: grep `arrayUnion` UserRepositoryImpl → trovato a riga 51
+cmd: grep `@AndroidEntryPoint` CarezzeMessagingService → trovato a riga 16
+result: tutti i criteri CDM soddisfatti
+next: 04_verify.md

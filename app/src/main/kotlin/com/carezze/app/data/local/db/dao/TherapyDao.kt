@@ -15,6 +15,9 @@ interface TherapyDao {
     @Query("SELECT * FROM therapies WHERE personId = :personId")
     fun observe(personId: String): Flow<List<TherapyEntity>>
 
+    @Query("SELECT * FROM therapies WHERE isActive = 1")
+    suspend fun getActiveTherapies(): List<TherapyEntity>
+
     @Query("UPDATE therapies SET syncStatus = :status WHERE id = :id")
     suspend fun updateSyncStatus(
         id: String,

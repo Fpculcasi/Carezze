@@ -20,7 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -120,7 +120,7 @@ internal fun PersonDetailContent(
                         Icon(Icons.Default.Share, contentDescription = "Condividi")
                     }
                     IconButton(onClick = onNavigateToMembers) {
-                        Icon(Icons.Default.Group, contentDescription = "Membri")
+                        Icon(Icons.Default.Person, contentDescription = "Membri")
                     }
                     IconButton(onClick = {
                         editName = person?.name ?: ""

@@ -1,0 +1,30 @@
+# EXECUTE — 7.2: MedicationReminderWorker
+
+## Step 1 — Nuove dipendenze (libs.versions.toml + build.gradle.kts)
+cmd: Edit libs.versions.toml → aggiunta `androidx-hilt-work` e `androidx-hilt-compiler` (ver 1.2.0)
+cmd: Edit build.gradle.kts → aggiunta `implementation(libs.androidx.hilt.work)` + `ksp(libs.androidx.hilt.compiler)`
+result: OK
+
+## Step 2 — DAO queries aggiuntive
+cmd: Edit TherapyDao.kt → `getActiveTherapies(): List<TherapyEntity>`
+cmd: Edit MedicationLogDao.kt → `getConfirmedLogsInWindow(...): List<MedicationLogEntity>`
+result: OK
+
+## Step 3 — CarezzeApplication.kt: Configuration.Provider + scheduleWorkers()
+cmd: Write CarezzeApplication.kt → implementa `Configuration.Provider`, inject `HiltWorkerFactory`, schedula MedicationReminderWorker ogni 15 min in onCreate()
+result: OK
+
+## Step 4 — AndroidManifest.xml: disabilita WorkManager auto-init
+cmd: Edit AndroidManifest.xml → xmlns:tools + removal provider meta-data
+result: OK
+
+## Step 5 — NotificationHelper.kt e MedicationReminderWorker.kt
+cmd: Write NotificationHelper.kt → canali MEDICATION_REMINDER + INACTIVITY_ALERT + metodi post*
+cmd: Write MedicationReminderWorker.kt → @HiltWorker CoroutineWorker, logica window 30min, companion computeDueDoses
+result: OK
+
+## Step 6 — Build + test
+cmd: `./gradlew assembleDebug` → BUILD SUCCESSFUL in 4m 11s
+cmd: `./gradlew testDebugUnitTest` → BUILD SUCCESSFUL (34 tasks)
+result: tutti i CDM verificati
+next: 04_verify.md

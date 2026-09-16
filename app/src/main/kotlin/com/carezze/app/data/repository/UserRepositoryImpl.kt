@@ -4,6 +4,7 @@ import com.fpculcasi.carezze.domain.model.Language
 import com.fpculcasi.carezze.domain.model.TemperatureUnit
 import com.fpculcasi.carezze.domain.model.User
 import com.fpculcasi.carezze.domain.repository.UserRepository
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
@@ -41,6 +42,14 @@ class UserRepositoryImpl
             runCatching {
                 val snapshot = usersCollection().document(userId).get().await()
                 snapshot.toDomain(userId) ?: error("User document not found for $userId")
+            }
+
+        override suspend fun updateFcmToken(userId: String, token: String): Result<Unit> =
+            runCatching {
+                usersCollection()
+                    .document(userId)
+                    .set(mapOf("fcmTokens" to FieldValue.arrayUnion(token)), SetOptions.merge())
+                    .await()
             }
 
         override fun observeUser(userId: String): Flow<User?> =

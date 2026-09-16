@@ -12,8 +12,9 @@
 | **Firebase Cloud Messaging** | latest | Push notifications | Integrato con Firebase, delivery garantito, supporto multi-device |
 | **ZXing Core** | 3.5.3 | Generazione QR bitmap | Libreria pura Java, converte codice invito in `BitMatrix` → `Bitmap` |
 | **Hilt** | 2.x | Dependency Injection | Standard Android DI, integrato con Compose + ViewModel |
+| **androidx.hilt:hilt-work** | 1.2.0 | Worker DI | Abilita `@HiltWorker` + `HiltWorkerFactory` per iniettare dipendenze nei CoroutineWorker (M7) |
 | **Room** | 2.x | Cache locale SQLite | Offline-first: source of truth locale, query tipizzate, migration support |
-| **WorkManager** | 2.x | Sync in background | Sincronizzazione Room ↔ Firestore garantita anche dopo reboot |
+| **WorkManager** | 2.x | Background workers | Reminder farmaci (15 min) + inattività (30 min); `Configuration.Provider` in `CarezzeApplication` |
 | **Navigation Compose** | 2.x | Navigazione | Graph dichiarativo, type-safe routes con Kotlin serialization |
 | **Kotlin Coroutines** | 1.x | Async | Integrazione nativa con Flow, Firestore SDK, Room |
 | **Kotlin Flow** | — | Stream dati reattivi | StateFlow nei ViewModel, cold Flow nei Repository |

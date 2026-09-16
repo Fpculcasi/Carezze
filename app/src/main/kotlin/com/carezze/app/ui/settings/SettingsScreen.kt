@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fpculcasi.carezze.BuildConfig
 import com.fpculcasi.carezze.domain.model.Language
 import com.fpculcasi.carezze.domain.model.TemperatureUnit
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
@@ -111,6 +112,15 @@ internal fun SettingsContent(
                     modifier = Modifier.weight(1f),
                 )
             }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(12.dp)
+            )
         }
     }
 }
