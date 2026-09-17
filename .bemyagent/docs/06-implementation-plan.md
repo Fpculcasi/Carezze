@@ -239,7 +239,8 @@ card and feed view. History shows 30 days in list or calendar mode.
 
 | Task | Descrizione | Status |
 |---|---|---|
-| 5.7.1 | Estrai palette M3 dal logo: primary navy `~#1B2763`, secondary blue-cyan `~#40C8F5`, tertiary violet `~#B868E8` → genera token M3 completi (container, on*, surface) | todo |
+| 5.7.0 | Ridisegna il logo PNG in SVG, sia foreground che background con i rispettivi gradienti | todo |
+| 5.7.1 | Estrai palette M3 dal logo: primary navy `~ #1B2763` (` #141c4d`), secondary blue-cyan `~ #40C8F5` (` #3aaee7`), tertiary violet `~ #B868E8` (` #a456e0`) → genera token M3 completi (container, on*, surface) | todo |
 | 5.7.2 | `Color.kt`: sostituisci token default Material3 purple con palette logo; `Theme.kt`: imposta `dynamicColor = false` | todo |
 | 5.7.3 | Verifica visiva: bottom nav, card, FAB, dialog, QuickLog sheet — nessun colore fuori palette | todo |
 
