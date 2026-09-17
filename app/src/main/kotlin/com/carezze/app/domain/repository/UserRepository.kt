@@ -11,4 +11,6 @@ interface UserRepository {
     fun observeUser(userId: String): Flow<User?>
 
     suspend fun updateFcmToken(userId: String, token: String): Result<Unit>
+
+    suspend fun saveConsent(userId: String): Result<Unit>
 }

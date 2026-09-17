@@ -54,8 +54,10 @@ class AuthRepositoryImpl
             password: String,
         ): Result<User> =
             runCatching {
-                firebaseAuth.createUserWithEmailAndPassword(email, password).await().user?.toDomain()
+                val user = firebaseAuth.createUserWithEmailAndPassword(email, password).await().user
                     ?: error("Create user returned null user")
+                user.sendEmailVerification().await()
+                user.toDomain()
             }
 
         override suspend fun linkWithEmail(
@@ -64,8 +66,10 @@ class AuthRepositoryImpl
         ): Result<User> =
             runCatching {
                 val credential = EmailAuthProvider.getCredential(email, password)
-                firebaseAuth.currentUser?.linkWithCredential(credential)?.await()?.user?.toDomain()
+                val user = firebaseAuth.currentUser?.linkWithCredential(credential)?.await()?.user
                     ?: error("Link with email returned null user")
+                user.sendEmailVerification().await()
+                user.toDomain()
             }
 
         override suspend fun signInWithGoogle(idToken: String): Result<User> =
@@ -97,6 +101,18 @@ class AuthRepositoryImpl
                     ?: error("Nessun utente autenticato")
             }
 
+        override suspend fun sendEmailVerification(): Result<Unit> =
+            runCatching {
+                firebaseAuth.currentUser?.sendEmailVerification()?.await()
+                    ?: error("Nessun utente autenticato")
+            }
+
+        override suspend fun reloadUser(): Result<Unit> =
+            runCatching {
+                firebaseAuth.currentUser?.reload()?.await()
+                    ?: error("Nessun utente autenticato")
+            }
+
         private fun FirebaseUser.toDomain() =
             User(
                 id = uid,
@@ -109,5 +125,6 @@ class AuthRepositoryImpl
                 personAccess = emptyList(),
                 therapyAccess = emptyList(),
                 isAnonymous = isAnonymous,
+                isEmailVerified = isEmailVerified,
             )
     }

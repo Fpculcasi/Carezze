@@ -2,6 +2,7 @@ package com.fpculcasi.carezze.ui.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,17 +28,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fpculcasi.carezze.R
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
+
+private const val PRIVACY_POLICY_URL = "https://fpculcasi.github.io/carezze/privacy"
 
 @Composable
 fun RegisterScreen(
@@ -86,6 +97,7 @@ internal fun RegisterContent(
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
+    var termsAccepted by rememberSaveable { mutableStateOf(false) }
     val passwordMismatch =
         password.isNotEmpty() && confirmPassword.isNotEmpty() && password != confirmPassword
 
@@ -179,10 +191,43 @@ internal fun RegisterContent(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            val primaryColor = MaterialTheme.colorScheme.primary
+            val termsText = buildAnnotatedString {
+                append("Accetto i ")
+                withLink(LinkAnnotation.Url(PRIVACY_POLICY_URL)) {
+                    withStyle(
+                        SpanStyle(
+                            color = primaryColor,
+                            textDecoration = TextDecoration.Underline,
+                        )
+                    ) {
+                        append("Termini e la Privacy Policy")
+                    }
+                }
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Checkbox(
+                    checked = termsAccepted,
+                    onCheckedChange = { termsAccepted = it },
+                )
+                Text(
+                    text = termsText,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface,
+                    ),
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Button(
                 onClick = { onRegister(email.trim(), password) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = email.isNotBlank() && password.isNotBlank() && !passwordMismatch,
+                enabled = email.isNotBlank() && password.isNotBlank() && !passwordMismatch && termsAccepted,
             ) {
                 Text("Registrati")
             }

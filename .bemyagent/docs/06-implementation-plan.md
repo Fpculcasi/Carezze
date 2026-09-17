@@ -82,27 +82,29 @@ Settings screen covers language, temperature unit, and quiet hours.
 ---
 
 ## Milestone 2.5 — GDPR & Compliance
-**Goal**: App compliant GDPR per il lancio pubblico — diritto all'oblio, recupero password, consenso esplicito, verifica email | **Status**: in-progress
+**Goal**: App compliant GDPR per il lancio pubblico — diritto all'oblio, recupero password, consenso esplicito, verifica email | **Status**: done
 
 | Task | Descrizione | Status |
 |---|---|---|
 | 2.5.1 | Password reset (email): `SendPasswordResetEmailUseCase`, `ForgotPasswordScreen`, link "Password dimenticata?" in `LoginScreen` | done |
 | 2.5.2 | Elimina account (Art. 17 — diritto all'oblio): `DeleteAccountUseCase`, `deleteAccount()` su Firebase Auth, dialog conferma; disponibile sia per utenti autenticati che anonimi | done |
-| 2.5.3 | Consenso T&C / Privacy Policy alla registrazione: checkbox obbligatorio in `RegisterScreen` con link URL esterno; bottone "Registrati" disabilitato senza consenso; registra `consentTimestamp` su Firestore `users/{uid}` — **open question**: URL policy (Google Sites / sito dedicato?) | todo |
-| 2.5.4 | Verifica email post-registrazione: `sendEmailVerification()` dopo `createUserWithEmail`; nuova `EmailVerificationScreen` (polling `isEmailVerified` + resend); accesso dashboard condizionale alla verifica; Google = già verificato; anonimi = esclusi — **open question**: accesso parziale (sola lettura) o blocco totale pre-verifica? | todo |
-| 2.5.5 | Schermata "Privacy & Dati" in Impostazioni: riepilogo sintetico di cosa viene raccolto + link a policy completa | todo |
+| 2.5.3 | Consenso T&C / Privacy Policy alla registrazione: checkbox obbligatorio in `RegisterScreen` con link `LinkAnnotation.Url` a GitHub Pages; bottone "Registrati" disabilitato senza consenso; `consentGivenAt = FieldValue.serverTimestamp()` via `SaveConsentUseCase` su Firestore `users/{uid}` | done |
+| 2.5.4 | Verifica email post-registrazione: `sendEmailVerification()` in `createUserWithEmail`+`linkWithEmail`; `AuthUiState.PendingEmailVerification`; `EmailVerificationScreen` con `checkEmailVerified()` (reload + `_emailVerified` StateFlow) + resend cooldown 60s; blocco totale pre-verifica; Google/anonimi esclusi | done |
+| 2.5.5 | Schermata "Privacy & Dati" in Impostazioni: riepilogo sintetico raccolta dati + link GitHub Pages policy completa | done |
 
-**Note architetturali:**
-- Consenso (2.5.3): memorizzato come `users/{uid}.consentGivenAt: Timestamp` su Firestore — no Custom Claims (non serve server-side enforcement)
-- Verifica email (2.5.4): `currentUser.reload()` ogni volta che `EmailVerificationScreen` è in foreground + bottone "Rinvia" con cooldown 60s
-- 2.5.3 e 2.5.4 hanno open questions che richiedono decisione umana prima di partire
+**Scelte architetturali:**
+- Consenso (2.5.3): `users/{uid}.consentGivenAt: Timestamp` via `SetOptions.merge()` — non sovrascritta da `syncUser` (non nel map)
+- Verifica email (2.5.4): `reload()` non triggera `AuthStateListener` → `_emailVerified: MutableStateFlow<Boolean>` per navigazione; `AuthUiState.PendingEmailVerification` inserito tra `Anonymous` e `Authenticated` nel mapping
+- URL policy: GitHub Pages `https://fpculcasi.github.io/carezze/privacy` (costante in `RegisterScreen` e `PrivacyDataScreen`)
+- Blocco verifica: totale (nessun accesso parziale pre-verifica)
 
 **Git commit message (proposta):**
 ```
-feat: [M2.5] GDPR — password reset, account deletion (Art. 17)
+feat: [M2.5] GDPR — T&C consent, email verification, privacy screen
 
-Adds forgot-password flow via Firebase sendPasswordResetEmail
-and delete-account with confirmation dialog for all user types.
+Adds mandatory T&C checkbox with GitHub Pages link at registration,
+email verification wall (full block) with resend cooldown, and
+Privacy & Data screen in Settings. consentGivenAt saved on Firestore.
 ```
 
 ---

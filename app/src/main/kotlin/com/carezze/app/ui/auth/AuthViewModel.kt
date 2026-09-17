@@ -3,6 +3,7 @@ package com.fpculcasi.carezze.ui.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fpculcasi.carezze.domain.model.User
+import com.fpculcasi.carezze.domain.repository.AuthRepository
 import com.fpculcasi.carezze.domain.usecase.auth.CreateUserWithEmailUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.GetCurrentUserUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.LinkWithEmailUseCase
@@ -12,8 +13,10 @@ import com.fpculcasi.carezze.domain.usecase.auth.SendPasswordResetEmailUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.SignInAnonymouslyUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.SignInWithEmailUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.SignInWithGoogleUseCase
+import com.fpculcasi.carezze.domain.usecase.user.SaveConsentUseCase
 import com.fpculcasi.carezze.domain.usecase.user.SyncUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +40,8 @@ constructor(
     private val observeAuthState: ObserveAuthStateUseCase,
     private val syncUser: SyncUserUseCase,
     private val sendPasswordResetEmail: SendPasswordResetEmailUseCase,
+    private val saveConsent: SaveConsentUseCase,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
     private val _passwordVisible = MutableStateFlow(false)
     val passwordVisible: StateFlow<Boolean> = _passwordVisible.asStateFlow()
@@ -59,6 +64,7 @@ constructor(
                 when {
                     user == null -> AuthUiState.SignedOut
                     user.isAnonymous -> AuthUiState.Anonymous(user)
+                    !user.isEmailVerified -> AuthUiState.PendingEmailVerification(user)
                     else -> AuthUiState.Authenticated(user)
                 }
             }
@@ -80,6 +86,41 @@ constructor(
 
     fun clearResetEmailSent() {
         _resetEmailSent.value = false
+    }
+
+    private val _emailVerified = MutableStateFlow(false)
+    val emailVerified: StateFlow<Boolean> = _emailVerified.asStateFlow()
+
+    private val _resendCooldown = MutableStateFlow(0)
+    val resendCooldown: StateFlow<Int> = _resendCooldown.asStateFlow()
+
+    fun checkEmailVerified() {
+        viewModelScope.launch {
+            authRepository.reloadUser()
+                .onSuccess {
+                    val verified = authRepository.currentUser?.isEmailVerified ?: false
+                    if (verified) {
+                        _emailVerified.value = true
+                    } else {
+                        _errorMessage.value = "Email non ancora verificata. Controlla la tua casella di posta."
+                    }
+                }
+                .onFailure { _errorMessage.value = it.localizedMessage }
+        }
+    }
+
+    fun resendVerificationEmail() {
+        viewModelScope.launch {
+            authRepository.sendEmailVerification()
+                .onSuccess {
+                    _resendCooldown.value = 60
+                    repeat(60) {
+                        delay(1_000)
+                        _resendCooldown.value -= 1
+                    }
+                }
+                .onFailure { _errorMessage.value = it.localizedMessage }
+        }
     }
 
     fun continueLocally() {
@@ -109,7 +150,9 @@ constructor(
                 } else {
                     createUserWithEmail(email, password)
                 }
-            result.onFailure { _errorMessage.value = it.localizedMessage }
+            result
+                .onSuccess { user -> saveConsent(user.id) }
+                .onFailure { _errorMessage.value = it.localizedMessage }
         }
     }
 
@@ -141,6 +184,8 @@ sealed interface AuthUiState {
     data object SignedOut : AuthUiState
 
     data class Anonymous(val user: User) : AuthUiState
+
+    data class PendingEmailVerification(val user: User) : AuthUiState
 
     data class Authenticated(val user: User) : AuthUiState
 }

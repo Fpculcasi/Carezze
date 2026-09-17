@@ -28,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.fpculcasi.carezze.ui.auth.AuthUiState
 import com.fpculcasi.carezze.ui.auth.AuthViewModel
+import com.fpculcasi.carezze.ui.auth.EmailVerificationScreen
 import com.fpculcasi.carezze.ui.auth.ForgotPasswordScreen
 import com.fpculcasi.carezze.ui.auth.LoginScreen
 import com.fpculcasi.carezze.ui.auth.RegisterScreen
@@ -42,6 +43,7 @@ import com.fpculcasi.carezze.ui.settings.SettingsScreen
 import com.fpculcasi.carezze.ui.invitation.GenerateInvitationScreen
 import com.fpculcasi.carezze.ui.invitation.MembersScreen
 import com.fpculcasi.carezze.ui.invitation.RedeemInvitationScreen
+import com.fpculcasi.carezze.ui.settings.PrivacyDataScreen
 import com.fpculcasi.carezze.ui.therapy.AddTherapyScreen
 import com.fpculcasi.carezze.ui.therapy.EditTherapyScreen
 import com.fpculcasi.carezze.ui.therapy.TherapyDetailScreen
@@ -60,6 +62,8 @@ import kotlinx.serialization.Serializable
 @Serializable object Register
 
 @Serializable object ForgotPassword
+
+@Serializable object EmailVerification
 
 // -- Main shell route: contains Scaffold + BottomBar + inner NavHost --
 @Serializable object Main
@@ -93,6 +97,8 @@ import kotlinx.serialization.Serializable
 @Serializable object RedeemInvitation
 
 @Serializable data class Members(val personId: String)
+
+@Serializable object PrivacyData
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Bottom navigation bar tab model
@@ -138,13 +144,20 @@ fun AppNavigation() {
     val authViewModel: AuthViewModel = hiltViewModel()
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
 
-    // Auto-navigate to Login whenever the user signs out, rebuilding the [Welcome → Login] stack
     LaunchedEffect(authState) {
-        if (authState is AuthUiState.SignedOut) {
-            rootNavController.navigate(Welcome) {
-                popUpTo(rootNavController.graph.id) { inclusive = true }
+        when (authState) {
+            is AuthUiState.SignedOut -> {
+                rootNavController.navigate(Welcome) {
+                    popUpTo(rootNavController.graph.id) { inclusive = true }
+                }
+                rootNavController.navigate(Login)
             }
-            rootNavController.navigate(Login)
+            is AuthUiState.PendingEmailVerification -> {
+                rootNavController.navigate(EmailVerification) {
+                    popUpTo(rootNavController.graph.id) { inclusive = true }
+                }
+            }
+            else -> Unit
         }
     }
 
@@ -191,6 +204,17 @@ fun AppNavigation() {
         composable<ForgotPassword> {
             ForgotPasswordScreen(
                 onNavigateBack = { rootNavController.popBackStack() },
+            )
+        }
+
+        // -- Email verification screen --
+        composable<EmailVerification> {
+            EmailVerificationScreen(
+                onNavigateToDashboard = {
+                    rootNavController.navigate(Main) {
+                        popUpTo(rootNavController.graph.id) { inclusive = true }
+                    }
+                },
             )
         }
 
@@ -318,7 +342,9 @@ fun MainScreen(
             }
 
             composable<Settings> {
-                SettingsScreen()
+                SettingsScreen(
+                    onNavigateToPrivacy = { navController.navigate(PrivacyData) },
+                )
             }
 
             // ────────────────────────────────────────────
@@ -412,6 +438,10 @@ fun MainScreen(
                 HistoryCalendarScreen(
                     onNavigateBack = { navController.popBackStack() },
                 )
+            }
+
+            composable<PrivacyData> {
+                PrivacyDataScreen(onNavigateBack = { navController.popBackStack() })
             }
         }
     }

@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -33,7 +35,10 @@ import com.fpculcasi.carezze.domain.model.TemperatureUnit
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsScreen(
+    onNavigateToPrivacy: () -> Unit = {},
+    viewModel: SettingsViewModel = hiltViewModel(),
+) {
     val user by viewModel.settingsState.collectAsStateWithLifecycle()
 
     SettingsContent(
@@ -45,6 +50,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
         onTemperatureUnitChange = viewModel::setTemperatureUnit,
         onQuietHoursStartChange = viewModel::setQuietHoursStart,
         onQuietHoursEndChange = viewModel::setQuietHoursEnd,
+        onNavigateToPrivacy = onNavigateToPrivacy,
     )
 }
 
@@ -59,6 +65,7 @@ internal fun SettingsContent(
     onTemperatureUnitChange: (TemperatureUnit) -> Unit,
     onQuietHoursStartChange: (String) -> Unit,
     onQuietHoursEndChange: (String) -> Unit,
+    onNavigateToPrivacy: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -114,6 +121,15 @@ internal fun SettingsContent(
             }
 
             Spacer(modifier = Modifier.weight(1f))
+
+            HorizontalDivider()
+
+            TextButton(
+                onClick = onNavigateToPrivacy,
+                modifier = Modifier.align(Alignment.Start),
+            ) {
+                Text("Privacy & Dati")
+            }
 
             Text(
                 "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
@@ -187,6 +203,7 @@ private fun SettingsContentPreview() {
             onTemperatureUnitChange = {},
             onQuietHoursStartChange = {},
             onQuietHoursEndChange = {},
+            onNavigateToPrivacy = {},
         )
     }
 }

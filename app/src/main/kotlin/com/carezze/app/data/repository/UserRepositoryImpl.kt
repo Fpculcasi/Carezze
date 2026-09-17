@@ -52,6 +52,14 @@ class UserRepositoryImpl
                     .await()
             }
 
+        override suspend fun saveConsent(userId: String): Result<Unit> =
+            runCatching {
+                usersCollection()
+                    .document(userId)
+                    .set(mapOf("consentGivenAt" to FieldValue.serverTimestamp()), SetOptions.merge())
+                    .await()
+            }
+
         override fun observeUser(userId: String): Flow<User?> =
             callbackFlow {
                 val listener =

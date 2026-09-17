@@ -33,13 +33,17 @@
 
 ## Navigazione / Schermate
 
-**Struttura (post bottom-bar):** `AppNavigation` (root NavHost): Welcome → Login/Register → `Main`. `MainScreen` = shell con `Scaffold` + `NavigationBar` a 4 tab (Home/Dashboard, Persone, Profilo, Impostazioni) + inner NavHost; la bottom bar è visibile solo sulle 4 route radice, nascosta sulle schermate di dettaglio. Tab `Profilo` = placeholder da implementare.
+**Struttura (post bottom-bar):** `AppNavigation` (root NavHost): Welcome → Login/Register/ForgotPassword/**EmailVerification** → `Main`. `MainScreen` = shell con `Scaffold` + `NavigationBar` a 4 tab (Home/Dashboard, Persone, Profilo, Impostazioni) + inner NavHost; la bottom bar è visibile solo sulle 4 route radice, nascosta sulle schermate di dettaglio. `EmailVerification` è nel root NavHost (non in `Main`): bloccante fino a verifica email.
+
+**AuthUiState:** `Loading | SignedOut | Anonymous | PendingEmailVerification | Authenticated`. Mapping: anonimo → `Anonymous`; email non verificata → `PendingEmailVerification`; email verificata o Google → `Authenticated`. Root `LaunchedEffect(authState)` gestisce navigazione su `SignedOut` e `PendingEmailVerification`.
 
 | Schermata | File (futuro) | Auth richiesta | Descrizione |
 |---|---|---|---|
 | Splash / Welcome | `ui/auth/WelcomeScreen.kt` ✅ | No | Entry point: locale o registrazione |
 | Login | `ui/auth/LoginScreen.kt` ✅ | No | Email/password, Google |
-| Register | `ui/auth/RegisterScreen.kt` ✅ | No | Nuovo account + migrazione locale |
+| Register | `ui/auth/RegisterScreen.kt` ✅ | No | Nuovo account + migrazione locale; checkbox T&C obbligatorio |
+| Verifica Email | `ui/auth/EmailVerificationScreen.kt` ✅ | Sì (email non verificata) | Blocco post-registrazione email; "Ho verificato" + resend 60s cooldown |
+| Privacy & Dati | `ui/settings/PrivacyDataScreen.kt` ✅ | No | Riepilogo raccolta dati + link GitHub Pages policy |
 | Dashboard | `ui/dashboard/DashboardScreen.kt` ✅ (stub) | No (locale ok) | Card view / Feed view toggle (M5) |
 | Quick Log Sheet | `ui/dashboard/QuickLogSheet.kt` | No | Bottom sheet 1-tap event |
 | Lista Persone | `ui/person/PersonListScreen.kt` ✅ | No | Tutte le Persone accessibili |
@@ -60,6 +64,7 @@
 
 | Use Case | File | Input | Output / Side Effect |
 |---|---|---|---|
+| `SaveConsentUseCase` | `domain/usecase/user/` | `userId: String` | scrive `consentGivenAt = serverTimestamp()` su Firestore `users/{uid}` |
 | `SignInAnonymouslyUseCase` | `domain/usecase/auth/` | — | `Result<User>` anonimo da Firebase Auth |
 | `GetCurrentUserUseCase` | `domain/usecase/auth/` | — | `User?` sincrono dal repository |
 | `ObserveAuthStateUseCase` | `domain/usecase/auth/` | — | `Flow<User?>` real-time auth state |

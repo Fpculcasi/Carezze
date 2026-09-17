@@ -11,6 +11,7 @@ data class User(
     val personAccess: List<String>,
     val therapyAccess: List<String>,
     val isAnonymous: Boolean,
+    val isEmailVerified: Boolean = false,
 )
 
 enum class Language { IT, EN }
