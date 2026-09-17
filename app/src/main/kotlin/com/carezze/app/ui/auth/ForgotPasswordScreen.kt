@@ -10,9 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-
-import androidx.compose.ui.res.painterResource
-import com.fpculcasi.carezze.R
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -21,19 +18,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,57 +34,42 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 
 @Composable
-fun LoginScreen(
-    onNavigateToDashboard: () -> Unit,
-    onNavigateToRegister: () -> Unit,
-    onNavigateToForgotPassword: () -> Unit,
+fun ForgotPasswordScreen(
     onNavigateBack: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel(),
 ) {
-    val authState by viewModel.authState.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
-    val passwordVisible by viewModel.passwordVisible.collectAsStateWithLifecycle()
+    val resetEmailSent by viewModel.resetEmailSent.collectAsStateWithLifecycle()
 
-    LaunchedEffect(authState) {
-        when (authState) {
-            is AuthUiState.Anonymous, is AuthUiState.Authenticated -> onNavigateToDashboard()
-            else -> Unit
+    LaunchedEffect(resetEmailSent) {
+        if (resetEmailSent) {
+            viewModel.clearResetEmailSent()
+            onNavigateBack()
         }
     }
 
-    LoginContent(
+    ForgotPasswordContent(
         errorMessage = errorMessage,
-        passwordVisible = passwordVisible,
-        onTogglePasswordVisible = viewModel::togglePasswordVisible,
-        onLogin = viewModel::signIn,
+        onSendReset = viewModel::sendPasswordReset,
         onClearError = viewModel::clearError,
-        onNavigateToRegister = onNavigateToRegister,
-        onNavigateToForgotPassword = onNavigateToForgotPassword,
         onNavigateBack = onNavigateBack,
-        onGoogleSignIn = viewModel::signInOrLinkWithGoogle,
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun LoginContent(
+internal fun ForgotPasswordContent(
     errorMessage: String?,
-    passwordVisible: Boolean,
-    onTogglePasswordVisible: () -> Unit,
-    onLogin: (email: String, password: String) -> Unit,
+    onSendReset: (email: String) -> Unit,
     onClearError: () -> Unit,
-    onNavigateToRegister: () -> Unit,
-    onNavigateToForgotPassword: () -> Unit,
     onNavigateBack: () -> Unit,
-    onGoogleSignIn: (String) -> Unit,
 ) {
     var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Accedi") },
+                title = { Text("Recupera password") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
@@ -109,6 +87,14 @@ internal fun LoginContent(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
+            Text(
+                text = "Inserisci l'indirizzo email del tuo account. Ti invieremo un link per reimpostare la password.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             OutlinedTextField(
                 value = email,
                 onValueChange = {
@@ -121,26 +107,6 @@ internal fun LoginContent(
                 singleLine = true,
             )
 
-            OutlinedTextField(
-                value = password,
-                onValueChange = {
-                    password = it
-                    onClearError()
-                },
-                label = { Text("Password") },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                singleLine = true,
-                trailingIcon = {
-                    val icon = if (passwordVisible) R.drawable.ic_visibility else R.drawable.ic_visibility_off
-                    val description = if (passwordVisible) "Hide password" else "Show password"
-
-                    IconButton(onClick = { onTogglePasswordVisible() }) {
-                        Icon(painter = painterResource(icon), contentDescription = description)
-                    }
-                })
-
             if (errorMessage != null) {
                 Text(
                     text = errorMessage,
@@ -152,61 +118,38 @@ internal fun LoginContent(
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = { onLogin(email.trim(), password) },
+                onClick = { onSendReset(email.trim()) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = email.isNotBlank() && password.isNotBlank(),
+                enabled = email.isNotBlank(),
             ) {
-                Text("Accedi")
+                Text("Invia link di recupero")
             }
-
-            TextButton(onClick = onNavigateToForgotPassword) {
-                Text("Password dimenticata?")
-            }
-
-            TextButton(onClick = onNavigateToRegister) {
-                Text("Non hai un account? Registrati")
-            }
-
-            GoogleSignInButton(
-                onIdTokenReceived = onGoogleSignIn,
-                onError = { onClearError() },
-            )
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun LoginContentPreview() {
+private fun ForgotPasswordContentPreview() {
     CarezzeTheme {
-        LoginContent(
+        ForgotPasswordContent(
             errorMessage = null,
-            passwordVisible = false,
-            onTogglePasswordVisible = {},
-            onLogin = { _, _ -> },
+            onSendReset = {},
             onClearError = {},
-            onNavigateToRegister = {},
-            onNavigateToForgotPassword = {},
             onNavigateBack = {},
-            onGoogleSignIn = {},
         )
     }
 }
 
-@Preview(showBackground = true, name = "With error")
+@Preview(showBackground = true, name = "Con errore")
 @Composable
-private fun LoginContentErrorPreview() {
+private fun ForgotPasswordContentErrorPreview() {
     CarezzeTheme {
-        LoginContent(
-            errorMessage = "Email o password errati",
-            passwordVisible = false,
-            onTogglePasswordVisible = {},
-            onLogin = { _, _ -> },
+        ForgotPasswordContent(
+            errorMessage = "Nessun account trovato con questa email",
+            onSendReset = {},
             onClearError = {},
-            onNavigateToRegister = {},
-            onNavigateToForgotPassword = {},
             onNavigateBack = {},
-            onGoogleSignIn = {},
         )
     }
 }

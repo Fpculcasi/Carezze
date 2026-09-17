@@ -41,14 +41,12 @@ fun WelcomeScreen(
         }
     }
 
-    CarezzeTheme {
-        WelcomeContent(
-            isLoading = authState is AuthUiState.Loading,
-            onContinueLocally = viewModel::continueLocally,
-            onNavigateToLogin = onNavigateToLogin,
-            onGoogleSignIn = viewModel::signInOrLinkWithGoogle,
-        )
-    }
+    WelcomeContent(
+        isLoading = authState is AuthUiState.Loading,
+        onContinueLocally = viewModel::continueLocally,
+        onNavigateToLogin = onNavigateToLogin,
+        onGoogleSignIn = viewModel::signInOrLinkWithGoogle,
+    )
 }
 
 @Composable

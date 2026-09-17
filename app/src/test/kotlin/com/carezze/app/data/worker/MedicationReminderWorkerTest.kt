@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalTime
 
 class MedicationReminderWorkerTest {
-
     @Test
     fun `dose exactly at now is included`() {
         val now = LocalTime.of(8, 0)

@@ -28,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.fpculcasi.carezze.ui.auth.AuthUiState
 import com.fpculcasi.carezze.ui.auth.AuthViewModel
+import com.fpculcasi.carezze.ui.auth.ForgotPasswordScreen
 import com.fpculcasi.carezze.ui.auth.LoginScreen
 import com.fpculcasi.carezze.ui.auth.RegisterScreen
 import com.fpculcasi.carezze.ui.auth.WelcomeScreen
@@ -57,6 +58,8 @@ import kotlinx.serialization.Serializable
 @Serializable object Login
 
 @Serializable object Register
+
+@Serializable object ForgotPassword
 
 // -- Main shell route: contains Scaffold + BottomBar + inner NavHost --
 @Serializable object Main
@@ -135,12 +138,13 @@ fun AppNavigation() {
     val authViewModel: AuthViewModel = hiltViewModel()
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
 
-    // Auto-navigate to Welcome whenever the user signs out
+    // Auto-navigate to Login whenever the user signs out, rebuilding the [Welcome → Login] stack
     LaunchedEffect(authState) {
         if (authState is AuthUiState.SignedOut) {
             rootNavController.navigate(Welcome) {
                 popUpTo(rootNavController.graph.id) { inclusive = true }
             }
+            rootNavController.navigate(Login)
         }
     }
 
@@ -174,9 +178,19 @@ fun AppNavigation() {
                 onNavigateToRegister = {
                     rootNavController.navigate(Register)
                 },
+                onNavigateToForgotPassword = {
+                    rootNavController.navigate(ForgotPassword)
+                },
                 onNavigateBack = {
                     rootNavController.popBackStack()
                 },
+            )
+        }
+
+        // -- Forgot password screen --
+        composable<ForgotPassword> {
+            ForgotPasswordScreen(
+                onNavigateBack = { rootNavController.popBackStack() },
             )
         }
 

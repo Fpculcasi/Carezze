@@ -8,6 +8,7 @@ import com.fpculcasi.carezze.domain.usecase.auth.GetCurrentUserUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.LinkWithEmailUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.LinkWithGoogleUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.ObserveAuthStateUseCase
+import com.fpculcasi.carezze.domain.usecase.auth.SendPasswordResetEmailUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.SignInAnonymouslyUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.SignInWithEmailUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.SignInWithGoogleUseCase
@@ -35,6 +36,7 @@ constructor(
     private val getCurrentUser: GetCurrentUserUseCase,
     private val observeAuthState: ObserveAuthStateUseCase,
     private val syncUser: SyncUserUseCase,
+    private val sendPasswordResetEmail: SendPasswordResetEmailUseCase,
 ) : ViewModel() {
     private val _passwordVisible = MutableStateFlow(false)
     val passwordVisible: StateFlow<Boolean> = _passwordVisible.asStateFlow()
@@ -73,6 +75,13 @@ constructor(
         _errorMessage.value = null
     }
 
+    private val _resetEmailSent = MutableStateFlow(false)
+    val resetEmailSent: StateFlow<Boolean> = _resetEmailSent.asStateFlow()
+
+    fun clearResetEmailSent() {
+        _resetEmailSent.value = false
+    }
+
     fun continueLocally() {
         viewModelScope.launch {
             signInAnonymously().onFailure { _errorMessage.value = it.localizedMessage }
@@ -101,6 +110,14 @@ constructor(
                     createUserWithEmail(email, password)
                 }
             result.onFailure { _errorMessage.value = it.localizedMessage }
+        }
+    }
+
+    fun sendPasswordReset(email: String) {
+        viewModelScope.launch {
+            sendPasswordResetEmail(email)
+                .onSuccess { _resetEmailSent.value = true }
+                .onFailure { _errorMessage.value = it.localizedMessage }
         }
     }
 

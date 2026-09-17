@@ -81,6 +81,32 @@ Settings screen covers language, temperature unit, and quiet hours.
 
 ---
 
+## Milestone 2.5 — GDPR & Compliance
+**Goal**: App compliant GDPR per il lancio pubblico — diritto all'oblio, recupero password, consenso esplicito, verifica email | **Status**: in-progress
+
+| Task | Descrizione | Status |
+|---|---|---|
+| 2.5.1 | Password reset (email): `SendPasswordResetEmailUseCase`, `ForgotPasswordScreen`, link "Password dimenticata?" in `LoginScreen` | done |
+| 2.5.2 | Elimina account (Art. 17 — diritto all'oblio): `DeleteAccountUseCase`, `deleteAccount()` su Firebase Auth, dialog conferma; disponibile sia per utenti autenticati che anonimi | done |
+| 2.5.3 | Consenso T&C / Privacy Policy alla registrazione: checkbox obbligatorio in `RegisterScreen` con link URL esterno; bottone "Registrati" disabilitato senza consenso; registra `consentTimestamp` su Firestore `users/{uid}` — **open question**: URL policy (Google Sites / sito dedicato?) | todo |
+| 2.5.4 | Verifica email post-registrazione: `sendEmailVerification()` dopo `createUserWithEmail`; nuova `EmailVerificationScreen` (polling `isEmailVerified` + resend); accesso dashboard condizionale alla verifica; Google = già verificato; anonimi = esclusi — **open question**: accesso parziale (sola lettura) o blocco totale pre-verifica? | todo |
+| 2.5.5 | Schermata "Privacy & Dati" in Impostazioni: riepilogo sintetico di cosa viene raccolto + link a policy completa | todo |
+
+**Note architetturali:**
+- Consenso (2.5.3): memorizzato come `users/{uid}.consentGivenAt: Timestamp` su Firestore — no Custom Claims (non serve server-side enforcement)
+- Verifica email (2.5.4): `currentUser.reload()` ogni volta che `EmailVerificationScreen` è in foreground + bottone "Rinvia" con cooldown 60s
+- 2.5.3 e 2.5.4 hanno open questions che richiedono decisione umana prima di partire
+
+**Git commit message (proposta):**
+```
+feat: [M2.5] GDPR — password reset, account deletion (Art. 17)
+
+Adds forgot-password flow via Firebase sendPasswordResetEmail
+and delete-account with confirmation dialog for all user types.
+```
+
+---
+
 ## Milestone 3 — Gestione Persone
 **Goal**: Utente può creare, visualizzare e modificare Profili Persona | **Status**: done
 

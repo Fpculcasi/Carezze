@@ -30,4 +30,8 @@ interface AuthRepository {
     suspend fun linkWithGoogle(idToken: String): Result<User>
 
     suspend fun signOut()
+
+    suspend fun sendPasswordResetEmail(email: String): Result<Unit>
+
+    suspend fun deleteAccount(): Result<Unit>
 }

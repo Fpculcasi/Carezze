@@ -4,6 +4,7 @@ import com.fpculcasi.carezze.domain.model.Language
 import com.fpculcasi.carezze.domain.model.TemperatureUnit
 import com.fpculcasi.carezze.domain.model.User
 import com.fpculcasi.carezze.domain.repository.AuthRepository
+import com.fpculcasi.carezze.domain.usecase.auth.DeleteAccountUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.ObserveAuthStateUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.SignOutUseCase
 import com.fpculcasi.carezze.domain.usecase.user.ObserveUserUseCase
@@ -31,6 +32,7 @@ class ProfileViewModelTest {
     private val observeUser = mockk<ObserveUserUseCase>()
     private val syncUser = mockk<SyncUserUseCase>(relaxed = true)
     private val signOut = mockk<SignOutUseCase>(relaxed = true)
+    private val deleteAccount = mockk<DeleteAccountUseCase>(relaxed = true)
     private val authRepository = mockk<AuthRepository>()
 
     private lateinit var viewModel: ProfileViewModel
@@ -47,7 +49,7 @@ class ProfileViewModelTest {
     }
 
     private fun createViewModel() {
-        viewModel = ProfileViewModel(observeAuthState, observeUser, syncUser, signOut, authRepository)
+        viewModel = ProfileViewModel(observeAuthState, observeUser, syncUser, signOut, deleteAccount, authRepository)
     }
 
     @Test

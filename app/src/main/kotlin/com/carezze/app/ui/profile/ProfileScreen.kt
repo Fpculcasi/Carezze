@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +49,7 @@ fun ProfileScreen(
 ) {
     val authState by viewModel.authState.collectAsStateWithLifecycle()
     val user by viewModel.userState.collectAsStateWithLifecycle()
+    val deleteError by viewModel.deleteError.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("Profilo") }) },
@@ -58,6 +60,9 @@ fun ProfileScreen(
                     modifier = Modifier.padding(padding),
                     onNavigateToLogin = onNavigateToLogin,
                     onNavigateToRegister = onNavigateToRegister,
+                    onDeleteAccount = viewModel::deleteAccount,
+                    deleteError = deleteError,
+                    onClearDeleteError = viewModel::clearDeleteError,
                 )
 
             is AuthUiState.Authenticated -> {
@@ -69,6 +74,9 @@ fun ProfileScreen(
                     isAnonymous = false,
                     onSaveDisplayName = viewModel::updateDisplayName,
                     onSignOut = viewModel::signOut,
+                    onDeleteAccount = viewModel::deleteAccount,
+                    deleteError = deleteError,
+                    onClearDeleteError = viewModel::clearDeleteError,
                     onNavigateToRedeemInvitation = onNavigateToRedeemInvitation,
                 )
             }
@@ -83,7 +91,33 @@ private fun AnonymousProfileContent(
     modifier: Modifier = Modifier,
     onNavigateToLogin: () -> Unit,
     onNavigateToRegister: () -> Unit,
+    onDeleteAccount: () -> Unit,
+    deleteError: String?,
+    onClearDeleteError: () -> Unit,
 ) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    if (showDeleteDialog) {
+        DeleteAccountDialog(
+            onConfirm = {
+                showDeleteDialog = false
+                onDeleteAccount()
+            },
+            onDismiss = { showDeleteDialog = false },
+        )
+    }
+
+    if (deleteError != null) {
+        AlertDialog(
+            onDismissRequest = onClearDeleteError,
+            title = { Text("Errore") },
+            text = { Text(deleteError) },
+            confirmButton = {
+                TextButton(onClick = onClearDeleteError) { Text("OK") }
+            },
+        )
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -111,6 +145,16 @@ private fun AnonymousProfileContent(
         OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = onNavigateToLogin) {
             Text("Accedi")
         }
+        Spacer(Modifier.height(32.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(16.dp))
+        TextButton(
+            onClick = { showDeleteDialog = true },
+            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text("Elimina i miei dati")
+        }
     }
 }
 
@@ -122,9 +166,34 @@ private fun AuthenticatedProfileContent(
     isAnonymous: Boolean,
     onSaveDisplayName: (String) -> Unit,
     onSignOut: () -> Unit,
+    onDeleteAccount: () -> Unit,
+    deleteError: String?,
+    onClearDeleteError: () -> Unit,
     onNavigateToRedeemInvitation: () -> Unit = {},
 ) {
     var nameInput by remember(displayName) { mutableStateOf(displayName) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    if (showDeleteDialog) {
+        DeleteAccountDialog(
+            onConfirm = {
+                showDeleteDialog = false
+                onDeleteAccount()
+            },
+            onDismiss = { showDeleteDialog = false },
+        )
+    }
+
+    if (deleteError != null) {
+        AlertDialog(
+            onDismissRequest = onClearDeleteError,
+            title = { Text("Errore") },
+            text = { Text(deleteError) },
+            confirmButton = {
+                TextButton(onClick = onClearDeleteError) { Text("OK") }
+            },
+        )
+    }
 
     Column(
         modifier = modifier
@@ -203,7 +272,42 @@ private fun AuthenticatedProfileContent(
         ) {
             Text("Disconnetti")
         }
+        TextButton(
+            onClick = { showDeleteDialog = true },
+            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text("Elimina account")
+        }
     }
+}
+
+@Composable
+private fun DeleteAccountDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Elimina account") },
+        text = {
+            Text(
+                "Questa operazione è irreversibile. Tutti i tuoi dati verranno " +
+                    "eliminati definitivamente. Sei sicuro di voler continuare?",
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm,
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+            ) {
+                Text("Elimina")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Annulla") }
+        },
+    )
 }
 
 @Composable
@@ -229,6 +333,9 @@ private fun PreviewAnonymousProfile() {
                 modifier = Modifier.padding(padding),
                 onNavigateToLogin = {},
                 onNavigateToRegister = {},
+                onDeleteAccount = {},
+                deleteError = null,
+                onClearDeleteError = {},
             )
         }
     }
@@ -249,6 +356,9 @@ private fun PreviewAuthenticatedProfile() {
                 isAnonymous = false,
                 onSaveDisplayName = {},
                 onSignOut = {},
+                onDeleteAccount = {},
+                deleteError = null,
+                onClearDeleteError = {},
                 onNavigateToRedeemInvitation = {},
             )
         }

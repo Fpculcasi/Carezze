@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fpculcasi.carezze.domain.model.User
 import com.fpculcasi.carezze.domain.repository.AuthRepository
+import com.fpculcasi.carezze.domain.usecase.auth.DeleteAccountUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.ObserveAuthStateUseCase
 import com.fpculcasi.carezze.domain.usecase.auth.SignOutUseCase
 import com.fpculcasi.carezze.domain.usecase.user.ObserveUserUseCase
@@ -13,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -26,6 +28,7 @@ class ProfileViewModel
         private val observeUser: ObserveUserUseCase,
         private val syncUser: SyncUserUseCase,
         private val signOutUseCase: SignOutUseCase,
+        private val deleteAccountUseCase: DeleteAccountUseCase,
         private val authRepository: AuthRepository,
     ) : ViewModel() {
         val authState: StateFlow<AuthUiState> =
@@ -56,5 +59,18 @@ class ProfileViewModel
 
         fun signOut() {
             viewModelScope.launch { signOutUseCase() }
+        }
+
+        private val _deleteError = MutableStateFlow<String?>(null)
+        val deleteError: StateFlow<String?> = _deleteError.asStateFlow()
+
+        fun clearDeleteError() {
+            _deleteError.value = null
+        }
+
+        fun deleteAccount() {
+            viewModelScope.launch {
+                deleteAccountUseCase().onFailure { _deleteError.value = it.localizedMessage }
+            }
         }
     }

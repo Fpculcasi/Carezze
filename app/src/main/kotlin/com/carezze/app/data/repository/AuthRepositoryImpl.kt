@@ -86,6 +86,17 @@ class AuthRepositoryImpl
             firebaseAuth.signOut()
         }
 
+        override suspend fun sendPasswordResetEmail(email: String): Result<Unit> =
+            runCatching {
+                firebaseAuth.sendPasswordResetEmail(email).await()
+            }
+
+        override suspend fun deleteAccount(): Result<Unit> =
+            runCatching {
+                firebaseAuth.currentUser?.delete()?.await()
+                    ?: error("Nessun utente autenticato")
+            }
+
         private fun FirebaseUser.toDomain() =
             User(
                 id = uid,
