@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-
 import androidx.compose.ui.res.painterResource
 import com.fpculcasi.carezze.R
 import androidx.compose.material3.Button
@@ -34,9 +31,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 
@@ -94,7 +91,7 @@ internal fun LoginContent(
                 title = { Text("Accedi") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(painterResource(R.drawable.baseline_arrow_back_24), contentDescription = "Indietro")
                     }
                 },
             )
@@ -175,7 +172,7 @@ internal fun LoginContent(
     }
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 private fun LoginContentPreview() {
     CarezzeTheme {
@@ -193,7 +190,7 @@ private fun LoginContentPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "With error")
+@PreviewLightDark
 @Composable
 private fun LoginContentErrorPreview() {
     CarezzeTheme {

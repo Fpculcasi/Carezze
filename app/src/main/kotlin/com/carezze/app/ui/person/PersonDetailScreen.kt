@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
@@ -42,9 +41,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.fpculcasi.carezze.R
 import com.fpculcasi.carezze.domain.model.MemberRole
 import com.fpculcasi.carezze.domain.model.Person
 import com.fpculcasi.carezze.domain.model.Therapy
@@ -112,7 +113,7 @@ internal fun PersonDetailContent(
                 title = { Text(person?.name ?: "") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(painterResource(R.drawable.baseline_arrow_back_24), contentDescription = "Indietro")
                     }
                 },
                 actions = {
@@ -134,7 +135,7 @@ internal fun PersonDetailContent(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { onNavigateToAddTherapy(personId) }) {
-                Icon(Icons.Default.Add, contentDescription = "Aggiungi terapia")
+                Icon(painterResource(R.drawable.outline_add_24), contentDescription = "Aggiungi terapia")
             }
         },
     ) { padding ->
@@ -303,7 +304,7 @@ private fun TherapyListItem(
     }
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 private fun PersonDetailContentPreview() {
     CarezzeTheme {

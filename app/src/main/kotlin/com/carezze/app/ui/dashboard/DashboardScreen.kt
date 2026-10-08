@@ -48,10 +48,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.fpculcasi.carezze.R
 import com.fpculcasi.carezze.domain.model.ActivityLog
 import com.fpculcasi.carezze.domain.model.DiaperType
 import com.fpculcasi.carezze.domain.model.Person
@@ -292,6 +294,7 @@ private fun CardView(
                 }
             }
         }
+
         persons.isEmpty() -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
@@ -301,6 +304,7 @@ private fun CardView(
                 )
             }
         }
+
         else -> {
             LazyColumn(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -384,7 +388,7 @@ private fun PersonCard(
                 )
             }
             IconButton(onClick = onOpenQuickLog) {
-                Icon(Icons.Default.Add, contentDescription = "Registra evento")
+                Icon(painterResource(R.drawable.outline_add_24), contentDescription = "Registra evento")
             }
         }
     }
@@ -465,6 +469,7 @@ private fun ActivityLog.label(): String =
                     DiaperType.DRY -> "Asciutto"
                 }
             }"
+
         is ActivityLog.SleepStart -> "Inizio sonno"
         is ActivityLog.SleepEnd -> "Fine sonno"
         is ActivityLog.Temperature -> "Temperatura · $temperature°${unit.name}"
@@ -490,7 +495,7 @@ private fun ActivityLog.emoji(): String =
         is ActivityLog.Hygiene -> "🛁"
     }
 
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 private fun DashboardContentPreview() {
     val persons =
@@ -512,7 +517,7 @@ private fun DashboardContentPreview() {
             selectedPersonId = null,
             searchQuery = "",
             viewMode = DashboardViewMode.CARD,
-            personColors = mapOf("p1" to 0, "p2" to 2, "p3" to 4, "p5" to 3),
+            personColors = mapOf("p1" to 0, "p2" to 2, "p3" to 4, "p5" to 3, "p6" to 1, "p7" to 3),
             onSelectPerson = {},
             onSearchQueryChange = {},
             onToggleViewMode = {},

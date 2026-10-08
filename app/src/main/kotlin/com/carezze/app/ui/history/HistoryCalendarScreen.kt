@@ -41,10 +41,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.fpculcasi.carezze.R
 import com.fpculcasi.carezze.domain.model.ActivityLog
 import com.fpculcasi.carezze.domain.model.MedicationStatus
 import java.time.LocalDate
@@ -77,7 +79,7 @@ fun HistoryCalendarScreen(
                 title = { Text("Calendario") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(painterResource(R.drawable.baseline_arrow_back_24), contentDescription = "Indietro")
                     }
                 },
             )

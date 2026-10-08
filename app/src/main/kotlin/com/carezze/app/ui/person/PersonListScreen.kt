@@ -36,9 +36,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.fpculcasi.carezze.R
 import com.fpculcasi.carezze.domain.model.MemberRole
 import com.fpculcasi.carezze.domain.model.Person
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
@@ -80,7 +82,7 @@ internal fun PersonListContent(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { showCreateDialog = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Aggiungi Persona")
+                Icon(painterResource(R.drawable.outline_add_24), contentDescription = "Aggiungi Persona")
             }
         },
     ) { padding ->
@@ -198,7 +200,7 @@ private fun PersonItem(
             },
             trailingContent = {
                 IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Elimina")
+                    Icon(painterResource(R.drawable.outline_delete_24), contentDescription = "Elimina")
                 }
             },
         )
@@ -211,7 +213,7 @@ private val previewPersons =
         Person("2", "Christian", null, "uid1", mapOf("uid1" to MemberRole.OWNER)),
     )
 
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 private fun PersonListContentPreview() {
     CarezzeTheme {
@@ -225,7 +227,7 @@ private fun PersonListContentPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Empty")
+@PreviewLightDark
 @Composable
 private fun PersonListContentEmptyPreview() {
     CarezzeTheme {

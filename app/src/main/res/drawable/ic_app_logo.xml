@@ -7,5 +7,5 @@
     <foreground android:drawable="@drawable/carezzelogo" />
 
     <!-- Optional: Themed/Monochrome icon for Android 13+ -->
-    <monochrome android:drawable="@drawable/carezzelogoMonocromo" />
+    <monochrome android:drawable="@drawable/carezzelogomonocromo" />
 </adaptive-icon>

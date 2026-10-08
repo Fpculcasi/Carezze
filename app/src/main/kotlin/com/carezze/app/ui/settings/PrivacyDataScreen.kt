@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,8 +18,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.fpculcasi.carezze.R
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 
 private const val PRIVACY_POLICY_URL = "https://fpculcasi.github.io/carezze/privacy"
@@ -42,7 +42,7 @@ internal fun PrivacyDataContent(onNavigateBack: () -> Unit) {
                 title = { Text("Privacy & Dati") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(painterResource(R.drawable.baseline_arrow_back_24), contentDescription = "Indietro")
                     }
                 },
             )
@@ -130,7 +130,7 @@ internal fun PrivacyDataContent(onNavigateBack: () -> Unit) {
     }
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 private fun PrivacyDataContentPreview() {
     CarezzeTheme {

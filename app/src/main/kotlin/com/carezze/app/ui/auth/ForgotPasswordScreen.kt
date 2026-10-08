@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,10 +24,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.fpculcasi.carezze.R
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 
@@ -72,7 +72,7 @@ internal fun ForgotPasswordContent(
                 title = { Text("Recupera password") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(painterResource(R.drawable.baseline_arrow_back_24), contentDescription = "Indietro")
                     }
                 },
             )
@@ -128,7 +128,7 @@ internal fun ForgotPasswordContent(
     }
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 private fun ForgotPasswordContentPreview() {
     CarezzeTheme {
@@ -141,7 +141,7 @@ private fun ForgotPasswordContentPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Con errore")
+@PreviewLightDark
 @Composable
 private fun ForgotPasswordContentErrorPreview() {
     CarezzeTheme {

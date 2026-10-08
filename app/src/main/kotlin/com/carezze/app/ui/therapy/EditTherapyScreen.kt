@@ -13,7 +13,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
@@ -35,9 +34,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.fpculcasi.carezze.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +67,7 @@ fun EditTherapyScreen(
                             onNavigateBack()
                         }
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(painterResource(R.drawable.baseline_arrow_back_24), contentDescription = "Indietro")
                     }
                 },
             )
@@ -179,7 +180,7 @@ private fun EditStepTwoContent(
             onClick = viewModel::addMedication,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Icon(Icons.Default.Add, contentDescription = null)
+            Icon(painterResource(R.drawable.outline_add_24), contentDescription = null)
             Spacer(Modifier.width(8.dp))
             Text("Aggiungi farmaco")
         }
@@ -212,7 +213,7 @@ private fun EditMedicationFormItem(
             Text("Farmaco", style = MaterialTheme.typography.titleSmall)
             if (canDelete) {
                 IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Rimuovi")
+                    Icon(painterResource(R.drawable.outline_delete_24), contentDescription = "Rimuovi")
                 }
             }
         }

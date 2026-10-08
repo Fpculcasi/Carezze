@@ -41,9 +41,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.fpculcasi.carezze.domain.model.DiaperType
 import com.fpculcasi.carezze.domain.model.MealType
 import com.fpculcasi.carezze.domain.model.MealUnit
@@ -726,7 +726,7 @@ private val previewTherapy =
         medications = listOf(previewMedication),
     )
 
-@Preview(showBackground = true, name = "Selezione tipo")
+@PreviewLightDark
 @Composable
 private fun PreviewTypeSelectionGrid() {
     CarezzeTheme {
@@ -736,7 +736,7 @@ private fun PreviewTypeSelectionGrid() {
     }
 }
 
-@Preview(showBackground = true, name = "Terapie — nessuna attiva")
+@PreviewLightDark
 @Composable
 private fun PreviewTherapyEmpty() {
     CarezzeTheme {
@@ -760,7 +760,7 @@ private fun PreviewTherapyEmpty() {
     }
 }
 
-@Preview(showBackground = true, name = "Terapie — dosi schedulate")
+@PreviewLightDark
 @Composable
 private fun PreviewTherapyScheduledDoses() {
     val dose =
@@ -793,7 +793,7 @@ private fun PreviewTherapyScheduledDoses() {
     }
 }
 
-@Preview(showBackground = true, name = "Terapie — flusso manuale selezione farmaco")
+@PreviewLightDark
 @Composable
 private fun PreviewTherapyManualMedicationPicker() {
     CarezzeTheme {
@@ -822,7 +822,7 @@ private fun PreviewTherapyManualMedicationPicker() {
     }
 }
 
-@Preview(showBackground = true, name = "Terapie — flusso manuale conferma dose")
+@PreviewLightDark
 @Composable
 private fun PreviewTherapyManualConfirmDose() {
     CarezzeTheme {
@@ -852,7 +852,7 @@ private fun PreviewTherapyManualConfirmDose() {
     }
 }
 
-@Preview(showBackground = true, name = "Form pasto")
+@PreviewLightDark
 @Composable
 private fun PreviewMealForm() {
     CarezzeTheme {
@@ -862,7 +862,7 @@ private fun PreviewMealForm() {
     }
 }
 
-@Preview(showBackground = true, name = "Form pannolino")
+@PreviewLightDark
 @Composable
 private fun PreviewDiaperForm() {
     CarezzeTheme {
@@ -872,7 +872,7 @@ private fun PreviewDiaperForm() {
     }
 }
 
-@Preview(showBackground = true, name = "Form sonno")
+@PreviewLightDark
 @Composable
 private fun PreviewSleepForm() {
     CarezzeTheme {
@@ -882,7 +882,7 @@ private fun PreviewSleepForm() {
     }
 }
 
-@Preview(showBackground = true, name = "Form temperatura")
+@PreviewLightDark
 @Composable
 private fun PreviewTemperatureForm() {
     CarezzeTheme {
@@ -892,7 +892,7 @@ private fun PreviewTemperatureForm() {
     }
 }
 
-@Preview(showBackground = true, name = "Form peso")
+@PreviewLightDark
 @Composable
 private fun PreviewWeightForm() {
     CarezzeTheme {
@@ -902,7 +902,7 @@ private fun PreviewWeightForm() {
     }
 }
 
-@Preview(showBackground = true, name = "Form igiene")
+@PreviewLightDark
 @Composable
 private fun PreviewHygieneForm() {
     CarezzeTheme {
@@ -912,7 +912,7 @@ private fun PreviewHygieneForm() {
     }
 }
 
-@Preview(showBackground = true, name = "Pulsante salva")
+@PreviewLightDark
 @Composable
 private fun PreviewSaveButton() {
     CarezzeTheme {
@@ -922,7 +922,7 @@ private fun PreviewSaveButton() {
     }
 }
 
-@Preview(showBackground = true, name = "FilterToggle selezionato")
+@PreviewLightDark
 @Composable
 private fun PreviewFilterToggleSelected() {
     CarezzeTheme {

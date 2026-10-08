@@ -17,7 +17,7 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = (project.findProperty("versionCode") as String?)?.toInt() ?: 1
-        versionName = project.findProperty("versionName") as String? ?: "1.5.0-beta"
+        versionName = project.findProperty("versionName") as String? ?: "1.6.0-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
@@ -86,6 +86,13 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    // Source - https://stackoverflow.com/a/79787821
+    // Posted by ianhanniballake
+    // Retrieved 2026-09-19, License - CC BY-SA 4.0
+    implementation(libs.compose.material.icons)
+    // Source - https://stackoverflow.com/a/64733418/13170864
+    // class file for com.google.common.util.concurrent.ListenableFuture not found
+    implementation(libs.guava)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
@@ -110,9 +117,9 @@ dependencies {
 
     // Firebase
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.firestore.ktx)
-    implementation(libs.firebase.messaging.ktx)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.messaging)
 
     // Kotlin
     implementation(libs.kotlinx.serialization.json)

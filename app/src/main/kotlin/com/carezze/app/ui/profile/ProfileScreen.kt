@@ -32,9 +32,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fpculcasi.carezze.ui.auth.AuthUiState
 import com.fpculcasi.carezze.ui.theme.CarezzeTheme
@@ -322,7 +322,7 @@ private fun ProfileInfoRow(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, name = "Profilo — Ospite")
+@PreviewLightDark
 @Composable
 private fun PreviewAnonymousProfile() {
     CarezzeTheme {
@@ -342,7 +342,7 @@ private fun PreviewAnonymousProfile() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, name = "Profilo — Autenticato")
+@PreviewLightDark
 @Composable
 private fun PreviewAuthenticatedProfile() {
     CarezzeTheme {
