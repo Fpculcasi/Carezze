@@ -1,4 +1,4 @@
-![Carezze logo](carezze-logo.png "Carezze")
+![Carezze logo](.bemyagent/work/5.7/5.7.0/carezzelogo.svg "Carezze")
 
 # Carezze
 [![Firebase App Distribution](https://github.com/Fpculcasi/Carezze/actions/workflows/firebase-distribute.yml/badge.svg)](https://github.com/Fpculcasi/Carezze/actions/workflows/firebase-distribute.yml)
