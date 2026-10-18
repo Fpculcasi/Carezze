@@ -1,0 +1,37 @@
+# EXECUTE — 6.4
+
+## 2026-09-15
+
+### Step 1 — ADR + spec alignment (pre-task)
+- Aggiornato `adr-invite-flow.md`: status da Option B (Cloud Function) a Option A (client-side transaction)
+- Aggiornata `specs/sharing.md`: rimossa nota ⚠️ inconsistenza, aggiunta nota ✅ risolta
+- Next: task 6.4 TTEV
+
+### Step 2 — 04-tech-stack.md
+- Rimosso riferimento Firebase Cloud Functions (D-15: no Cloud Functions)
+- Rimosso Firebase Piano Blaze → Spark
+- Aggiunto ZXing Core 3.5.3
+- Next: aggiornare libs.versions.toml
+
+### Step 3 — libs.versions.toml + build.gradle.kts
+- Aggiunto `zxing = "3.5.3"` nelle versions
+- Aggiunto `zxing-core` library alias nella sezione libraries
+- Aggiunto `implementation(libs.zxing.core)` in app/build.gradle.kts
+- Next: creare QrCodeGenerator
+
+### Step 4 — QrCodeGenerator.kt
+- Creato `data/util/QrCodeGenerator.kt`
+- Usa `QRCodeWriter.encode()` + loop pixel per pixel → `Bitmap.RGB_565`
+- `@Singleton @Inject constructor()` per Hilt injection
+- Next: implementare stub in InvitationRepositoryImpl
+
+### Step 5 — InvitationRepositoryImpl.kt
+- Aggiunto import `callbackFlow`, `awaitClose`
+- Implementato `observeInvitations(userId)`: `callbackFlow` su query Firestore `createdBy == userId`; listener chiuso con `awaitClose { registration.remove() }`
+- Implementato `generateInvitation(...)`: codice 8 char random, write Firestore con `mutableMapOf`, nullable `personId` gestito, restituisce `Invitation`
+- Aggiunto `generateCode()` in companion object: `CODE_CHARS = (A..Z + 0..9)`, pick 8 random
+- Next: build di verifica
+
+### Step 6 — Build
+- Comando: `./gradlew assembleDebug --quiet` (background, timeout 5min)
+- Risultato: in attesa

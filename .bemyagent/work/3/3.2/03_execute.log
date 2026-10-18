@@ -1,0 +1,2 @@
+2026-08-31 | CREATE data/repository/PersonRepositoryImpl.kt (Firestore-only, Room deferred) | next: compile verify
+2026-08-31 | EDIT di/FirestoreModule.kt — aggiunto binding PersonRepository | next: compile verify

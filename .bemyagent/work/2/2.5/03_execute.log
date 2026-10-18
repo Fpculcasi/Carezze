@@ -1,0 +1,23 @@
+# EXECUTE — 2.5
+
+## 2026-08-30
+
+### Step 1 — Wrote domain layer
+Files: `domain/repository/UserRepository.kt`, `domain/usecase/user/SyncUserUseCase.kt`, `GetUserUseCase.kt`, `ObserveUserUseCase.kt`
+Next intended action: write data layer
+
+### Step 2 — Wrote UserRepositoryImpl
+Firestore `set(merge=true)` for idempotent upserts; `toDomain()` maps Firestore document to `User` with safe defaults for missing fields
+Next intended action: write FirestoreModule
+
+### Step 3 — Wrote FirestoreModule
+`@Provides FirebaseFirestore.getInstance()`; `@Binds UserRepositoryImpl`
+Next intended action: update AuthViewModel
+
+### Step 4 — Updated AuthViewModel
+Added `SyncUserUseCase` injection; `syncUser(user)` is launched in `viewModelScope` on every non-null auth state emission (idempotent via Firestore merge)
+Next intended action: write tests + build
+
+### Step 5 — Build + tests
+Command: `./gradlew assembleDebug test --no-daemon`
+Result: `BUILD SUCCESSFUL in 1m 29s`; 21 tests total, 0 failures, 0 errors

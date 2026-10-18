@@ -1,0 +1,23 @@
+# EXECUTE — 7.5: Conferma Familiare
+
+## Step 1 — NotificationActionReceiver.kt
+cmd: Write data/service/NotificationActionReceiver.kt → @AndroidEntryPoint, inject LogMedicationUseCase + FirebaseAuth, onReceive con goAsync(), cancel notifica
+result: OK
+
+## Step 2 — AndroidManifest.xml: registra receiver
+cmd: Edit AndroidManifest → <receiver android:name=".data.service.NotificationActionReceiver" exported=false> con ACTION_MEDICATION_TAKEN intent-filter
+result: OK
+
+## Step 3 — NotificationHelper.kt: action "Preso"
+cmd: Write NotificationHelper → aggiunti params opzionali (personId, therapyId, medicationId, scheduledTimeEpoch), costruisce PendingIntent broadcast per ACTION_MEDICATION_TAKEN, addAction "Preso"
+result: OK
+
+## Step 4 — MedicationReminderWorker.kt: passa extra action alla notifica
+cmd: Edit MedicationReminderWorker → aggiunto personId=therapy.personId, therapyId=therapy.id, medicationId=medId, scheduledTimeEpoch=slotInstant.epochSecond
+result: OK
+
+## Step 5 — Build + test
+cmd: `./gradlew assembleDebug` → BUILD SUCCESSFUL in 54s
+cmd: `./gradlew testDebugUnitTest` → BUILD SUCCESSFUL (34 tasks)
+result: tutti i CDM soddisfatti
+next: 04_verify.md

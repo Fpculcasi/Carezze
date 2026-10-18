@@ -1,0 +1,23 @@
+## Execute — 4.5.7
+
+### Step 1: QuickLogViewModel.kt — full rewrite
+Aggiunto THERAPY enum, terapie state (therapies/selectedTherapyId/selectedMedicationId), iniezione ObserveTherapiesUseCase + AddManualMedicationLogUseCase, metodi selectTherapy/clearTherapy/selectMedication/clearMedication/logMedication/loadTherapies + job cancellation.
+→ File scritto.
+
+### Step 2: QuickLogSheet.kt — full rewrite
+Aggiunto tile "💊 Farmaci" nella griglia (8 tile totali, 4 righe 2-col), TherapyStepContent con flusso 3-step, LaunchedEffect(Unit) per reset state all'apertura, nuovi param onNavigateToAddTherapy/onNavigateToTherapyLog, verticalScroll aggiunto al Column root.
+→ File scritto.
+
+### Step 3: DashboardScreen.kt — surgical edits
+Aggiunti param onNavigateToAddTherapy e onNavigateToTherapyLog con default no-op; passati a QuickLogSheet con chiusura del sheet (quickLogPersonId = null) prima della navigazione.
+→ Edit applicato.
+
+### Step 4: AppNavigation.kt — surgical edit
+Aggiunti onNavigateToAddTherapy → AddTherapy(personId) e onNavigateToTherapyLog → TherapyLog(personId, therapyId) nel composable<Dashboard>.
+→ Edit applicato.
+
+### Step 5: Build verify
+Comando: `JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew :app:compileDebugKotlin`
+Risultato: BUILD SUCCESSFUL in 1m 51s — 2 executed, 17 up-to-date.
+Warning pre-esistente DashboardViewModel ExperimentalCoroutinesApi — non correlato.
+→ PASS

@@ -1,0 +1,1 @@
+2026-09-06T00:00Z | 4.5.6 | firestore.rules — split medicationLogs `write` into `read,create,update` (any member) + `delete` (OWNER only) for cascade-delete security | PASS | grep "allow delete" firestore.rules → line present under medicationLogs; therapies/{therapyId} delete-on-owner already in place since M4

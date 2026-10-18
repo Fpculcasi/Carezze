@@ -1,0 +1,30 @@
+# EXECUTE — 7.6: Cloud Functions — Quiet Hours + FCM Push
+
+## Step 1 — functions/ infrastruttura
+cmd: mkdir functions/src
+cmd: Write functions/package.json → node 20, firebase-admin, firebase-functions v5
+cmd: Write functions/tsconfig.json → TypeScript strict, outDir=lib, target ES2020
+cmd: Write functions/.eslintrc.js → eslint + @typescript-eslint config
+result: OK
+
+## Step 2 — functions/src/index.ts
+cmd: Write → `scheduledMedicationReminder` onSchedule ogni 15min (Europe/Rome):
+     - collectionGroup query therapies isActive=true
+     - per ciascuna: dosi nella finestra 30min
+     - per ciascun membro: leggi quietHoursStart/End, se in quiet hours → skip
+     - invia FCM a tutti i fcmTokens del membro
+result: OK
+
+## Step 3 — firebase.json
+cmd: Edit → aggiunta sezione "functions": { "source": "functions", "runtime": "nodejs20" }
+result: OK
+
+## Deploy
+Deploy: requires-human-action
+```
+cd functions && npm install && npm run build
+firebase deploy --only functions
+```
+Prerequisito: Firebase Blaze plan (Cloud Functions richiede billing abilitato)
+
+next: 04_verify.md

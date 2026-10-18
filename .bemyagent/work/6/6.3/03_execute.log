@@ -1,0 +1,15 @@
+2026-09-14T07:50Z | START | Task 6.3 — revokeAccess cascade implementation | next: write TTEV files
+
+2026-09-14T07:51Z | EDIT | InvitationRepository.kt — added `personId: String? = null` to revokeAccess signature | next: update RevokeAccessUseCase
+
+2026-09-14T07:51Z | EDIT | RevokeAccessUseCase.kt — added `personId: String? = null`, passed to repository | next: implement revokeAccess in InvitationRepositoryImpl
+
+2026-09-14T07:51Z | EDIT | InvitationRepositoryImpl.kt — implemented revokeAccess with validateRevokeArgs + revokeInternal (transaction + batch cascade for PERSON and THERAPY) | next: update existing test
+
+2026-09-14T07:52Z | EDIT | RevokeAccessUseCaseTest.kt — updated 2 coEvery stubs to include `personId = null` (mechanical, no functional change) | next: create new repo test
+
+2026-09-14T07:52Z | CREATE | InvitationRepositoryImplRevokeTest.kt — 3 JVM-pure tests on validateRevokeArgs companion | next: compile + run tests
+
+2026-09-14T07:52Z | CMD | ./gradlew compileDebugKotlin → BUILD SUCCESSFUL in 13s | next: run targeted tests
+
+2026-09-14T07:53Z | CMD | ./gradlew :app:testDebugUnitTest --tests "*RevokeAccessUseCaseTest*" --tests "*InvitationRepositoryImplRevokeTest*" → BUILD SUCCESSFUL — 3+2=5 tests, 0 failures | next: write VERIFY

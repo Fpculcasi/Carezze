@@ -1,0 +1,5 @@
+2026-08-30T00:00Z | EDIT app/build.gradle.kts — inserire signingConfigs block + signingConfig in release buildType
+→ Edit completato. Risultato: `signingConfigs { create("release") { … } }` inserito prima di `buildTypes`; `signingConfig = signingConfigs.getByName("release")` aggiunto al release buildType.
+→ NEXT: scrivere 04_verify.md e verificare grep output.
+2026-08-30T00:00Z | VERIFY — grep -n "signingConfigs|signingConfig|KEYSTORE" app/build.gradle.kts
+→ Output: righe 28-35 (signingConfigs block), riga 43 (signingConfig applicato). Atteso: presente. ✅

@@ -1,17 +1,15 @@
 package com.fpculcasi.carezze
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.fpculcasi.carezze.ui.theme.CareNestTheme
+import com.fpculcasi.carezze.data.service.EXTRA_PERSON_ID
+import com.fpculcasi.carezze.data.service.EXTRA_ROUTE_TYPE
+import com.fpculcasi.carezze.data.service.EXTRA_THERAPY_ID
+import com.fpculcasi.carezze.ui.navigation.AppNavigation
+import com.fpculcasi.carezze.ui.theme.CarezzeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -19,31 +17,19 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        handleNotificationIntent()
         setContent {
-            CareNestTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background,
-                ) {
-                    Greeting("Carezze")
-                }
+            CarezzeTheme {
+                AppNavigation()
             }
         }
     }
-}
 
-@Composable
-fun Greeting(
-    name: String,
-    modifier: Modifier = Modifier,
-) {
-    Text(text = "Benvenuto in $name", modifier = modifier)
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CareNestTheme {
-        Greeting("Carezze")
+    private fun handleNotificationIntent() {
+        val routeType = intent?.getStringExtra(EXTRA_ROUTE_TYPE) ?: return
+        val personId = intent.getStringExtra(EXTRA_PERSON_ID) ?: ""
+        val therapyId = intent.getStringExtra(EXTRA_THERAPY_ID) ?: ""
+        // TODO(M7-7.4): pass (routeType, personId, therapyId) to AppNavigation for deep-link routing
+        Log.d("MainActivity", "Notification tap: type=$routeType person=$personId therapy=$therapyId")
     }
 }

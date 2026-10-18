@@ -1,0 +1,18 @@
+# EXECUTE — 7.4: FCM Service Routing
+
+## Step 1 — CarezzeMessagingService.kt: onMessageReceived
+cmd: Write service → parse data map, build PendingIntent a MainActivity con extras, chiama NotificationHelper per tipo
+result: OK
+
+## Step 2 — NotificationHelper.kt: aggiunto contentIntent opzionale
+cmd: Write NotificationHelper → aggiunto `contentIntent: PendingIntent? = null` a entrambi i metodi post*
+result: OK
+
+## Step 3 — MainActivity.kt: handleNotificationIntent()
+cmd: Edit MainActivity → legge EXTRA_ROUTE_TYPE, EXTRA_PERSON_ID, EXTRA_THERAPY_ID; TODO per navigazione profonda
+result: OK
+
+## Step 4 — Build
+cmd: `./gradlew assembleDebug` → BUILD SUCCESSFUL in 1m 2s
+result: CDM soddisfatti
+next: 04_verify.md

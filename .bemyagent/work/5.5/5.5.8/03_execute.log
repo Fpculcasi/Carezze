@@ -1,0 +1,18 @@
+## 03_execute.log — 5.5.8
+
+### 2026-09-12
+
+STEP 1: Creare DashboardViewModelTest.kt
+→ Intent: test filteredPersons (no-filter, select, clear, search-name, search-nick, blank) + toggleViewMode (2 test)
+→ Result: file creato; prima esecuzione FAIL (todos: todos scheduler mismatch UnconfinedTestDispatcher vs StandardTestDispatcher)
+→ Fix: passato `testDispatcher` a `runTest(testDispatcher)` in tutti i test che leggono stateIn(WhileSubscribed)
+→ Intent: creare ProfileViewModelTest.kt con stessa correzione
+→ Result: BUILD SUCCESSFUL — 11 test PASS
+
+STEP 2: Aggiornare docs
+→ specs/ux-rework.md: checkbox preview+titolo ✅, checkbox test ✅ con evidenza
+→ 06-implementation-plan.md: task 5.5.8 → done; milestone 5.5 → done
+→ 05-decisions-and-issues.md: Known Issues M5.5 chiuse
+
+STEP 3: Verifica suite completa
+→ `./gradlew testDebugUnitTest` → BUILD SUCCESSFUL (tutte le suite pregresse intatte)

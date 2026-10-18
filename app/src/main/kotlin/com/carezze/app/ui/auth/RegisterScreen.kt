@@ -1,0 +1,272 @@
+package com.fpculcasi.carezze.ui.auth
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fpculcasi.carezze.R
+import com.fpculcasi.carezze.ui.theme.CarezzeTheme
+
+private const val PRIVACY_POLICY_URL = "https://fpculcasi.github.io/carezze/privacy"
+
+@Composable
+fun RegisterScreen(
+    onNavigateToDashboard: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onNavigateBack: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel(),
+) {
+    val authState by viewModel.authState.collectAsStateWithLifecycle()
+    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
+    val passwordVisible by viewModel.passwordVisible.collectAsStateWithLifecycle()
+    val confirmPasswordVisible by viewModel.confirmPasswordVisible.collectAsStateWithLifecycle()
+
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthUiState.Anonymous, is AuthUiState.Authenticated -> onNavigateToDashboard()
+            else -> Unit
+        }
+    }
+
+    RegisterContent(
+        errorMessage = errorMessage,
+        passwordVisible = passwordVisible,
+        onTogglePasswordVisible = viewModel::togglePasswordVisible,
+        confirmPasswordVisible = confirmPasswordVisible,
+        onToggleConfirmPasswordVisible = viewModel::toggleConfirmPasswordVisible,
+        onRegister = viewModel::registerOrLink,
+        onClearError = viewModel::clearError,
+        onNavigateToLogin = onNavigateToLogin,
+        onNavigateBack = onNavigateBack,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun RegisterContent(
+    errorMessage: String?,
+    passwordVisible: Boolean,
+    onTogglePasswordVisible: () -> Unit,
+    confirmPasswordVisible: Boolean,
+    onToggleConfirmPasswordVisible: () -> Unit,
+    onRegister: (email: String, password: String) -> Unit,
+    onClearError: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onNavigateBack: () -> Unit,
+) {
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var confirmPassword by rememberSaveable { mutableStateOf("") }
+    var termsAccepted by rememberSaveable { mutableStateOf(false) }
+    val passwordMismatch =
+        password.isNotEmpty() && confirmPassword.isNotEmpty() && password != confirmPassword
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Crea account") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(painterResource(R.drawable.baseline_arrow_back_24), contentDescription = "Indietro")
+                    }
+                },
+            )
+        },
+    ) { padding ->
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Spacer(modifier = Modifier.height(24.dp))
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = {
+                    email = it
+                    onClearError()
+                },
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                singleLine = true,
+            )
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = {
+                    password = it
+                    onClearError()
+                },
+                label = { Text("Password") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                singleLine = true,
+                trailingIcon = {
+                    val icon = if (passwordVisible) R.drawable.ic_visibility else R.drawable.ic_visibility_off
+                    val description = if (passwordVisible) "Hide password" else "Show password"
+
+                    IconButton(onClick = { onTogglePasswordVisible() }) {
+                        Icon(painter = painterResource(icon), contentDescription = description)
+                    }
+                }
+            )
+
+            OutlinedTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                label = { Text("Conferma password") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                singleLine = true,
+                trailingIcon = {
+                    val icon = if (confirmPasswordVisible) R.drawable.ic_visibility else R.drawable.ic_visibility_off
+                    val description = if (confirmPasswordVisible) "Hide password" else "Show password"
+
+                    IconButton(onClick = { onToggleConfirmPasswordVisible() }) {
+                        Icon(painter = painterResource(icon), contentDescription = description)
+                    }
+                },
+                isError = passwordMismatch,
+                supportingText =
+                    if (passwordMismatch) {
+                        { Text("Le password non corrispondono") }
+                    } else {
+                        null
+                    }
+            )
+
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            val primaryColor = MaterialTheme.colorScheme.primary
+            val termsText = buildAnnotatedString {
+                append("Accetto i ")
+                withLink(LinkAnnotation.Url(PRIVACY_POLICY_URL)) {
+                    withStyle(
+                        SpanStyle(
+                            color = primaryColor,
+                            textDecoration = TextDecoration.Underline,
+                        )
+                    ) {
+                        append("Termini e la Privacy Policy")
+                    }
+                }
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Checkbox(
+                    checked = termsAccepted,
+                    onCheckedChange = { termsAccepted = it },
+                )
+                Text(
+                    text = termsText,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface,
+                    ),
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = { onRegister(email.trim(), password) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = email.isNotBlank() && password.isNotBlank() && !passwordMismatch && termsAccepted,
+            ) {
+                Text("Registrati")
+            }
+
+            TextButton(onClick = onNavigateToLogin) {
+                Text("Hai già un account? Accedi")
+            }
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun RegisterContentPreview() {
+    CarezzeTheme {
+        RegisterContent(
+            errorMessage = null,
+            passwordVisible = false,
+            onTogglePasswordVisible = {},
+            confirmPasswordVisible = false,
+            onToggleConfirmPasswordVisible = {},
+            onRegister = { _, _ -> },
+            onClearError = {},
+            onNavigateToLogin = {},
+        ) {}
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun RegisterContentErrorPreview() {
+    CarezzeTheme {
+        RegisterContent(
+            errorMessage = "Indirizzo email già in uso",
+            passwordVisible = true,
+            onTogglePasswordVisible = {},
+            confirmPasswordVisible = true,
+            onToggleConfirmPasswordVisible = {},
+            onRegister = { _, _ -> },
+            onClearError = {},
+            onNavigateToLogin = {},
+        ) {}
+    }
+}

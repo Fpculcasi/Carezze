@@ -1,0 +1,7 @@
+2026-09-05T00:00Z | 4.5.1 | Aggiunto TherapyStatus enum + endDate + status computed property a Therapy.kt | PASS
+2026-09-05T00:00Z | 4.5.1 | Aggiunto isManual: Boolean = false a MedicationLog in Therapy.kt | PASS
+2026-09-05T00:00Z | 4.5.1 | Aggiunto isManual: Boolean = false param a MedicationLogRepository.logMedication | PASS
+2026-09-05T00:00Z | 4.5.1 | Creato TerminateTherapyUseCase.kt | PASS
+2026-09-05T00:00Z | 4.5.1 | Creato AddManualMedicationLogUseCase.kt | PASS
+2026-09-05T00:00Z | 4.5.1 | Fix MedicationLogRepositoryImpl — aggiunto isManual alla firma override + propagato a Firestore | PASS
+2026-09-05T00:00Z | 4.5.1 | ./gradlew :app:compileDebugKotlin → BUILD SUCCESSFUL (no output) | PASS

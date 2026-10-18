@@ -1,0 +1,7 @@
+2026-08-31T00:00Z | created domain/model/Therapy.kt (Therapy, TherapyDuration, Medication, MedicationLog, MedicationStatus) | next: create TherapyRepository interface
+2026-08-31T00:00Z | created domain/repository/TherapyRepository.kt | next: create MedicationLogRepository interface
+2026-08-31T00:00Z | created domain/repository/MedicationLogRepository.kt | next: create 5 use cases
+2026-08-31T00:00Z | created 5 use cases in domain/usecase/therapy/ (Observe, Get, Create, Update, Delete) | next: create stub impl
+2026-08-31T00:00Z | created data/repository/TherapyRepositoryImpl.kt (TODO stubs) | next: add DI binding
+2026-08-31T00:00Z | updated di/FirestoreModule.kt — added TherapyRepository @Binds binding | next: run build
+2026-08-31T00:00Z | ./gradlew :app:compileDebugKotlin → BUILD SUCCESSFUL in 27s (JAVA_HOME set to Android Studio JBR) | DONE

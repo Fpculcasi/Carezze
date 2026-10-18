@@ -1,0 +1,6 @@
+2026-08-31T00:00Z | updated TherapyRepository interface — getTherapy/deleteTherapy now require personId (subcollection path) | next: update use cases
+2026-08-31T00:00Z | updated GetTherapyUseCase + DeleteTherapyUseCase with personId param | next: write full TherapyRepositoryImpl
+2026-08-31T00:00Z | replaced TherapyRepositoryImpl stub with full Firestore impl — callbackFlow, toDomain(), toMap() helpers, Timestamp<>LocalDate conversion | next: create MedicationLogRepositoryImpl
+2026-08-31T00:00Z | created MedicationLogRepositoryImpl — nested subcollection, observeLogs, logMedication | next: update FirestoreModule
+2026-08-31T00:00Z | updated FirestoreModule — added MedicationLogRepository @Binds binding | next: compile
+2026-08-31T00:00Z | ./gradlew :app:compileDebugKotlin → BUILD SUCCESSFUL in 8s | DONE

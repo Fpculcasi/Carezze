@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Points to your background color, vector path, or drawable image -->
+    <background android:drawable="@drawable/ic_launcher_background" />
+
+    <!-- Points to your main logo graphic (ensure it has transparent padding) -->
+    <foreground android:drawable="@drawable/carezzelogo" />
+
+    <!-- Optional: Themed/Monochrome icon for Android 13+ -->
+    <monochrome android:drawable="@drawable/carezzelogomonocromo" />
+</adaptive-icon>

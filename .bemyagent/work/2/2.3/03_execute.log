@@ -1,0 +1,30 @@
+# EXECUTE — 2.3
+
+## 2026-08-30
+
+### Step 1 — Wrote 3 new use cases
+Files: `SignInWithEmailUseCase.kt`, `CreateUserWithEmailUseCase.kt`, `LinkWithEmailUseCase.kt`
+Result: all delegate to `AuthRepository` (already implemented in 2.1)
+Next intended action: update AuthViewModel
+
+### Step 2 — Updated AuthViewModel
+Change: added `signIn()`, `registerOrLink()`, `errorMessage: StateFlow<String?>`, `clearError()`
+`registerOrLink()` checks `getCurrentUser().isAnonymous` to decide between `linkWithEmail` and `createUserWithEmail`
+Next intended action: write LoginScreen + RegisterScreen
+
+### Step 3 — Wrote LoginScreen + RegisterScreen
+Files: `ui/auth/LoginScreen.kt`, `ui/auth/RegisterScreen.kt`
+Both observe `authState` via `LaunchedEffect` and navigate to Dashboard on success; password mismatch validated client-side in RegisterScreen
+Next intended action: update AppNavigation
+
+### Step 4 — Updated AppNavigation
+Replaced inline `Text` stubs with real `LoginScreen` and `RegisterScreen` composables; added Register→Login navigation
+Next intended action: write unit tests
+
+### Step 5 — Wrote 3 unit tests
+Files: `SignInWithEmailUseCaseTest`, `CreateUserWithEmailUseCaseTest`, `LinkWithEmailUseCaseTest`
+Next intended action: build + test
+
+### Step 6 — Build + test
+Command: `./gradlew assembleDebug test --no-daemon`
+Result: `BUILD SUCCESSFUL`; 11 tests total, 0 failures, 0 errors

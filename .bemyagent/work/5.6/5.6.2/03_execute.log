@@ -1,0 +1,3 @@
+2026-09-13T00:00Z | ActivityLogRepositoryImpl rewritten | CoroutineScope by delegation, logActivity Room-first + launch{syncToFirestore} + 4 attempts backoff, observeActivityLogs channelFlow Room+Firestore | DONE
+2026-09-13T00:00Z | TherapyRepositoryImpl rewritten | createTherapy Room-first + sync bg, observeTherapies channelFlow, updateTherapy/deleteTherapy invariato (blocking OK per spec) | DONE
+2026-09-13T00:00Z | MedicationLogRepositoryImpl rewritten | logMedication Room-first + launch{syncToFirestore}, observeLogs channelFlow Room+Firestore | DONE 5.6.2

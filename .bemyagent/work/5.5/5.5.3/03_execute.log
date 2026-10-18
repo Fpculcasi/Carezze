@@ -1,0 +1,9 @@
+# EXECUTE — 5.5.3 Evento "Farmaco" nel Quick Log
+
+## Log
+
+2026-09-11 | QuickLogViewModel.kt — ScheduledDose data class + scheduledDoses/showManualDoseFlow in QuickLogUiState + iniettare LogMedicationUseCase + confirmScheduledDose + enterManualDoseFlow + exitManualDoseFlow + buildScheduledDoses | DONE
+2026-09-11 | QuickLogSheet.kt — TherapyStepContent rework: scheduled dose list + DoseRow composable + manual flow toggle + nuovi callback + preview aggiornate | DONE
+2026-09-11 | QuickLogViewModelTest.kt — 4 test nuovi: confirmScheduledDose success/failure, selectType computes doses, enterManualDoseFlow toggle | DONE
+2026-09-11 | Build verify: compileDebugKotlin + ktlintCheck + detekt + testDebugUnitTest → BUILD SUCCESSFUL 42/42 | PASS
+2026-09-11 | git commit 8e932e6 "feat: [5.5.3] QuickLog — dosi schedulate con 1-tap "Segna presa"" | COMMITTED

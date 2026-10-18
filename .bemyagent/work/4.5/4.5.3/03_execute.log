@@ -1,0 +1,23 @@
+# EXECUTE — 4.5.3
+
+## 2026-09-06
+
+### [1] TherapyViewModel.kt — aggiunta imports + use cases + metodi edit
+Command: Edit tool (3 edits sequenziali)
+Result: OK — `GetTherapyUseCase`, `UpdateTherapyUseCase` aggiunti a imports e costruttore; `loadTherapyForEdit` e `submitEditTherapy` aggiunti in coda alla classe.
+Next: aggiungere route EditTherapy in AppNavigation.kt
+
+### [2] AppNavigation.kt — route EditTherapy + composable
+Command: Edit tool (3 edits: import, route class, composable entry)
+Result: OK — `EditTherapyScreen` importato, `@Serializable data class EditTherapy` aggiunto, `composable<EditTherapy>` registrato nel NavHost dopo TherapyDetail.
+Next: creare EditTherapyScreen.kt
+
+### [3] EditTherapyScreen.kt — nuova schermata (180 righe)
+Command: Write tool
+Result: OK — wizard 2-step con `LaunchedEffect` per pre-popolamento, step 1 (nome/data/durata), step 2 (farmaci), pulsante "Salva modifiche" → `submitEditTherapy`.
+Next: compilazione
+
+### [4] Build
+Command: JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew :app:compileDebugKotlin
+Result: BUILD SUCCESSFUL in 2m 22s — 0 errori Kotlin
+Next: VERIFY

@@ -1,0 +1,1 @@
+2026-08-31T00:00Z | 4.6 | replaced placeholder therapies/medicationLogs rules with nested member-gated rules under persons/{personId} | PASS | firestore.rules updated — nested match /persons/{personId}/therapies/{therapyId} with memberIds check; medicationLogs gated via therapy.memberIds

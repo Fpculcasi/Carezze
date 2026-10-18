@@ -1,0 +1,2 @@
+2026-08-31 | CREATE domain/model/Person.kt + domain/repository/PersonRepository.kt + 5 use cases | next: compile verify
+2026-08-31 | Compilazione: pending (background job) | next: write 04_verify.md on result

@@ -1,0 +1,16 @@
+# EXECUTE — 2.6
+
+## 2026-08-30
+
+### Step 1 — Wrote SettingsViewModel + SettingsScreen
+`SettingsViewModel` injects `ObserveUserUseCase` + `SyncUserUseCase` + `AuthRepository` (for `currentUser.id`); exposes `settingsState: StateFlow<User?>`; update functions call `syncUser()` with a copy
+`SettingsScreen` uses `ExposedDropdownMenuBox` for language and temperature unit; quiet hours via two time-slot dropdowns (HH:mm in 30-min increments)
+Next intended action: add Settings route to AppNavigation
+
+### Step 2 — Updated AppNavigation + DashboardScreen
+Added `Settings` object route; `DashboardScreen` receives `onNavigateToSettings` lambda and shows a settings icon in the top bar
+Next intended action: build + test
+
+### Step 3 — Build + tests
+Command: `./gradlew assembleDebug test --no-daemon`
+Result: `BUILD SUCCESSFUL in 1m 11s`; all 21 tests pass

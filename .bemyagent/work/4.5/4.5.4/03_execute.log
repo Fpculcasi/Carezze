@@ -1,0 +1,23 @@
+# EXECUTE — 4.5.4
+
+## 2026-09-06
+
+### [1] TherapyViewModel.kt — inject TerminateTherapyUseCase + add terminateTherapy()
+Command: Edit tool (3 edits: import, constructor param, new function)
+Result: OK — `TerminateTherapyUseCase` importato e iniettato; `terminateTherapy(personId, therapyId)` aggiunto fire-and-forget.
+Next: riscrivere TherapyDetailScreen con FAB + menu overflow + dialogs
+
+### [2] TherapyDetailScreen.kt — FAB + overflow menu + dialogs Termina/Elimina
+Command: Write tool (riscrittura completa, contenuto originale preservato)
+Result: OK — `onNavigateToEdit: () -> Unit` aggiunto; FAB Edit; `DropdownMenu` con "Termina" (solo se `isActive`) e "Elimina"; `AlertDialog` per entrambe le azioni; stati con `rememberSaveable`.
+Next: wiring in AppNavigation
+
+### [3] AppNavigation.kt — onNavigateToEdit wired su TherapyDetailScreen
+Command: Edit tool (1 edit su composable<TherapyDetail>)
+Result: OK — `onNavigateToEdit = { navController.navigate(EditTherapy(route.personId, route.therapyId)) }` aggiunto.
+Next: build
+
+### [4] Build — compileDebugKotlin
+Command: `JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew :app:compileDebugKotlin`
+Result: BUILD SUCCESSFUL in 51s — 0 errori Kotlin.
+Next: VERIFY

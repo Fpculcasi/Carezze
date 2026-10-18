@@ -1,0 +1,7 @@
+2026-09-13T00:00Z | created SyncStatus.kt | enum SYNCED/PENDING/ERROR | next: Room entities
+2026-09-13T00:00Z | created ActivityLogEntity.kt TherapyEntity.kt MedicationLogEntity.kt | flat entities con syncStatus String | next: DAOs
+2026-09-13T00:00Z | created ActivityLogDao.kt TherapyDao.kt MedicationLogDao.kt | upsert + observe + updateSyncStatus | next: Database + DI
+2026-09-13T00:00Z | created CarezzeDatabase.kt version=1 exportSchema=false | next: RoomModule
+2026-09-13T00:00Z | created RoomModule.kt | @Module @InstallIn(SingletonComponent) carezze.db | next: domain model changes
+2026-09-13T00:00Z | modified ActivityLog.kt | added abstract syncStatus + override in tutti i subtype (default SYNCED) | next: Therapy.kt
+2026-09-13T00:00Z | modified Therapy.kt | added syncStatus a Therapy e MedicationLog (default SYNCED) | DONE 5.6.1

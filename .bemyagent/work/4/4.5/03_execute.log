@@ -1,0 +1,4 @@
+2026-08-31T00:00Z | created ObserveLogsUseCase — delegates to MedicationLogRepository.observeLogs | next: update TherapyViewModel
+2026-08-31T00:00Z | updated TherapyViewModel — added logsFor(personId,therapyId), progressFor(), remainingDoses() | next: update TherapyDetailScreen
+2026-08-31T00:00Z | updated TherapyDetailScreen — added TherapyProgressSection composable (LinearProgressIndicator + remaining count); wired logs + progress + remaining into content | next: compile
+2026-08-31T00:00Z | ./gradlew :app:compileDebugKotlin → BUILD SUCCESSFUL in 13s | DONE

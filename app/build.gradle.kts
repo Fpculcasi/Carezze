@@ -10,22 +10,38 @@ plugins {
 
 android {
     namespace = "com.fpculcasi.carezze"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.fpculcasi.carezze"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 37
+        versionCode = (project.findProperty("versionCode") as String?)?.toInt() ?: 1
+        versionName = project.findProperty("versionName") as String? ?: "1.6.0-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
+        // TODO: replace with actual Web Client ID from Firebase Console before enabling Google Sign-In
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"\"")
+    }
+
+    signingConfigs {
+        create("release") {
+            val keystoreFilePath = System.getenv("KEYSTORE_FILE")
+            if (keystoreFilePath != null) {
+                storeFile = file(keystoreFilePath)
+                storePassword = System.getenv("KEYSTORE_STORE_PASSWORD")
+                keyAlias = System.getenv("KEYSTORE_ALIAS")
+                keyPassword = System.getenv("KEYSTORE_KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -40,6 +56,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     kotlin {
@@ -69,6 +86,13 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    // Source - https://stackoverflow.com/a/79787821
+    // Posted by ianhanniballake
+    // Retrieved 2026-09-19, License - CC BY-SA 4.0
+    implementation(libs.compose.material.icons)
+    // Source - https://stackoverflow.com/a/64733418/13170864
+    // class file for com.google.common.util.concurrent.ListenableFuture not found
+    implementation(libs.guava)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
@@ -77,41 +101,53 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
+
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
 
     // Firebase
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.firestore.ktx)
-    implementation(libs.firebase.messaging.ktx)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.messaging)
 
     // Kotlin
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
 
+    // Credential Manager (Google Sign-In)
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.googleid)
+
     // Coil
     implementation(libs.coil.compose)
+    implementation(libs.zxing.core)
 
     // Unit tests
     testImplementation(libs.junit5.api)
     testImplementation(libs.junit5.params)
     testRuntimeOnly(libs.junit5.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
 
     // Instrumented tests
+    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 }
 

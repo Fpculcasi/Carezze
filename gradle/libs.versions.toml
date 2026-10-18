@@ -1,28 +1,33 @@
 [versions]
-agp = "8.9.1"
-kotlin = "2.2.10"
-ksp = "2.2.10-2.0.2"
-coreKtx = "1.16.0"
-lifecycleRuntimeKtx = "2.9.0"
-activityCompose = "1.10.1"
-composeBom = "2025.04.01"
-navigationCompose = "2.9.0"
-hilt = "2.56.1"
-hiltNavigationCompose = "1.2.0"
-room = "2.7.1"
-workManager = "2.10.1"
-firebaseBom = "33.13.0"
-kotlinxSerializationJson = "1.8.1"
-coroutines = "1.10.2"
-coil = "3.1.0"
+agp = "9.4.1"
+guava = "33.7.1-android"
+kotlin = "2.4.20"
+ksp = "2.3.6"
+coreKtx = "1.19.0"
+lifecycleRuntimeKtx = "2.11.0"
+activityCompose = "1.13.0"
+composeBom = "2026.09.00"
+navigationCompose = "2.10.1"
+hilt = "2.60.1"
+hiltNavigationCompose = "1.4.0"
+room = "2.8.5"
+workManager = "2.11.2"
+firebaseBom = "34.19.0"
+kotlinxSerializationJson = "1.11.0"
+coroutines = "1.11.0"
+coil = "3.6.3"
+credentialManager = "1.6.0"
+googleid = "1.2.1"
+datastore = "1.2.1"
+zxing = "3.5.4"
 detekt = "1.23.8"
-ktlint = "12.2.0"
+ktlint = "14.2.0"
 junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
-junit5 = "5.11.4"
-mockk = "1.14.2"
-turbine = "1.2.0"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
+junit5 = "6.1.3"
+mockk = "1.14.11"
+turbine = "1.2.1"
 
 [libraries]
 # Android core
@@ -39,6 +44,11 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+# Source - https://stackoverflow.com/a/79787821
+# Posted by ianhanniballake
+# Retrieved 2026-09-19, License - CC BY-SA 4.0
+compose-material-icons = { group = "androidx.compose.material", name = "material-icons-core" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 
 # Navigation
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
@@ -47,28 +57,41 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltNavigationCompose" }
+androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hiltNavigationCompose" }
 
 # Room
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
+# DataStore
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+
 # WorkManager
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManager" }
 
 # Firebase
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
-firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx" }
-firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
-firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 
 # Kotlin
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
 
+# Credential Manager (Google Sign-In)
+credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentialManager" }
+credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentialManager" }
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+
 # Coil
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+
+# ZXing (QR generation)
+zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -77,6 +100,7 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 junit5-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit5" }
 junit5-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit5" }
 junit5-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit5" }
+junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher", version = "6.1.3" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }

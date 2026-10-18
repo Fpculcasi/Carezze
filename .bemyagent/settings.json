@@ -1,0 +1,10 @@
+{
+  "language": "it",
+  "interactiveMode": false,
+  "strictVerification": false,
+  "autoModelSwitching": true,
+  "autoCommit": false,
+  "obstacleThreshold": 2,
+  "contextSlicingThreshold": 200,
+  "javaHome": "/c/Program Files/Android/Android Studio/jbr"
+}

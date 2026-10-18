@@ -1,0 +1,29 @@
+# EXECUTE — 1.1 Init Android Project
+
+## 2026-08-30
+
+### Passo 1: Check ambiente
+Comando: `ls .gradle/wrapper/dists/gradle-8.14-all/`
+Risultato: Gradle 8.14 disponibile localmente. Android Studio JDK 21 trovato.
+Prossima azione: correggere versioni KSP/Kotlin in libs.versions.toml da cached disponibili.
+
+### Passo 2: Versioni locali reali
+Comando: `ls ~/.gradle/caches/modules-2/files-2.1/com.google.devtools.ksp/symbol-processing-gradle-plugin/`
+Risultato: `2.2.10-2.0.2` → Kotlin=2.2.10, KSP=2.2.10-2.0.2, Hilt=2.56.1, AGP=8.9.1
+Prossima azione: aggiornare libs.versions.toml + eseguire gradle wrapper.
+
+### Passo 3: Generazione Gradle wrapper
+Comando: `gradle wrapper --gradle-version 8.14 --distribution-type all`
+Risultato: BUILD SUCCESSFUL (1m 37s). Generati: gradlew, gradlew.bat, gradle-wrapper.jar, gradle-wrapper.properties
+Deprecation: `jvmTarget: String` deprecato → migrato a `kotlin { compilerOptions { jvmTarget.set(...) } }`
+Prossima azione: creare gradle.properties con android.useAndroidX=true.
+
+### Passo 4: Prima esecuzione assembleDebug
+Comando: `./gradlew assembleDebug`
+Risultato: FAILED — `android.useAndroidX` property not enabled
+Prossima azione: creare gradle.properties.
+
+### Passo 5: Fix gradle.properties + retry
+Comando: `./gradlew assembleDebug` (dopo aver aggiunto gradle.properties)
+Risultato: BUILD SUCCESSFUL (2s cache hit — primo run ~3min)
+APK: `app/build/outputs/apk/debug/app-debug.apk` ✓

@@ -1,0 +1,163 @@
+package com.fpculcasi.carezze.ui.auth
+
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.content.res.Configuration.UI_MODE_TYPE_NORMAL
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fpculcasi.carezze.BuildConfig
+import com.fpculcasi.carezze.R
+import com.fpculcasi.carezze.ui.theme.CarezzeTheme
+
+@Composable
+fun WelcomeScreen(
+    onNavigateToDashboard: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel(),
+) {
+    val authState by viewModel.authState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthUiState.Anonymous, is AuthUiState.Authenticated -> onNavigateToDashboard()
+            else -> Unit
+        }
+    }
+
+    WelcomeContent(
+        isLoading = authState is AuthUiState.Loading,
+        onContinueLocally = viewModel::continueLocally,
+        onNavigateToLogin = onNavigateToLogin,
+        onGoogleSignIn = viewModel::signInOrLinkWithGoogle,
+    )
+}
+
+@Composable
+internal fun WelcomeContent(
+    isLoading: Boolean,
+    onContinueLocally: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onGoogleSignIn: (String) -> Unit,
+) {
+    Scaffold { padding ->
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Spacer(modifier = Modifier.weight(1f))
+
+            Image(painter = painterResource(R.drawable.carezzelogo), contentDescription = "logo")
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Carezze",
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Monitora i bisogni delle persone a te più care",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(48.dp))
+
+            Button(
+                onClick = onContinueLocally,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading,
+            ) {
+                Text("Continua in locale")
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedButton(
+                onClick = onNavigateToLogin,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Accedi / Registrati")
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            GoogleSignInButton(
+                onIdTokenReceived = onGoogleSignIn,
+                onError = {},
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(12.dp)
+            )
+        }
+    }
+}
+
+@Preview(name = "Light", showBackground = true)
+@Preview(name = "Dark", showBackground = true, uiMode = UI_MODE_NIGHT_YES or UI_MODE_TYPE_NORMAL)
+@Composable
+private fun WelcomeContentPreview() {
+    CarezzeTheme {
+        WelcomeContent(
+            isLoading = false,
+            onContinueLocally = {},
+            onNavigateToLogin = {},
+            onGoogleSignIn = {},
+        )
+    }
+}
+
+@Preview(name = "Light", showBackground = true)
+@Preview(name = "Dark", showBackground = true, uiMode = UI_MODE_NIGHT_YES or UI_MODE_TYPE_NORMAL)
+@Composable
+private fun WelcomeContentLoadingPreview() {
+    CarezzeTheme {
+        WelcomeContent(
+            isLoading = true,
+            onContinueLocally = {},
+            onNavigateToLogin = {},
+            onGoogleSignIn = {},
+        )
+    }
+}

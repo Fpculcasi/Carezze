@@ -1,0 +1,8 @@
+# Execute Log — 2.5.3
+
+## 2026-09-17
+
+```
+ACTION: Aggiunta UserRepository.saveConsent + UserRepositoryImpl implementazione
+NEXT: Creare SaveConsentUseCase
+```

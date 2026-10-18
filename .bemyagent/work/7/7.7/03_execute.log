@@ -1,0 +1,15 @@
+# EXECUTE — 7.7: Unit Tests M7
+
+## Step 1 — MedicationReminderWorkerTest.kt
+cmd: Write app/src/test/.../data/worker/MedicationReminderWorkerTest.kt → 8 test cases per computeDueDoses
+result: OK (primo run fallito per `:` e `.` nei nomi metodo — caratteri illegali JVM)
+
+## Step 2 — Fix nomi test
+cmd: Rinomina `multiple doses: only in-window ones returned` → `multiple doses - only in-window ones returned`; rimuovi altri caratteri illegali
+result: OK
+
+## Step 3 — Test run
+cmd: `./gradlew testDebugUnitTest` → BUILD SUCCESSFUL
+cmd: verifica report → `MedicationReminderWorkerTest.html` presente in report
+result: 8 nuovi test eseguiti (verificato da presenza class nel report)
+next: 04_verify.md

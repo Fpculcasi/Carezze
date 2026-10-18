@@ -1,0 +1,15 @@
+# EXECUTE — 4.5.8
+
+## 2026-09-08
+- Letto codebase: use cases, QuickLogViewModel, repository interfaces, test esistenti
+- Creati 01_think.md + 02_tasks.md (pre-execution)
+- Creato TerminateTherapyUseCaseTest.kt (3 test: success con slot, failure getTherapy, failure updateTherapy)
+- Creato AddManualMedicationLogUseCaseTest.kt (2 test: verifica TAKEN+isManual=true, failure)
+- Creato QuickLogViewModelTest.kt (5 test: null user no-op, isSaved, error, filter active, clearType)
+- next: run tests
+
+`JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew :app:testDebugUnitTest --tests "*.TerminateTherapyUseCaseTest" --tests "*.AddManualMedicationLogUseCaseTest" --tests "*.QuickLogViewModelTest"`
+→ BUILD SUCCESSFUL in 1m 27s — 3 warning ExperimentalCoroutinesApi su QuickLogViewModelTest
+
+- Aggiunto @OptIn(ExperimentalCoroutinesApi::class) a QuickLogViewModelTest
+- next: verify + aggiornamento piano

@@ -1,0 +1,6 @@
+2026-08-31T00:00Z | created TherapyViewModel — therapiesFor(personId), wizard form state, submitTherapy | next: AddTherapyScreen
+2026-08-31T00:00Z | created AddTherapyScreen — 2-step wizard (therapy info / medications) with LinearProgressIndicator | next: TherapyDetailScreen
+2026-08-31T00:00Z | created TherapyDetailScreen — shows therapy metadata + medication cards with scheduledTimes | next: update PersonDetailScreen
+2026-08-31T00:00Z | updated PersonDetailScreen — replaced TODO stub with therapy list + FAB for add therapy; added onNavigateToAddTherapy + onNavigateToTherapy callbacks | next: update navigation
+2026-08-31T00:00Z | updated AppNavigation — added AddTherapy + TherapyDetail typed routes | next: compile
+2026-08-31T00:00Z | ./gradlew :app:compileDebugKotlin → BUILD SUCCESSFUL in 14s | DONE

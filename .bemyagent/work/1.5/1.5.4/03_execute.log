@@ -1,0 +1,5 @@
+2026-08-30T00:00Z | CREATE .github/workflows/firebase-distribute.yml — workflow completo con trigger tag, signing, release notes, upload Firebase
+→ Write completato. File creato con 70 righe.
+→ NEXT: scrivere 04_verify.md e verificare grep output.
+2026-08-30T00:00Z | VERIFY — grep key lines in firebase-distribute.yml
+→ Output: riga 6 trigger v*.*.*-beta, riga 15 fetch-depth:0, righe 52-55 KEYSTORE env vars, riga 56 assembleRelease, riga 66 firebase appdistribution:distribute. Tutti presenti. ✅
